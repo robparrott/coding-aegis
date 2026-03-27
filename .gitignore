@@ -1,5 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
 
-# Beads / Dolt files (added by bd init)
+# Testing / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime-generated tool shims (AD-9: created by coding-aegis skill, not checked in)
+CLAUDE.md
+
+# Beads / Dolt
 .dolt/
 *.db
 .beads-credential-key

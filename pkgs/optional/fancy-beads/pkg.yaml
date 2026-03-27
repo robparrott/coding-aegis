@@ -1,0 +1,7 @@
+name: fancy-beads
+version: 0.1.0
+description: Issue tracking with beads — backlog sync, workflow guidance, and docs generation
+author: platform-team
+artifacts:
+  - type: skill
+    path: skills/fancy-beads/SKILL.md

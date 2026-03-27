@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    {
+      "name": "coding-aegis",
+      "path": "./pkgs/bootstrap/coding-aegis"
+    }
+  ]
+}

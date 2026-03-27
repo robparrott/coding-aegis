@@ -1,0 +1,17 @@
+{
+  "name": "coding-aegis",
+  "metadata": {
+    "description": "Engineering organization coding agent governance packages",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "coding-aegis",
+      "description": "Browse, install, and manage coding agent governance packages",
+      "source": "./",
+      "skills": [
+        "./pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+      ]
+    }
+  ]
+}

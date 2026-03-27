@@ -1,17 +1,14 @@
 # Phase 3: Cursor Bootstrap
 
-**Status**: Not started
+**Status**: open | **ID**: `coding-aegis-wpi`
 
 ## Tasks
 
-9. Create `.cursor-plugin/marketplace.json` at repo root
-10. Create `pkgs/bootstrap/coding-aegis/.cursor-plugin/plugin.json`
-11. Create Cursor-native `coding-aegis.mdc` rule in `tools/cursor/rules/`
-12. Register GitHub Enterprise App at Cursor dashboard (admin)
-13. Import repo into Cursor Team Marketplace (admin)
-14. Test: user installs from Cursor marketplace, verify rule loads
+- [ ] `coding-aegis-wpi.1` Create .cursor-plugin/marketplace.json
+- [ ] `coding-aegis-wpi.2` Create coding-aegis Cursor plugin.json
+- [ ] `coding-aegis-wpi.3` Create Cursor-native coding-aegis.mdc rule
+- [ ] `coding-aegis-wpi.4` Register GitHub Enterprise App at Cursor dashboard
+- [ ] `coding-aegis-wpi.5` Import repo into Cursor Team Marketplace
+- [ ] `coding-aegis-wpi.6` Test Cursor marketplace install flow
 
-## Dependencies
-
-- Phase 1 (Foundation) must be complete
-- Phase 2 recommended but not strictly required
+**Progress**: 0/6 tasks complete
