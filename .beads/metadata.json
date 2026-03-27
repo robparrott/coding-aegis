@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "coding_aegis",
+  "project_id": "44629ae5-3d9b-49e8-ba63-76f96b1918a2"
+}
