@@ -56,8 +56,8 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 - [AD-12: External package references](docs/architecture/AD-12-external-package-references.md)
 
 ### Guides
-- [Build guide](docs/BUILD.md) — How to build, install, and use the CLI
-- [Test guide](docs/TEST.md) — How to run tests and verify the system
+- [Build guide](docs/build/BUILD.md) — How to build, install, and use the CLI
+- [Test guide](docs/test/TEST.md) — How to run tests and verify the system
 - [AGENTS.md](AGENTS.md) — Coding agent guidance for contributors
 - [Backlog](docs/backlog/) — Implementation phases and task tracking
 
