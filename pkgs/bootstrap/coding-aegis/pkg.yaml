@@ -1,0 +1,7 @@
+name: coding-aegis
+version: 0.1.0
+description: Browse, install, and manage coding agent governance packages
+author: platform-team
+artifacts:
+  - type: skill
+    path: skills/coding-aegis/SKILL.md

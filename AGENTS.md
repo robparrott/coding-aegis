@@ -10,6 +10,8 @@ DO NOT START implementation until tasks are reviewed and approved by the user.
 
 Use beads (`bd`) to do planning, task tracking and dependency management. Run `bd onboard` for more information. Every task should have a spec file created to define the contract or behavior for the work. After completing each task and before committing, run `scripts/sync-backlog.sh` to export the current beads state to `docs/backlog/`.
 
+After each completed task, stage all changed files with `git add` so work is never left unstaged.
+
 When a design decision is made, create an architecture decision record to document the decision and why it was made.
 
 ## Repository Layout Standard
