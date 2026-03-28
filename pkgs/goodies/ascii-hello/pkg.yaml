@@ -1,0 +1,7 @@
+name: ascii-hello
+version: 0.1.0
+description: Generate ASCII art from your username — fun and otherwise useless
+author: platform-team
+artifacts:
+  - type: skill
+    path: skills/ascii-hello/SKILL.md

@@ -45,5 +45,8 @@ Rules installed by coding-aegis are prefixed `aegis--` to distinguish governance
 ## Scope
 
 Packages can be installed to:
-- **Project** (default) — governs a single repository
-- **User** (`--scope user`) — applies across all repositories for the current user
+- **Project** — governs a single repository
+- **User** — applies across all repositories for the current user
+- **Local** — applies to you in this repository only
+
+The install command presents a scope picker.

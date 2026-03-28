@@ -7,4 +7,5 @@
 - [ ] `coding-aegis-3m9` [decision] Resolve multi-tool repository support (AD-11)
 - [x] `coding-aegis-ui6` [task] Move HOWTO.md into docs/howto/ directory
 - [x] `coding-aegis-67o` [task] Order catalog tiers by priority in skill output
-- [ ] `coding-aegis-d1q` [task] Create ascii-hello goodies skill
+- [x] `coding-aegis-7f6` [task] Rename skill-testing.md to bootstrapping-skill-testing.md
+- [x] `coding-aegis-d1q` [task] Create ascii-hello goodies skill

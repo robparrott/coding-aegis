@@ -1,0 +1,70 @@
+---
+name: ascii-hello
+description: Generate ASCII art from your username. Fun and otherwise useless.
+---
+
+# ascii-hello
+
+When invoked, render the current user's username as ASCII art using block letters.
+
+## Behavior
+
+1. Determine the username from the environment (`$USER` or `whoami`).
+2. Render it as large block-letter ASCII art.
+3. Output the result directly — no files, no side effects.
+
+## Letter Style
+
+Use this block-letter alphabet:
+
+```
+A:        B:        C:        D:        E:        F:
+ █████    ██████    ██████    ██████    ███████   ███████
+██   ██   ██   ██   ██        ██   ██   ██        ██
+███████   ██████    ██        ██   ██   █████     █████
+██   ██   ██   ██   ██        ██   ██   ██        ██
+██   ██   ██████    ██████    ██████    ███████   ██
+
+G:        H:        I:        J:        K:        L:
+ ██████   ██   ██    ████        ██    ██   ██   ██
+██        ██   ██     ██         ██    ██  ██    ██
+██  ███   ███████     ██         ██    █████     ██
+██   ██   ██   ██     ██    ██   ██    ██  ██    ██
+ ██████   ██   ██    ████    █████     ██   ██   ███████
+
+M:        N:        O:        P:        Q:        R:
+██   ██   ██   ██    ████    ██████    ████    ██████
+███ ███   ███  ██   ██  ██   ██   ██  ██  ██   ██   ██
+██ █ ██   ██ █ ██   ██  ██   ██████   ██  ██   ██████
+██   ██   ██  ███   ██  ██   ██       ██ ███   ██  ██
+██   ██   ██   ██    ████    ██        ███ █   ██   ██
+
+S:        T:        U:        V:        W:        X:
+ █████    ██████    ██   ██   ██   ██  ██   ██  ██   ██
+██        ██  ██    ██   ██   ██   ██  ██   ██   ██ ██
+ █████      ██      ██   ██   ██   ██  ██ █ ██    ███
+     ██     ██      ██   ██    ██ ██   ███ ███   ██ ██
+ █████      ██       █████      ███    ██   ██  ██   ██
+
+Y:        Z:
+██   ██   ███████
+ ██ ██       ██
+  ███       ██
+  ██       ██
+  ██      ███████
+```
+
+## Example
+
+```
+$ whoami
+rob
+
+Output:
+
+██████     ████    ██████
+██   ██   ██  ██   ██   ██
+██████    ██  ██   ██████
+██  ██    ██  ██   ██   ██
+██   ██    ████    ██████
+```

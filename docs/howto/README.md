@@ -2,4 +2,4 @@
 
 Runbooks and step-by-step procedures.
 
-- [Skill Testing](skill-testing.md) — Install and test the coding-aegis skill locally and from GitHub
+- [Skill Testing](bootstrapping-skill-testing.md) — Author/maintainer validation of the coding-aegis skill in Claude Code

@@ -1,6 +1,6 @@
-# Skill Testing Runbooks
+# Skill Testing Runbooks (Claude Code)
 
-Step-by-step procedures for installing and testing the coding-aegis skill.
+Validation procedures for coding-aegis authors and maintainers. These runbooks verify that the skill installs and loads correctly in Claude Code during development — they are not end-user documentation.
 
 ---
 
@@ -99,33 +99,25 @@ Add the GitHub repo as a marketplace and install remotely. Tests the end-to-end 
 
 1. **Add the GitHub marketplace**
 
-   Replace `<org>` with the GitHub org or username.
+   Replace `robparrott` with the GitHub org or username if different.
 
    ```
-   /plugin marketplace add <org>/coding-aegis
+   /plugin marketplace add robparrott/coding-aegis
    ```
 
-   *Expect:* `Successfully added marketplace: ...` (no plugin count shown).
+   *Expect:* `Successfully added marketplace: robparrott-coding-aegis`
 
-2. **Browse available plugins**
-
-   ```
-   /plugin
-   ```
-
-   Navigate to the **Discover** tab to confirm the coding-aegis plugin appears.
-
-3. **Install the plugin**
-
-   Marketplace name is derived from `org-repo`.
+2. **Install the plugin**
 
    ```
-   /plugin install coding-aegis@<org>-coding-aegis
+   /plugin install coding-aegis@robparrott-coding-aegis
    ```
 
-   *Expect:* Plugin installs from remote.
+   *Expect:* `Installed coding-aegis. Restart Claude Code to load new plugins.`
 
-3. **Verify the skill**
+3. **Restart Claude Code** — exit and relaunch to load the plugin.
+
+4. **Verify the skill**
 
    ```
    /coding-aegis
@@ -133,29 +125,38 @@ Add the GitHub repo as a marketplace and install remotely. Tests the end-to-end 
 
    *Expect:* Skill responds.
 
-4. **Check install scope** (default is user)
+5. **List the catalog**
+
+   ```
+   /coding-aegis list
+   ```
+
+   *Expect:* Packages listed by tier (required, best-practices, optional, goodies).
+
+6. **Check install location**
 
    ```
    ls ~/.claude/plugins/cache/
    ```
 
-   *Expect:* coding-aegis plugin cached.
+   *Expect:* coding-aegis plugin listed.
 
-5. **Optionally test project-scoped install**
-
-   ```
-   /plugin uninstall coding-aegis@<org>-coding-aegis
-   /plugin install coding-aegis@<org>-coding-aegis --scope project
-   ls .claude/plugins/
-   ```
-
-   *Expect:* Plugin installed at project level.
-
-6. **Cleanup**
+7. **Optionally test project-scoped install**
 
    ```
-   /plugin uninstall coding-aegis@<org>-coding-aegis
-   /plugin marketplace remove <org>-coding-aegis
+   /plugin uninstall coding-aegis@robparrott-coding-aegis
+   /plugin install coding-aegis@robparrott-coding-aegis
+   ```
+
+   The install command opens a scope picker. Select **"Install for all collaborators on this repository (project scope)"** and hit Enter.
+
+   *Expect:* Plugin reference added to `.claude/settings.local.json` under `enabledPlugins`. The plugin cache still lives at `~/.claude/plugins/cache/`.
+
+8. **Cleanup**
+
+   ```
+   /plugin uninstall coding-aegis@robparrott-coding-aegis
+   /plugin marketplace remove robparrott-coding-aegis
    ```
 
 ---
