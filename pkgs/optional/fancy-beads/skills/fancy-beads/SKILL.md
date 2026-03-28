@@ -20,12 +20,10 @@ scripts/sync-backlog.sh
 This regenerates `docs/backlog/` with:
 - **Per-epic files** — Title, status, description, and a task checklist with status icons (`[ ]` open, `[~]` in progress, `[x]` closed, `[!]` blocked)
 - **`standalone.md`** — Issues not belonging to any epic
-- **`README.md`** — Index with links to all epics and progress counts
+- **`graph.md`** — Dependency graph from `bd graph --all --compact` with a task index linking each ID to its backlog file
+- **`README.md`** — Index with links to all epics, progress counts, and graph
 
 Requires `bd` and `python3` on PATH. Clears and regenerates all files in `docs/backlog/` on each run.
 
 > **Do not edit files in `docs/backlog/` manually** — they are overwritten on every sync.
 
-## Future: Dependency Graph
-
-`bd graph` output will be rendered as navigable markdown with hyperlinked task IDs.

@@ -33,6 +33,10 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 - **Windsurf / Copilot**: TBD — bootstrap mechanisms to be designed later
 - **GitHub Enterprise App**: Required for Cursor private repo access
 
+## Backlog
+
+**[View the backlog](docs/backlog/README.md)** — epics, tasks, and [dependency graph](docs/backlog/graph.md) auto-generated from beads (`bd`).
+
 ## Documentation
 
 ### Specifications

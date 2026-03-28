@@ -33,6 +33,10 @@ def bd_children_json(parent_id):
 def status_icon(status):
     return {"open": "[ ]", "in_progress": "[~]", "closed": "[x]", "blocked": "[!]"}.get(status, "[ ]")
 
+def slugify(title):
+    slug = title.lower().replace(" ", "-").replace("/", "-").replace(":", "").replace("(", "").replace(")", "")
+    return "-".join(slug.split("-")[:6])
+
 # Get all epics sorted by title
 epics = bd_json("list", "--type", "epic")
 epics.sort(key=lambda e: e.get("title", ""))
@@ -51,9 +55,7 @@ for epic in epics:
     children = bd_children_json(eid)
     children.sort(key=lambda c: c.get("id", ""))
 
-    # Derive filename from title
-    slug = title.lower().replace(" ", "-").replace("/", "-").replace(":", "").replace("(", "").replace(")", "")
-    slug = "-".join(slug.split("-")[:6])  # truncate
+    slug = slugify(title)
     filename = f"{slug}.md"
 
     lines = [f"# {title}", "", f"**Status**: {status} | **ID**: `{eid}`", ""]
@@ -94,15 +96,67 @@ for epic in epics:
     closed_count = sum(1 for c in children if c["status"] == "closed")
     total = closed_count + open_count
     icon = status_icon(epic["status"])
-    slug = epic["title"].lower().replace(" ", "-").replace("/", "-").replace(":", "").replace("(", "").replace(")", "")
-    slug = "-".join(slug.split("-")[:6])
+    slug = slugify(epic["title"])
     index_lines.append(f"- {icon} [{epic['title']}]({slug}.md) — {closed_count}/{total} tasks")
 index_lines.append("")
 
 if orphans:
     index_lines += ["## Standalone", "", f"- [Standalone issues](standalone.md) — {len(orphans)} issues", ""]
 
+index_lines += ["## Views", "", "- [Dependency graph](graph.md)", ""]
+
 (backlog_dir / "README.md").write_text("\n".join(index_lines))
 
-print(f"Synced {len(epics)} epics and {len(orphans)} standalone issues to {backlog_dir}/")
+# Build ID-to-file mapping for hyperlinks
+import re
+
+id_to_file = {}
+for epic in epics:
+    slug = slugify(epic["title"])
+    id_to_file[epic["id"]] = f"{slug}.md"
+    for child in bd_children_json(epic["id"]):
+        # Children link to their parent epic file
+        id_to_file[child["id"]] = f"{slug}.md"
+if orphans:
+    for issue in orphans:
+        id_to_file[issue["id"]] = "standalone.md"
+
+# Generate dependency graph with hyperlinked task IDs
+graph_result = subprocess.run(
+    ["bd", "graph", "--all", "--compact"],
+    capture_output=True, text=True
+)
+if graph_result.returncode == 0 and graph_result.stdout.strip():
+    graph_text = graph_result.stdout
+
+    # Build regex from known IDs to match them in graph output
+    escaped_ids = [re.escape(tid) for tid in sorted(id_to_file.keys(), key=len, reverse=True)]
+    id_pattern = re.compile(r'\b(' + '|'.join(escaped_ids) + r')\b') if escaped_ids else None
+    graph_lines = [
+        "# Dependency Graph",
+        "",
+        "Auto-generated from `bd graph --all --compact`.",
+        "",
+        "```",
+        graph_text.rstrip(),
+        "```",
+        "",
+        "## Task Index",
+        "",
+    ]
+    # Add a linkable index of all IDs found in the graph
+    if id_pattern:
+        seen = set()
+        for match in id_pattern.finditer(graph_text):
+            task_id = match.group(1)
+            if task_id not in seen:
+                seen.add(task_id)
+                graph_lines.append(f"- [`{task_id}`]({id_to_file[task_id]})")
+    graph_lines.append("")
+    (backlog_dir / "graph.md").write_text("\n".join(graph_lines))
+    graph_count = " + dependency graph"
+else:
+    graph_count = ""
+
+print(f"Synced {len(epics)} epics and {len(orphans)} standalone issues{graph_count} to {backlog_dir}/")
 PYEOF

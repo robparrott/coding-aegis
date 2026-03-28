@@ -15,3 +15,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 ## Standalone
 
 - [Standalone issues](standalone.md) — 9 issues
+
+## Views
+
+- [Dependency graph](graph.md)
