@@ -93,6 +93,28 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-a0q (2 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
+  │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
+  └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-bg5 (2 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-bg5 ● P2 coding-aegis Skill UX
+  │   └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
+  └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-avj (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -108,6 +130,33 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-3m9 ● P2 Resolve multi-tool repository support (AD-11)
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-400 (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-400 ● P3 Author GitHub Copilot install section in docs/how…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-ytb (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-ytb ● P3 Author Windsurf install section in docs/howto/ins…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-lve (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-lve ● P3 Author Cursor install section in docs/howto/insta…
 ```
 
 ## Task Index
@@ -148,5 +197,12 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-wpi.4`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.5`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.6`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
+- [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
+- [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
+- [`coding-aegis-z61`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
+- [`coding-aegis-400`](standalone.md)
+- [`coding-aegis-ytb`](standalone.md)
+- [`coding-aegis-lve`](standalone.md)
