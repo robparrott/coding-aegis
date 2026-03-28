@@ -1,5 +1,8 @@
 {
   "name": "coding-aegis",
+  "owner": {
+    "name": "platform-team"
+  },
   "metadata": {
     "description": "Engineering organization coding agent governance packages",
     "version": "1.0.0"

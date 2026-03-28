@@ -4,7 +4,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 ## Epics
 
-- [ ] [Phase 2: coding-aegis Skill (Claude Code)](phase-2-coding-aegis-skill-claude.md) — 0/4 tasks
+- [ ] [Phase 2: coding-aegis Skill (Claude Code)](phase-2-coding-aegis-skill-claude.md) — 1/4 tasks
 - [ ] [Phase 3: Cursor Bootstrap](phase-3-cursor-bootstrap.md) — 0/6 tasks
 - [ ] [Phase 4: Renderers / Adaptation](phase-4-renderers---adaptation.md) — 0/4 tasks
 - [ ] [Phase 5: CLI Tooling](phase-5-cli-tooling.md) — 0/4 tasks
@@ -14,4 +14,4 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 ## Standalone
 
-- [Standalone issues](standalone.md) — 5 issues
+- [Standalone issues](standalone.md) — 8 issues

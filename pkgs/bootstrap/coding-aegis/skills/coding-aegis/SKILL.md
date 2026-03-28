@@ -20,12 +20,12 @@ Browse, install, and manage governance packages for coding agents.
 
 Packages are organized by tier:
 
-| Tier | Purpose |
-|------|---------|
-| **required** | Non-negotiable governance — auto-installed |
-| **best-practices** | Recommended defaults — opt-out with justification |
-| **optional** | Available on demand — opt-in |
-| **goodies** | Community and experimental |
+| Tier | Purpose | Listed in priority order |
+|------|---------|--------------------------|
+| **required** | Non-negotiable governance — auto-installed | 1st |
+| **best-practices** | Recommended defaults — opt-out with justification | 2nd |
+| **optional** | Available on demand — opt-in | 3rd |
+| **goodies** | Community and experimental | 4th |
 
 The catalog lives at `pkgs/` in the [coding-aegis](https://github.com/coding-aegis/coding-aegis) repository. Each package contains a `pkg.yaml` manifest describing its artifacts (skills, agents, rules, MCP configs).
 
