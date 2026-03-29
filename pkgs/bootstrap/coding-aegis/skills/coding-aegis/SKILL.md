@@ -154,9 +154,8 @@ Present the user with a choice using AskUserQuestion:
 ```
 Where should this package be installed?
 
-1. Project — `.claude/` in the current repo (governs this project)
+1. Project — `.claude/` in the current repo (governs this project, shared via source control)
 2. User — `~/.claude/` in your home directory (governs all your projects)
-3. Local — `.claude.local/` in the current repo (personal, not committed)
 ```
 
 Map the response to a base path:
@@ -165,7 +164,6 @@ Map the response to a base path:
 |-------|-----------|
 | Project | `{CWD}/.claude/` |
 | User | `~/.claude/` |
-| Local | `{CWD}/.claude.local/` |
 
 ### Step 3 — Install rules
 
@@ -227,7 +225,7 @@ For each artifact where `type: mcp`:
 
 1. Read the source `servers.json` from the package.
 2. Determine the target config file:
-   - Project/Local scope: `{CWD}/.mcp.json`
+   - Project scope: `{CWD}/.mcp.json`
    - User scope: `~/.claude.json`
 3. If the target file exists, read it and parse as JSON.
 4. Merge each server entry from the package into the `mcpServers` object.
@@ -236,7 +234,7 @@ For each artifact where `type: mcp`:
 
 ### Step 7 — Update AGENTS.md (Project scope only)
 
-Skip this step for User and Local scopes. Skip if AGENTS.md does not exist in CWD.
+Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
 
 1. Read AGENTS.md.
 2. Look for the heading `## Installed Governance Rules`.
@@ -273,6 +271,8 @@ Print a summary:
 
 If AGENTS.md was updated, add: "AGENTS.md updated with installed governance rules table."
 
+**Important**: After installing skills, remind the user: "Restart Claude Code to load newly installed skills."
+
 ## status
 
 Show all coding-aegis-managed packages and their version status.
@@ -284,7 +284,6 @@ Show all coding-aegis-managed packages and their version status.
    | Scope | Path |
    |-------|------|
    | Project | `{CWD}/.claude/` |
-   | Local | `{CWD}/.claude.local/` |
    | User | `~/.claude/` |
 
 2. For each scope:
@@ -322,9 +321,6 @@ Show all coding-aegis-managed packages and their version status.
 | Package | Version | Tier | Artifacts | Status |
 |---------|---------|------|-----------|--------|
 | pirate-speak | 0.1.0 | goodies | 2 rules, 1 skill | current |
-
-### Local (.claude.local/)
-(none)
 
 ### User (~/.claude/)
 (none)

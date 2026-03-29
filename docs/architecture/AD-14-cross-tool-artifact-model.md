@@ -32,8 +32,9 @@ Establish a canonical mapping of coding-aegis concepts to the native artifact lo
 |-------|-------------|--------|----------|---------|
 | **Project** | `{repo}/.claude/` | `{repo}/.cursor/` | `{repo}/.windsurf/` | `{repo}/.github/` |
 | **User** | `~/.claude/` | `~/.cursor/` | `~/.codeium/windsurf/` | VS Code settings |
-| **Local** | `{repo}/.claude.local/` | N/A | N/A | N/A |
 | **Team** | N/A | Cursor Team Marketplace | N/A | GitHub org-level |
+
+> **Note**: Claude Code supports a local settings override via `.claude/settings.local.json`, but does not discover skills, rules, or agents from a `.claude.local/` directory. The two supported installation scopes for artifacts are Project and User.
 
 ## Agent Skills standard
 

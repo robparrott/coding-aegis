@@ -109,7 +109,6 @@ If an override file exists for the target tool and artifact, use it verbatim ins
 |-------|-------------|--------|----------|---------|
 | Project | `{repo}/.claude/` | `{repo}/.cursor/` | `{repo}/.windsurf/` | `{repo}/.github/` |
 | User | `~/.claude/` | `~/.cursor/` | `~/.codeium/windsurf/` | VS Code settings |
-| Local | `{repo}/.claude.local/` | N/A | N/A | N/A |
 
 For tools that don't support a scope level, warn the user and skip.
 

@@ -86,7 +86,7 @@ Count by type, comma-separated: "2 rules, 1 skill".
 #### Behavior
 
 1. **Resolve**: Find package in catalog, read `pkg.yaml`, determine tier.
-2. **Scope picker**: Ask user — Project (`.claude/`), User (`~/.claude/`), Local (`.claude.local/`).
+2. **Scope picker**: Ask user — Project (`.claude/`), User (`~/.claude/`).
 3. **Install rules**: For each `type: rule` artifact:
    - Read source file.
    - Construct managed-by frontmatter: `package`, `rule`, `version`, `tier`, `managed-by: coding-aegis`.
@@ -135,7 +135,7 @@ aegis--{package-name}--{rule-basename}.md
 
 #### Behavior
 
-1. Scan three scopes: Project (`.claude/`), Local (`.claude.local/`), User (`~/.claude/`).
+1. Scan two scopes: Project (`.claude/`), User (`~/.claude/`).
 2. For each scope:
    - Glob for `{scope}/rules/aegis--*`.
    - Glob for `{scope}/skills/*/SKILL.md`.
@@ -154,9 +154,6 @@ aegis--{package-name}--{rule-basename}.md
 | Package | Version | Tier | Artifacts | Status |
 |---------|---------|------|-----------|--------|
 | pirate-speak | 0.1.0 | goodies | 2 rules, 1 skill | current |
-
-### Local (.claude.local/)
-(none)
 
 ### User (~/.claude/)
 (none)

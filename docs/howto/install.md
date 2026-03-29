@@ -70,6 +70,25 @@ To pick up new packages or updates from the catalog:
 /plugin marketplace update robparrott-coding-aegis
 ```
 
+### Troubleshooting
+
+**Plugin says "already installed" but skill is not available**
+
+This can happen when the marketplace was re-registered under a different name or the cached version is stale. Fix by removing both the plugin and the marketplace, then reinstalling:
+
+```
+/plugin uninstall coding-aegis@coding-aegis
+/plugin marketplace remove coding-aegis
+/plugin marketplace add robparrott/coding-aegis
+/plugin install coding-aegis@robparrott-coding-aegis
+```
+
+Restart Claude Code after reinstalling.
+
+**Skill only works in the coding-aegis repo, not other projects**
+
+The plugin was installed with local (project) scope. Uninstall and reinstall with user scope so it's available across all repositories.
+
 ### Removing
 
 ```
