@@ -191,8 +191,8 @@ For each artifact where `type: rule`:
    - Reconstruct the combined frontmatter block followed by the body content.
 5. If the source file has no frontmatter, prepend the managed-by block.
 6. Compute the target filename: `aegis--{package-name}--{rule-basename}.md`
-7. Ensure the target directory exists: `mkdir -p {base-path}/rules/`
-8. Write the file to `{base-path}/rules/{target-filename}`.
+7. Compute the target path: `{base-path}/rules/{target-filename}`.
+   Do not write yet — collect all target paths and contents for the batch write in Step 8.
 
 ### Step 4 — Install skills
 
@@ -204,8 +204,8 @@ For each artifact where `type: skill`:
 3. For each file found:
    a. Read the source file.
    b. Compute the relative path within the skill directory.
-   c. Ensure the target directory exists: `mkdir -p {base-path}/skills/{skill-name}/{subdir}`
-   d. Write the file to `{base-path}/skills/{skill-name}/{relative-path}`.
+   c. Compute the target path: `{base-path}/skills/{skill-name}/{relative-path}`.
+      Do not write yet — collect for the batch write in Step 8.
 4. Skills are copied verbatim — no frontmatter injection. The SKILL.md frontmatter
    already has `name` and `description` per the Agent Skills standard.
 
@@ -217,7 +217,8 @@ For each artifact where `type: agent`:
 2. Extract the basename without extension.
 3. Build managed-by frontmatter (same schema as rules, with `rule:` key omitted).
 4. Merge frontmatter as in Step 3.
-5. Write to `{base-path}/agents/aegis--{package-name}--{agent-basename}.md`.
+5. Compute the target path: `{base-path}/agents/aegis--{package-name}--{agent-basename}.md`.
+   Do not write yet — collect for the batch write in Step 8.
 
 ### Step 6 — Install MCP configs
 
@@ -232,7 +233,14 @@ For each artifact where `type: mcp`:
    Do not overwrite existing entries with the same key.
 5. Write the updated JSON file.
 
-### Step 7 — Update AGENTS.md (Project scope only)
+### Step 7 — Batch write all files
+
+Write all collected files from Steps 3–6 in a **single parallel batch** using the Write
+tool. Issue all Write calls in one response — this minimizes permission prompts.
+
+The Write tool creates parent directories automatically. Do not use `mkdir -p` or Bash.
+
+### Step 8 — Update AGENTS.md (Project scope only)
 
 Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
 
@@ -255,7 +263,7 @@ Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
    Populate the table by scanning `{CWD}/.claude/rules/aegis--*`. Read each file's
    frontmatter for package, rule, version, and tier.
 
-### Step 8 — Confirm
+### Step 9 — Confirm
 
 Print a summary:
 
@@ -403,13 +411,14 @@ Warning: Package '{name}' has no artifacts to install.
 
 ### Write errors
 
-If `mkdir -p` or file write fails, report the path and suggest checking permissions.
+If a file write fails, report the path and suggest checking permissions.
 Do not silently continue — stop and inform the user.
 
-### Directory creation
+### Tool usage
 
-Always create target directories before writing files. Use `mkdir -p` via Bash
-for `rules/`, `skills/`, and `agents/` directories under the chosen scope.
+Use the Write tool for all file creation. It creates parent directories automatically.
+Do not use Bash for `mkdir` or any file operations during install — this avoids
+unnecessary permission prompts.
 
 ## Cross-tool Support
 
