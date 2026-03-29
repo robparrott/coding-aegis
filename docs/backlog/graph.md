@@ -72,22 +72,24 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-2sv (10 issues, 1 layers)
+📊 Dependency graph for coding-aegis-2sv (11 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-2sv ● P1 Cross-tool artifact model refactor
   │   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
+  │   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   │   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   │   ├── ○ coding-aegis-2sv.5 ● P2 Claude Code rules delivery
   │   ├── ○ coding-aegis-2sv.6 ● P2 Windsurf rules delivery
   │   ├── ○ coding-aegis-2sv.7 ● P2 Copilot instructions delivery
   │   ├── ○ coding-aegis-2sv.8 ● P2 Windsurf skills delivery
-  │   ├── ○ coding-aegis-2sv.9 ● P2 Create example package covering all artifact types
+  │   ├── ◐ coding-aegis-2sv.9 ● P2 Create example package covering all artifact types
   │   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   │   └── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
+  ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   ├── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
@@ -95,7 +97,7 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-2sv.6 ● P2 Windsurf rules delivery
   ├── ○ coding-aegis-2sv.7 ● P2 Copilot instructions delivery
   ├── ○ coding-aegis-2sv.8 ● P2 Windsurf skills delivery
-  └── ○ coding-aegis-2sv.9 ● P2 Create example package covering all artifact types
+  └── ◐ coding-aegis-2sv.9 ● P2 Create example package covering all artifact types
 
 ────────────────────────────────────────────────────────────
 
@@ -213,6 +215,7 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-cdb.6`](phase-8-external-package-references.md)
 - [`coding-aegis-2sv`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.1`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.10`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.2`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.5`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.6`](cross-tool-artifact-model-refactor.md)

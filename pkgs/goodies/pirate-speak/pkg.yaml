@@ -1,0 +1,11 @@
+name: pirate-speak
+version: 0.1.0
+description: Arrr! Pirate-themed governance demo — exercises every artifact type
+author: platform-team
+artifacts:
+  - type: rule
+    path: rules/pirate-speak.md
+  - type: rule
+    path: rules/pirate-readme.md
+  - type: skill
+    path: skills/pirate-speak/SKILL.md
