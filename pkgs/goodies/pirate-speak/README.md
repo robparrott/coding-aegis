@@ -18,15 +18,12 @@ pirate-speak/
 ├── rules/
 │   ├── pirate-speak.md               # Always-on rule: pirate dialect in all responses
 │   └── pirate-readme.md              # File-scoped rule: pirate headings in README.md files
-├── skills/
-│   └── pirate-speak/
-│       └── SKILL.md                  # Invocable skill: ASCII skull banner
-└── tools/
-    └── cursor/
-        └── rules/
-            ├── pirate-speak.mdc      # Cursor override: alwaysApply frontmatter
-            └── pirate-readme.mdc     # Cursor override: globs frontmatter
+└── skills/
+    └── pirate-speak/
+        └── SKILL.md                  # Invocable skill: ASCII skull banner
 ```
+
+Tool-specific format differences (file extension, frontmatter) are handled by the coding-aegis skill at install time — see [AD-15](../../../docs/architecture/AD-15-single-source-install-adaptation.md).
 
 ## Artifacts
 
@@ -35,7 +32,6 @@ pirate-speak/
 | **rule** (always-on) | `rules/pirate-speak.md` | Injects pirate dialect into all agent responses — greetings, nautical metaphors, pirate code comments |
 | **rule** (file-scoped) | `rules/pirate-readme.md` | Triggers only when editing `README.md` — enforces pirate-themed section headings |
 | **skill** (invocable) | `skills/pirate-speak/SKILL.md` | `/pirate-speak` prints an ASCII skull-and-crossbones banner confirming governance is active |
-| **tool override** | `tools/cursor/rules/*.mdc` | Cursor-native `.mdc` copies with `alwaysApply` / `globs` frontmatter (until renderers are built) |
 
 ## How to verify
 
