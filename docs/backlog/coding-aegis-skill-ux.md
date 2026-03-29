@@ -6,6 +6,7 @@ Design and implement the user experience for the coding-aegis skill — catalog 
 
 ## Tasks
 
+- [ ] `coding-aegis-bg5.1` Add install-required and install-best-practices commands to coding-aegis skill
 - [ ] `coding-aegis-z61` Design coding-aegis skill UX
 
-**Progress**: 0/1 tasks complete
+**Progress**: 0/2 tasks complete

@@ -72,24 +72,56 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-wpi (7 issues, 1 layers)
+📊 Dependency graph for coding-aegis-2sv (10 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  ├── ○ coding-aegis-wpi ● P2 Phase 3: Cursor Bootstrap
-  │   ├── ○ coding-aegis-wpi.1 ● P2 Create .cursor-plugin/marketplace.json
-  │   ├── ○ coding-aegis-wpi.2 ● P2 Create coding-aegis Cursor plugin.json
-  │   ├── ○ coding-aegis-wpi.3 ● P2 Create Cursor-native coding-aegis.mdc rule
-  │   ├── ○ coding-aegis-wpi.4 ● P2 Register GitHub Enterprise App at Cursor dashboard
-  │   ├── ○ coding-aegis-wpi.5 ● P2 Import repo into Cursor Team Marketplace
-  │   └── ○ coding-aegis-wpi.6 ● P2 Test Cursor marketplace install flow
-  ├── ○ coding-aegis-wpi.1 ● P2 Create .cursor-plugin/marketplace.json
-  ├── ○ coding-aegis-wpi.2 ● P2 Create coding-aegis Cursor plugin.json
-  ├── ○ coding-aegis-wpi.3 ● P2 Create Cursor-native coding-aegis.mdc rule
-  ├── ○ coding-aegis-wpi.4 ● P2 Register GitHub Enterprise App at Cursor dashboard
-  ├── ○ coding-aegis-wpi.5 ● P2 Import repo into Cursor Team Marketplace
-  └── ○ coding-aegis-wpi.6 ● P2 Test Cursor marketplace install flow
+  ├── ○ coding-aegis-2sv ● P1 Cross-tool artifact model refactor
+  │   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
+  │   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
+  │   ├── ○ coding-aegis-2sv.5 ● P2 Claude Code rules delivery
+  │   ├── ○ coding-aegis-2sv.6 ● P2 Windsurf rules delivery
+  │   ├── ○ coding-aegis-2sv.7 ● P2 Copilot instructions delivery
+  │   ├── ○ coding-aegis-2sv.8 ● P2 Windsurf skills delivery
+  │   ├── ○ coding-aegis-2sv.9 ● P2 Create example package covering all artifact types
+  │   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
+  │   └── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
+  ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
+  ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
+  ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
+  ├── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
+  ├── ○ coding-aegis-2sv.5 ● P2 Claude Code rules delivery
+  ├── ○ coding-aegis-2sv.6 ● P2 Windsurf rules delivery
+  ├── ○ coding-aegis-2sv.7 ● P2 Copilot instructions delivery
+  ├── ○ coding-aegis-2sv.8 ● P2 Windsurf skills delivery
+  └── ○ coding-aegis-2sv.9 ● P2 Create example package covering all artifact types
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-bg5 (3 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-bg5 ● P2 coding-aegis Skill UX
+  │   ├── ○ coding-aegis-bg5.1 ● P2 Add install-required and install-best-practices c…
+  │   └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
+  ├── ○ coding-aegis-bg5.1 ● P2 Add install-required and install-best-practices c…
+  └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
 
 ────────────────────────────────────────────────────────────
 
@@ -101,17 +133,6 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
   │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-bg5 (2 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-bg5 ● P2 coding-aegis Skill UX
-  │   └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
-  └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
 
 ────────────────────────────────────────────────────────────
 
@@ -133,6 +154,15 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-135 (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-135 ● P3 Create conventional-commits best-practices skill
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-400 (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -148,15 +178,6 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-ytb ● P3 Author Windsurf install section in docs/howto/ins…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-lve (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-lve ● P3 Author Cursor install section in docs/howto/insta…
 ```
 
 ## Task Index
@@ -190,19 +211,26 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-cdb.4`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.5`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.6`](phase-8-external-package-references.md)
+- [`coding-aegis-2sv`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.1`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.2`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.5`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.6`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.7`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.8`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.9`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.1`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.2`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.3`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.4`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.5`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.6`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
+- [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
+- [`coding-aegis-z61`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
-- [`coding-aegis-z61`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
+- [`coding-aegis-135`](standalone.md)
 - [`coding-aegis-400`](standalone.md)
 - [`coding-aegis-ytb`](standalone.md)
-- [`coding-aegis-lve`](standalone.md)

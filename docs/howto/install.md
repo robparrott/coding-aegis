@@ -81,7 +81,37 @@ To pick up new packages or updates from the catalog:
 
 ## Cursor
 
-*Stub — to be authored when Phase 3 (Cursor Bootstrap) is complete.*
+### Prerequisites
+
+- Cursor editor
+- Local clone of the coding-aegis repo
+
+### Install
+
+From your target project directory, symlink the governance rule and skill into Cursor's project locations:
+
+```
+mkdir -p .cursor/rules .cursor/skills/coding-aegis
+ln -s /path/to/coding-aegis/pkgs/bootstrap/coding-aegis/rules/coding-aegis.mdc .cursor/rules/aegis--coding-aegis.mdc
+ln -s /path/to/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis/SKILL.md .cursor/skills/coding-aegis/SKILL.md
+```
+
+The `alwaysApply: true` frontmatter causes Cursor to inject the rule into every chat automatically. The skill symlink makes `/coding-aegis` available as an invocable skill. No restart required.
+
+### Verify
+
+Open a Cursor chat and ask: "What governance rules are active?" The agent should reference coding-aegis catalog tiers (required, best-practices, optional, goodies) and the `aegis--` prefix convention.
+
+### Updating
+
+`git pull` in your coding-aegis clone. The symlink picks up changes immediately — no restart needed.
+
+### Removing
+
+```
+rm .cursor/rules/aegis--coding-aegis.mdc
+rm -rf .cursor/skills/coding-aegis
+```
 
 ---
 

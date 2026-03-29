@@ -35,7 +35,7 @@ Packages install artifacts to tool-native locations:
 
 | Artifact | Claude Code | Cursor | Windsurf | Copilot |
 |----------|-------------|--------|----------|---------|
-| skill | `.claude/skills/{name}/` | — | — | — |
+| skill | `.claude/skills/{name}/` | `.cursor/skills/{name}/` | `.agents/skills/{name}/` | — |
 | agent | `.claude/agents/` | — | — | — |
 | rule | `.claude/rules/` | `.cursor/rules/` | `.windsurf/rules/` | `.github/instructions/` |
 | mcp | `.mcp.json` | `.mcp.json` | `.mcp.json` | — |

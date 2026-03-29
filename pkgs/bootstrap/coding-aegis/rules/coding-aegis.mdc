@@ -1,0 +1,56 @@
+---
+description: "coding-aegis governance — catalog browsing, package tiers, and installation guidance"
+alwaysApply: true
+---
+
+# coding-aegis
+
+Browse, install, and manage governance packages for coding agents.
+
+## Catalog
+
+Packages are organized by tier:
+
+| Tier | Purpose | Install behavior |
+|------|---------|------------------|
+| **required** | Non-negotiable governance | Auto-installed |
+| **best-practices** | Recommended defaults | Opt-out with justification |
+| **optional** | Available on demand | Opt-in |
+| **goodies** | Community and experimental | Opt-in |
+
+The catalog lives at `pkgs/` in the coding-aegis repository. Each package contains a `pkg.yaml` manifest describing its artifacts (skills, agents, rules, MCP configs).
+
+## Package Format
+
+Every package has a `pkg.yaml`:
+
+```yaml
+name: my-package
+version: 0.1.0
+description: What this package provides
+author: team-name
+artifacts:
+  - type: rule          # rule | skill | agent | mcp
+    path: rules/my-rule.mdc
+```
+
+## Installation
+
+Packages install artifacts to tool-native locations:
+
+| Artifact | Claude Code | Cursor | Windsurf | Copilot |
+|----------|-------------|--------|----------|---------|
+| skill | `.claude/skills/{name}/` | `.cursor/skills/{name}/` | `.agents/skills/{name}/` | — |
+| agent | `.claude/agents/` | — | — | — |
+| rule | `.claude/rules/` | `.cursor/rules/` | `.windsurf/rules/` | `.github/instructions/` |
+| mcp | `.mcp.json` | `.mcp.json` | `.mcp.json` | — |
+
+Rules installed by coding-aegis are prefixed `aegis--` to distinguish governance-managed files from project-owned files.
+
+## Scope
+
+Packages can be installed to:
+
+- **Project** — governs a single repository
+- **User** — applies across all repositories for the current user
+- **Local** — applies to you in this repository only
