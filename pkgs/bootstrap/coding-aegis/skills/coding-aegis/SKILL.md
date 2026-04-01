@@ -8,29 +8,31 @@ description: Browse, install, and manage coding agent governance packages from t
 Browse, install, and manage governance packages for coding agents. This skill provides
 four commands: `list`, `show`, `install`, and `status`.
 
-## Catalog Resolution
+## CLI Helper
 
-Before executing any command, locate the package catalog:
+This skill includes a Python CLI helper (`aegis-catalog.py`) in the same directory as
+this SKILL.md file. Use it via the Bash tool for catalog operations instead of manual
+Glob/Read/parse cycles:
 
-1. Use Glob to search for `pkgs/required` starting from the current working directory.
-2. If found, the catalog root is the `pkgs/` directory containing it.
-3. If not found in CWD, check whether this skill file's path contains `pkgs/bootstrap/coding-aegis/`. If so, walk up from the skill file's location to reach `pkgs/`.
-4. If the catalog still cannot be found, print the error from the Error Handling section and stop.
+```
+python3 "{skill-dir}/aegis-catalog.py" <subcommand> [args]
+```
 
-Store the resolved `pkgs/` path — all commands below reference it.
+Where `{skill-dir}` is the directory containing this SKILL.md file. Resolve it from
+the skill file path. The helper outputs JSON to stdout — parse it and format the
+response using the Output Format sections below.
 
-### Tier directories
+### Available subcommands
 
-Scan in this fixed order. Never reorder.
+| Subcommand | Purpose |
+|------------|---------|
+| `resolve-catalog [--from PATH]` | Locate the `pkgs/` catalog directory |
+| `list [--catalog PATH]` | List all packages by tier |
+| `show <name> [--catalog PATH]` | Full package details + README |
+| `install-prep <name> [--catalog PATH]` | Prepare install artifacts with frontmatter |
+| `status [--catalog PATH] [--scope PATH...]` | Installed packages and version status |
 
-| Order | Directory | Purpose |
-|-------|-----------|---------|
-| 1 | `required/` | Non-negotiable governance |
-| 2 | `best-practices/` | Recommended defaults |
-| 3 | `optional/` | Available on demand |
-| 4 | `goodies/` | Community and experimental |
-
-The `bootstrap/` directory is internal infrastructure. Exclude it from all listings and searches.
+If `--catalog` is omitted, the helper resolves it from the current working directory.
 
 ## Command Dispatch
 
@@ -61,12 +63,9 @@ Display all available packages grouped by tier.
 
 ### Steps
 
-1. For each tier directory in order (`required`, `best-practices`, `optional`, `goodies`):
-   a. Use Glob: `{catalog}/\{tier\}/*/pkg.yaml`
-   b. For each match, Read the `pkg.yaml`. Extract `name`, `version`, `description`.
-   c. Count artifacts by type from the `artifacts` list. Format as comma-separated
-      summary: "2 rules, 1 skill" or "1 skill". Use this type order: rules, skills, agents, mcp.
-2. Print one table per tier. If a tier has no packages, print the tier heading with "(none)".
+1. Run: `python3 "{skill-dir}/aegis-catalog.py" list`
+2. Parse the JSON response. It contains `tiers`, each with a `packages` array.
+3. Format the output using the template below.
 
 ### Output format
 
@@ -91,7 +90,7 @@ Display all available packages grouped by tier.
 | pirate-speak | 0.1.0 | 2 rules, 1 skill | Arrr! Pirate-themed... |
 ```
 
-Sort packages alphabetically within each tier.
+Sort packages alphabetically within each tier. If a tier has no packages, print "(none)".
 
 ## show
 
@@ -99,13 +98,9 @@ Display full details for a single package.
 
 ### Steps
 
-1. Search all four tier directories for a subdirectory matching the package name.
-   Use Glob: `{catalog}/*/\{name\}/pkg.yaml`
-2. If no match, print: "Package '{name}' not found in the catalog." and stop.
-3. Read the matched `pkg.yaml`. Determine the tier from the path (the directory between
-   `pkgs/` and the package name).
-4. Check for `README.md` in the package directory. Read it if present.
-5. Print the details.
+1. Run: `python3 "{skill-dir}/aegis-catalog.py" show <name>`
+2. If the JSON contains `"error"`, print the error message and stop.
+3. Format the output using the template below.
 
 ### Output format
 
@@ -124,13 +119,12 @@ Display full details for a single package.
 
 | # | Type | Path |
 |---|------|------|
-| 1 | rule | rules/pirate-speak.md |
-| 2 | rule | rules/pirate-readme.md |
-| 3 | skill | skills/pirate-speak/SKILL.md |
+| 1 | rule | rules/example-rule.md |
+| 2 | skill | skills/example/SKILL.md |
 
 ### README
 
-{README.md contents, or "(No README)"}
+{readme contents, or "(No README)"}
 ```
 
 ## install
@@ -139,13 +133,13 @@ Install a package's artifacts into the target project or user configuration.
 
 > **Note**: This skill currently supports **Claude Code only** (per AD-8).
 
-### Step 1 — Resolve the package
+### Step 1 — Resolve and prepare
 
-1. Find the package in the catalog (same lookup as `show`).
-2. Read `pkg.yaml`. Extract `name`, `version`, `artifacts`.
-3. Determine tier from directory path.
-4. Store the full package directory path for reading source files.
-5. If the package has no artifacts, warn and stop.
+1. Run: `python3 "{skill-dir}/aegis-catalog.py" install-prep <name>`
+2. If the JSON contains `"error"`, print the error and stop.
+3. The response contains `name`, `version`, `tier`, and an `artifacts` array.
+   Each artifact has: `type`, `target_subdir`, `target_filename`, `content`.
+4. If the artifacts array is empty, warn and stop.
 
 ### Step 2 — Scope picker
 
@@ -165,82 +159,17 @@ Map the response to a base path:
 | Project | `{CWD}/.claude/` |
 | User | `~/.claude/` |
 
-### Step 3 — Install rules
+### Step 3 — Batch write all files
 
-For each artifact where `type: rule`:
+For each artifact from Step 1, compute the full target path:
+`{base-path}/{target_subdir}/{target_filename}`
 
-1. Read the source file from the package directory.
-2. Extract the rule basename: filename without extension.
-   Example: `rules/pirate-speak.md` → basename `pirate-speak`.
-3. Build the managed-by frontmatter block:
-
-   ```yaml
-   ---
-   package: {package-name}
-   rule: {rule-basename}
-   version: {package-version}
-   tier: {tier}
-   managed-by: coding-aegis
-   ---
-   ```
-
-4. If the source file has existing YAML frontmatter (between `---` delimiters):
-   - Parse both the source frontmatter and the managed-by keys.
-   - Merge them. Managed-by keys (`package`, `rule`, `version`, `tier`, `managed-by`)
-     take precedence. All other source keys (e.g., `description`, `globs`) are preserved.
-   - Reconstruct the combined frontmatter block followed by the body content.
-5. If the source file has no frontmatter, prepend the managed-by block.
-6. Compute the target filename: `aegis--{package-name}--{rule-basename}.md`
-7. Compute the target path: `{base-path}/rules/{target-filename}`.
-   Do not write yet — collect all target paths and contents for the batch write in Step 8.
-
-### Step 4 — Install skills
-
-For each artifact where `type: skill`:
-
-1. Determine the skill name from the artifact path.
-   Example: `skills/pirate-speak/SKILL.md` → skill name `pirate-speak`.
-2. Glob for all files in the source skill directory: `{pkg-dir}/skills/{skill-name}/**/*`
-3. For each file found:
-   a. Read the source file.
-   b. Compute the relative path within the skill directory.
-   c. Compute the target path: `{base-path}/skills/{skill-name}/{relative-path}`.
-      Do not write yet — collect for the batch write in Step 8.
-4. Skills are copied verbatim — no frontmatter injection. The SKILL.md frontmatter
-   already has `name` and `description` per the Agent Skills standard.
-
-### Step 5 — Install agents
-
-For each artifact where `type: agent`:
-
-1. Read the source agent file.
-2. Extract the basename without extension.
-3. Build managed-by frontmatter (same schema as rules, with `rule:` key omitted).
-4. Merge frontmatter as in Step 3.
-5. Compute the target path: `{base-path}/agents/aegis--{package-name}--{agent-basename}.md`.
-   Do not write yet — collect for the batch write in Step 8.
-
-### Step 6 — Install MCP configs
-
-For each artifact where `type: mcp`:
-
-1. Read the source `servers.json` from the package.
-2. Determine the target config file:
-   - Project scope: `{CWD}/.mcp.json`
-   - User scope: `~/.claude.json`
-3. If the target file exists, read it and parse as JSON.
-4. Merge each server entry from the package into the `mcpServers` object.
-   Do not overwrite existing entries with the same key.
-5. Write the updated JSON file.
-
-### Step 7 — Batch write all files
-
-Write all collected files from Steps 3–6 in a **single parallel batch** using the Write
-tool. Issue all Write calls in one response — this minimizes permission prompts.
+Write all files in a **single parallel batch** using the Write tool. Issue all Write
+calls in one response — this minimizes permission prompts.
 
 The Write tool creates parent directories automatically. Do not use `mkdir -p` or Bash.
 
-### Step 8 — Update AGENTS.md (Project scope only)
+### Step 4 — Update AGENTS.md (Project scope only)
 
 Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
 
@@ -263,7 +192,7 @@ Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
    Populate the table by scanning `{CWD}/.claude/rules/aegis--*`. Read each file's
    frontmatter for package, rule, version, and tier.
 
-### Step 9 — Confirm
+### Step 5 — Confirm
 
 Print a summary:
 
@@ -272,9 +201,8 @@ Print a summary:
 
 | # | Type | Installed to |
 |---|------|-------------|
-| 1 | rule | .claude/rules/aegis--pirate-speak--pirate-speak.md |
-| 2 | rule | .claude/rules/aegis--pirate-speak--pirate-readme.md |
-| 3 | skill | .claude/skills/pirate-speak/SKILL.md |
+| 1 | rule | .claude/rules/aegis--example--example-rule.md |
+| 2 | skill | .claude/skills/example/SKILL.md |
 ```
 
 If AGENTS.md was updated, add: "AGENTS.md updated with installed governance rules table."
@@ -287,37 +215,9 @@ Show all coding-aegis-managed packages and their version status.
 
 ### Steps
 
-1. Define scopes to scan:
-
-   | Scope | Path |
-   |-------|------|
-   | Project | `{CWD}/.claude/` |
-   | User | `~/.claude/` |
-
-2. For each scope:
-   a. Glob: `{path}/rules/aegis--*`
-   b. Glob: `{path}/agents/aegis--*`
-   c. Glob: `{path}/skills/*/SKILL.md`
-
-3. For each `aegis--*` file found:
-   a. Read the file. Parse YAML frontmatter.
-   b. Extract `package`, `version`, `tier`, `managed-by`.
-   c. Skip files where `managed-by` is not `coding-aegis`.
-   d. Record the artifact: package name, version, type (rule or agent), tier.
-
-4. For each skill SKILL.md found:
-   a. Read frontmatter. Extract `name`.
-   b. Cross-reference: search the catalog for a package containing a skill artifact
-      whose path matches this skill name.
-   c. If matched, include it under that package. Otherwise skip — it is not governance-managed.
-
-5. Group artifacts by package name within each scope.
-   Build the artifact summary per package (e.g., "2 rules, 1 skill").
-
-6. Version comparison:
-   a. For each installed package, search the catalog for a matching `pkg.yaml`.
-   b. Read the catalog version.
-   c. Compare: if equal → `current`; if catalog is newer → `outdated`; if not in catalog → `unknown`.
+1. Run: `python3 "{skill-dir}/aegis-catalog.py" status`
+2. Parse the JSON response. It contains `scopes`, each with a `packages` array.
+3. Format the output using the template below.
 
 ### Output format
 
@@ -328,7 +228,7 @@ Show all coding-aegis-managed packages and their version status.
 
 | Package | Version | Tier | Artifacts | Status |
 |---------|---------|------|-----------|--------|
-| pirate-speak | 0.1.0 | goodies | 2 rules, 1 skill | current |
+| example | 1.0.0 | required | 2 rules, 1 skill | current |
 
 ### User (~/.claude/)
 (none)
@@ -356,9 +256,6 @@ aegis--{package-name}--{rule-basename}.md
 
 - `{package-name}`: the `name` field from `pkg.yaml`
 - `{rule-basename}`: source filename without extension
-
-Example: `pirate-speak.md` from the `pirate-speak` package →
-`aegis--pirate-speak--pirate-speak.md`
 
 ### Agent filename formula
 

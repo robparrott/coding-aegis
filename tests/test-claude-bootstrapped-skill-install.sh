@@ -10,11 +10,9 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis"
 GITHUB_REPO="robparrott/coding-aegis"
 PASS=0
 FAIL=0
-TIMEOUT_SKILL=${AEGIS_TEST_TIMEOUT_SKILL:-60}
 
 # Colors
 GREEN='\033[0;32m'
@@ -168,6 +166,97 @@ echo "  Repo root:   $REPO_ROOT"
 echo "  GitHub repo: $GITHUB_REPO"
 echo -e "  ${DIM}claude: $(command -v claude)${RESET}"
 
+# Phase 1: local directory marketplace
+test_marketplace_lifecycle "Local marketplace" "$REPO_ROOT" "coding-aegis"
+
+# Phase 2: remote GitHub marketplace
+test_marketplace_lifecycle "Remote marketplace (GitHub)" "$GITHUB_REPO" "coding-aegis"
+
+# Phase 3: skill command test via claude -p
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}Phase 3: aegis-catalog.py CLI helper${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+CATALOG_SCRIPT="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-catalog.py"
+FIXTURE_CATALOG="$REPO_ROOT/tests/fixtures/pkgs"
+
+# Test: resolve-catalog
+echo -e "${BOLD}TEST: aegis-catalog.py resolve-catalog${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" resolve-catalog --from "$REPO_ROOT" 2>&1)
+echo -e "  ${YELLOW}${output}${RESET}"
+if echo "$output" | grep -q '"catalog"'; then
+  pass "resolve-catalog"
+else
+  fail "resolve-catalog"
+fi
+
+# Test: list (using test fixture catalog)
+echo ""
+echo -e "${BOLD}TEST: aegis-catalog.py list (fixture)${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" list --catalog "$FIXTURE_CATALOG" 2>&1)
+if echo "$output" | grep -q '"test-stub"'; then
+  pass "list finds test-stub in fixture catalog"
+else
+  echo -e "  ${YELLOW}${output}${RESET}"
+  fail "list — test-stub not found"
+fi
+
+# Test: show (using test fixture catalog)
+echo ""
+echo -e "${BOLD}TEST: aegis-catalog.py show test-stub (fixture)${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+if echo "$output" | grep -q '"goodies"' && echo "$output" | grep -q '"1.0.0"'; then
+  pass "show test-stub — correct tier and version"
+else
+  echo -e "  ${YELLOW}${output}${RESET}"
+  fail "show test-stub"
+fi
+
+# Test: install-prep (using test fixture catalog)
+echo ""
+echo -e "${BOLD}TEST: aegis-catalog.py install-prep test-stub (fixture)${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" install-prep test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+if echo "$output" | grep -q 'aegis--test-stub--test-rule.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
+  pass "install-prep — correct filename and frontmatter"
+else
+  echo -e "  ${YELLOW}$(echo "$output" | head -20)${RESET}"
+  fail "install-prep"
+fi
+
+# Test: show not-found
+echo ""
+echo -e "${BOLD}TEST: aegis-catalog.py show nonexistent (fixture)${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show nonexistent --catalog "$FIXTURE_CATALOG" 2>&1) || true
+if echo "$output" | grep -q '"error"'; then
+  pass "show nonexistent — returns error"
+else
+  echo -e "  ${YELLOW}${output}${RESET}"
+  fail "show nonexistent — expected error"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# Phase 4: Skill end-to-end via claude -p (show command)
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}Phase 4: Skill show via claude -p${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+TIMEOUT_SKILL=${AEGIS_TEST_TIMEOUT_SKILL:-60}
+TEST_DIR="$(mktemp -d)"
+trap 'rm -rf "$TEST_DIR"; print_results' EXIT
+
+# Set up: copy skill + helper + fixture catalog into test dir
+mkdir -p "$TEST_DIR/.claude/skills/coding-aegis"
+cp "$SKILL_DIR/SKILL.md" "$TEST_DIR/.claude/skills/coding-aegis/SKILL.md"
+cp "$SKILL_DIR/aegis-catalog.py" "$TEST_DIR/.claude/skills/coding-aegis/aegis-catalog.py"
+cp -R "$FIXTURE_CATALOG" "$TEST_DIR/pkgs"
+echo -e "  ${DIM}Test dir: $TEST_DIR${RESET}"
+
 # macOS doesn't ship `timeout`; use a shell-based fallback
 if ! command -v timeout &>/dev/null; then
   timeout() {
@@ -184,46 +273,38 @@ if ! command -v timeout &>/dev/null; then
   }
 fi
 
-# Phase 1: local directory marketplace
-test_marketplace_lifecycle "Local marketplace" "$REPO_ROOT" "coding-aegis"
-
-# Phase 2: remote GitHub marketplace
-test_marketplace_lifecycle "Remote marketplace (GitHub)" "$GITHUB_REPO" "coding-aegis"
-
-# Phase 3: skill command test via claude -p
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Skill command: show${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-
-TEST_DIR="$(mktemp -d)"
-trap 'rm -rf "$TEST_DIR"; print_results' EXIT
-
-# Copy skill + catalog into test dir
-mkdir -p "$TEST_DIR/.claude/skills/coding-aegis"
-cp "$PLUGIN_DIR/skills/coding-aegis/SKILL.md" "$TEST_DIR/.claude/skills/coding-aegis/SKILL.md"
-cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
-echo -e "  ${DIM}Test dir: $TEST_DIR${RESET}"
-
-PROMPT="You have the coding-aegis skill loaded. Follow its instructions to execute the show command for the package named pirate-speak. The pkgs/ catalog directory exists at ./pkgs/ in the current working directory. Display the package details."
-echo -e "${BOLD}TEST: coding-aegis show pirate-speak${RESET}"
+SHOW_PROMPT="You have the coding-aegis skill loaded. Follow its instructions to execute the show command for the package named test-stub. The pkgs/ catalog directory exists at ./pkgs/ in the current working directory. Display the package details."
+echo -e "${BOLD}TEST: skill show test-stub via claude -p${RESET}"
 echo -e "  ${DIM}Timeout: ${TIMEOUT_SKILL}s${RESET}"
 
 output=""
 exit_code=0
-output=$(set +x; cd "$TEST_DIR" && timeout "$TIMEOUT_SKILL" claude -p "$PROMPT" \
-  --allowedTools "Glob,Read" \
+output=$(set +x; cd "$TEST_DIR" && timeout "$TIMEOUT_SKILL" claude -p "$SHOW_PROMPT" \
+  --allowedTools "Bash,Read,Glob" \
   < /dev/null 2>&1) || exit_code=$?
 
 if [ "$exit_code" -eq 124 ] || [ "$exit_code" -eq 142 ] || [ "$exit_code" -eq 143 ]; then
   echo -e "  ${RED}TIMEOUT after ${TIMEOUT_SKILL}s${RESET}"
-  fail "show pirate-speak — timed out"
+  fail "skill show test-stub — timed out"
 else
-  echo -e "  ${YELLOW}$(echo "$output" | head -30)${RESET}"
-  if echo "$output" | grep -qi "goodies"; then
-    pass "show pirate-speak — found 'goodies'"
+  echo -e "${YELLOW}$(echo "$output" | head -30)${RESET}"
+  errors=0
+  if ! echo "$output" | grep -qi "test-stub"; then
+    echo -e "  ${RED}Missing: test-stub name${RESET}"
+    errors=$((errors + 1))
+  fi
+  if ! echo "$output" | grep -qi "goodies"; then
+    echo -e "  ${RED}Missing: goodies tier${RESET}"
+    errors=$((errors + 1))
+  fi
+  if ! echo "$output" | grep -qi "1.0.0"; then
+    echo -e "  ${RED}Missing: version 1.0.0${RESET}"
+    errors=$((errors + 1))
+  fi
+  if [ "$errors" -eq 0 ]; then
+    pass "skill show test-stub — name, tier, version all present"
   else
-    fail "show pirate-speak — 'goodies' not found in output"
+    fail "skill show test-stub — $errors expected values missing"
   fi
 fi
 

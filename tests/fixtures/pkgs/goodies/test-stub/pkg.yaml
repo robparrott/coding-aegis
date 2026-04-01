@@ -1,0 +1,9 @@
+name: test-stub
+version: 1.0.0
+description: Minimal test fixture for aegis-catalog validation
+author: test-team
+artifacts:
+  - type: rule
+    path: rules/test-rule.md
+  - type: skill
+    path: skills/test-stub/SKILL.md
