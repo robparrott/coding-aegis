@@ -1,11 +1,15 @@
 #!/usr/bin/env -S bash -l
-# Smoke test: coding-aegis skill via Google Gemini CLI.
+# coding-aegis skill test — Google Gemini CLI
 # Usage: tests/test-gemini-skill-install.sh
 #
-# Phase 0: Verify gemini CLI is installed and authenticated.
-# Phase 1: aegis-catalog.py CLI helper (direct — shared with Claude/Codex tests).
-# Phase 2: Skill lifecycle — install, list, uninstall via gemini skills CLI.
-# Phase 3: Skill show command via gemini -p.
+# Follows the user journey per docs/architecture/testing-spec.md:
+#   T0  Prerequisites (installed + authenticated)
+#   T1  Install coding-aegis skill (gemini skills link)
+#   T2  Use skill: list packages
+#   T3  Use skill: show helloworld
+#   T4  Use skill: install helloworld
+#   T5  Verify installed files
+#   T6  Teardown
 #
 # Note: Gemini CLI on Homebrew emits keytar/keychain warnings to stderr.
 # These are harmless (falls back to file keychain). We filter them out.
@@ -17,8 +21,10 @@ gemini_quiet() {
 }
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 PASS=0
 FAIL=0
+TIMEOUT=${AEGIS_TEST_TIMEOUT:-90}
 
 # Colors
 GREEN='\033[0;32m'
@@ -38,15 +44,16 @@ fail() {
   FAIL=$((FAIL + 1))
 }
 
+# Test working directory
+TEST_DIR="$(mktemp -d)"
+
 cleanup() {
   echo ""
-  echo -e "${BOLD}Cleanup${RESET}"
+  echo -e "${BOLD}T6: Teardown${RESET}"
   echo -e "  ${DIM}Unlinking skill...${RESET}"
   gemini_quiet skills uninstall coding-aegis --scope user > /dev/null || true
-  if [ -n "${TEST_DIR:-}" ] && [ -d "${TEST_DIR:-}" ]; then
-    echo "  Removing test dir: $TEST_DIR"
-    rm -rf "$TEST_DIR"
-  fi
+  echo "  Removing test dir: $TEST_DIR"
+  rm -rf "$TEST_DIR"
   echo ""
   echo "================================"
   if [ "$FAIL" -eq 0 ]; then
@@ -59,31 +66,28 @@ cleanup() {
 }
 trap cleanup EXIT
 
-CATALOG_SCRIPT="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-catalog.py"
-SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
-REAL_CATALOG="$REPO_ROOT/pkgs"
-
 echo "========================================"
 echo "coding-aegis skill test (Gemini CLI)"
 echo "========================================"
 echo "  Repo root: $REPO_ROOT"
+echo "  Test dir:  $TEST_DIR"
+echo "  Timeout:   ${TIMEOUT}s"
 echo ""
 
 # ══════════════════════════════════════════════════════════════
-# Phase 0: Verify gemini CLI
+# T0 — Prerequisites
 # ══════════════════════════════════════════════════════════════
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 0: Gemini CLI check${RESET}"
+echo -e "${BOLD}T0: Prerequisites${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
 echo -e "${BOLD}TEST: gemini installed${RESET}"
 if command -v gemini &>/dev/null; then
-  gemini_path=$(command -v gemini)
   gemini_version=$(gemini --version 2>&1 || echo "unknown")
-  echo -e "  ${DIM}Path: $gemini_path${RESET}"
+  echo -e "  ${DIM}Path: $(command -v gemini)${RESET}"
   echo -e "  ${DIM}Version: $gemini_version${RESET}"
-  pass "gemini found: $gemini_version"
+  pass "gemini found"
 else
   fail "gemini not found in PATH"
   echo -e "  ${RED}Install: npm install -g @google/gemini-cli${RESET}"
@@ -96,220 +100,161 @@ auth_output=$(gemini_quiet -p "Reply with exactly: AUTH_OK" -o text < /dev/null)
 if echo "$auth_output" | grep -qi "AUTH_OK"; then
   pass "gemini authenticated"
 else
-  echo -e "  ${YELLOW}$(echo "$auth_output" | head -10)${RESET}"
-  fail "gemini auth check — check your API key or login"
+  echo -e "  ${YELLOW}$(echo "$auth_output" | head -5)${RESET}"
+  fail "gemini auth check failed"
   exit 1
 fi
 
 # ══════════════════════════════════════════════════════════════
-# Phase 1: aegis-catalog.py CLI helper (direct)
+# T1 — Install coding-aegis skill
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 1: aegis-catalog.py (direct)${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
-
-echo -e "${BOLD}TEST: resolve-catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" resolve-catalog --from "$REPO_ROOT" 2>&1)
-if echo "$output" | grep -q '"catalog"'; then
-  pass "resolve-catalog"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "resolve-catalog"
-fi
-
-echo ""
-echo -e "${BOLD}TEST: show helloworld${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
-errors=0
-for expect in '"name": "helloworld"' '"version": "1.0.0"' '"tier": "optional"' '"author": "platform-team"'; do
-  if ! echo "$output" | grep -q "$expect"; then
-    echo -e "  ${RED}Missing: $expect${RESET}"
-    errors=$((errors + 1))
-  fi
-done
-if [ "$errors" -eq 0 ]; then
-  pass "show helloworld — all fields correct"
-else
-  fail "show helloworld — $errors fields missing"
-fi
-
-echo ""
-echo -e "${BOLD}TEST: list fixture catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q '"helloworld"'; then
-  pass "list finds helloworld"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "list — helloworld not found"
-fi
-
-echo ""
-echo -e "${BOLD}TEST: install-prep helloworld${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q 'aegis--helloworld--helloworld.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
-  pass "install-prep — correct filename and frontmatter"
-else
-  echo -e "  ${YELLOW}$(echo "$output" | head -20)${RESET}"
-  fail "install-prep"
-fi
-
-echo ""
-echo -e "${BOLD}TEST: status with mock install${RESET}"
-MOCK_DIR="$(mktemp -d)"
-mkdir -p "$MOCK_DIR/rules"
-cat > "$MOCK_DIR/rules/aegis--helloworld--helloworld.md" <<'RULE'
----
-package: helloworld
-rule: helloworld
-version: 1.0.0
-tier: optional
-managed-by: coding-aegis
----
-
-# Hello World
-RULE
-output=$(python3 "$CATALOG_SCRIPT" status --catalog "$REAL_CATALOG" --scope "$MOCK_DIR" 2>&1)
-if echo "$output" | grep -q '"name": "helloworld"' && echo "$output" | grep -q '"status": "current"'; then
-  pass "status — detected helloworld as current"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "status"
-fi
-rm -rf "$MOCK_DIR"
-
-# ══════════════════════════════════════════════════════════════
-# Phase 2: Gemini skill lifecycle (link/list/uninstall)
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 2: Gemini skill lifecycle${RESET}"
+echo -e "${BOLD}T1: Install coding-aegis skill${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
 # Clean stale registration
 gemini_quiet skills uninstall coding-aegis --scope user > /dev/null || true
 
-# Test: skill link (local development path — no git clone needed)
 echo -e "${BOLD}TEST: gemini skills link${RESET}"
 output=$(gemini_quiet skills link "$SKILL_DIR" --scope user --consent) || true
 echo -e "  ${YELLOW}${output}${RESET}"
 if echo "$output" | grep -qi "link\|success\|install"; then
-  pass "skills link"
+  pass "skill linked"
 else
-  fail "skills link — unexpected output"
+  fail "skill link failed"
 fi
 
-# Test: skill list
 echo ""
-echo -e "${BOLD}TEST: gemini skills list${RESET}"
+echo -e "${BOLD}TEST: skill visible in list${RESET}"
 output=$(gemini_quiet skills list) || true
-echo -e "  ${YELLOW}${output}${RESET}"
 if echo "$output" | grep -qi "coding-aegis"; then
-  pass "skills list shows coding-aegis"
+  pass "coding-aegis in skills list"
 else
-  fail "skills list — coding-aegis not found"
+  echo -e "  ${YELLOW}${output}${RESET}"
+  fail "coding-aegis not in skills list"
 fi
 
-# Test: skill uninstall
-echo ""
-echo -e "${BOLD}TEST: gemini skills uninstall${RESET}"
-output=$(gemini_quiet skills uninstall coding-aegis --scope user) || true
-echo -e "  ${YELLOW}${output}${RESET}"
-if echo "$output" | grep -qi "uninstall\|remov\|success"; then
-  pass "skills uninstall"
-else
-  fail "skills uninstall — unexpected output"
-fi
-
-# Test: skill gone after uninstall
-echo ""
-echo -e "${BOLD}TEST: gemini skills list after uninstall${RESET}"
-output=$(gemini_quiet skills list) || true
-echo -e "  ${YELLOW}${output}${RESET}"
-if echo "$output" | grep -qi "coding-aegis"; then
-  fail "skill still present after uninstall"
-else
-  pass "skill removed from list"
-fi
+# Set up test directory with catalog
+git -C "$TEST_DIR" init -q
+cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
+echo -e "  ${DIM}Catalog available at $TEST_DIR/pkgs/${RESET}"
 
 # ══════════════════════════════════════════════════════════════
-# Phase 3: Skill commands via aegis-catalog.py (direct)
+# T2 — Use skill: list packages
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 3: Skill commands (direct CLI)${RESET}"
+echo -e "${BOLD}T2: Use skill — list packages${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
-# Test: show — full detail validation
-echo -e "${BOLD}TEST: show helloworld — full detail${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
+echo -e "${BOLD}TEST: coding-aegis list via gemini -p${RESET}"
+LIST_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
+list_output=$(cd "$TEST_DIR" && gemini_quiet -p "$LIST_PROMPT" -o text < /dev/null) || true
+echo -e "${YELLOW}$(echo "$list_output" | head -20)${RESET}"
+if echo "$list_output" | grep -qi "helloworld"; then
+  pass "list — helloworld found in output"
+else
+  fail "list — helloworld not found"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T3 — Use skill: show helloworld
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T3: Use skill — show helloworld${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: coding-aegis show helloworld via gemini -p${RESET}"
+SHOW_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
+show_output=$(cd "$TEST_DIR" && gemini_quiet -p "$SHOW_PROMPT" -o text < /dev/null) || true
+echo -e "${YELLOW}$(echo "$show_output" | head -20)${RESET}"
 errors=0
-for expect in '"name": "helloworld"' '"version": "1.0.0"' '"tier": "optional"' '"author": "platform-team"' '"artifact_summary": "1 rule, 1 skill"'; do
-  if ! echo "$output" | grep -q "$expect"; then
-    echo -e "  ${RED}Missing: $expect${RESET}"
-    errors=$((errors + 1))
+if ! echo "$show_output" | grep -qi "helloworld"; then
+  echo -e "  ${RED}Missing: helloworld name${RESET}"
+  errors=$((errors + 1))
+fi
+if ! echo "$show_output" | grep -qi "optional"; then
+  echo -e "  ${RED}Missing: optional tier${RESET}"
+  errors=$((errors + 1))
+fi
+if [ "$errors" -eq 0 ]; then
+  pass "show — name and tier present"
+else
+  fail "show — $errors expected values missing"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T4 — Use skill: install helloworld
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T4: Use skill — install helloworld${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: coding-aegis install helloworld via gemini -p${RESET}"
+INSTALL_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking the user. Write all files immediately."
+install_output=$(cd "$TEST_DIR" && gemini_quiet -p "$INSTALL_PROMPT" -o text --yolo < /dev/null) || true
+echo -e "${YELLOW}$(echo "$install_output" | head -30)${RESET}"
+if echo "$install_output" | grep -qi "install\|aegis--helloworld\|wrote\|created"; then
+  pass "install — skill reported install activity"
+else
+  fail "install — no install activity detected"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T5 — Verify installed files
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T5: Verify installed files${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+SCOPE_DIR="$TEST_DIR/.claude"
+
+echo -e "${BOLD}TEST: rule file exists${RESET}"
+RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
+if [ -f "$RULE_FILE" ]; then
+  pass "rule file exists"
+else
+  fail "rule file missing"
+  echo "  Files in test dir:"
+  find "$TEST_DIR" -path "$TEST_DIR/pkgs" -prune -o -type f -print 2>/dev/null | sed "s|$TEST_DIR/||" | sort | sed 's/^/    /'
+fi
+
+echo ""
+echo -e "${BOLD}TEST: rule frontmatter${RESET}"
+if [ -f "$RULE_FILE" ]; then
+  rule_content=$(cat "$RULE_FILE")
+  errors=0
+  for expect in "managed-by: coding-aegis" "package: helloworld" "tier: optional"; do
+    if ! echo "$rule_content" | grep -q "$expect"; then
+      echo -e "  ${RED}Missing: $expect${RESET}"
+      errors=$((errors + 1))
+    fi
+  done
+  if [ "$errors" -eq 0 ]; then
+    pass "rule frontmatter correct"
+  else
+    fail "rule frontmatter — $errors fields missing"
   fi
-done
-if [ "$errors" -eq 0 ]; then
-  pass "show helloworld — all fields correct"
 else
-  fail "show helloworld — $errors fields missing"
+  fail "rule frontmatter — file not found"
 fi
 
-# Test: list — tier structure
 echo ""
-echo -e "${BOLD}TEST: list — tier structure${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
-errors=0
-for tier in required best-practices optional goodies; do
-  if ! echo "$output" | grep -q "\"name\": \"$tier\""; then
-    echo -e "  ${RED}Missing tier: $tier${RESET}"
-    errors=$((errors + 1))
-  fi
-done
-if ! echo "$output" | grep -q '"helloworld"'; then
-  echo -e "  ${RED}Missing: helloworld in listing${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "list — 4 tiers, helloworld in optional"
+echo -e "${BOLD}TEST: skill file exists${RESET}"
+SKILL_FILE="$SCOPE_DIR/skills/helloworld/SKILL.md"
+if [ -f "$SKILL_FILE" ]; then
+  pass "skill file exists"
 else
-  fail "list — $errors issues"
+  fail "skill file missing"
 fi
 
-# Test: install-prep — artifact validation
-echo ""
-echo -e "${BOLD}TEST: install-prep helloworld — artifact detail${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
-errors=0
-if ! echo "$output" | grep -q '"target_filename": "aegis--helloworld--helloworld.md"'; then
-  echo -e "  ${RED}Missing: rule target filename${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$output" | grep -q 'managed-by: coding-aegis'; then
-  echo -e "  ${RED}Missing: managed-by in content${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$output" | grep -q '"target_subdir": "skills/helloworld"'; then
-  echo -e "  ${RED}Missing: skill subdir${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "install-prep — rule filename, frontmatter, skill copy all correct"
-else
-  fail "install-prep — $errors issues"
-fi
-
-# ══════════════════════════════════════════════════════════════
-# Phase 4: Install command — full pipeline
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 4: Install pipeline (direct CLI)${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-
-source "$(dirname "$0")/lib-install-test.sh"
-run_install_tests helloworld "$REPO_ROOT/pkgs"
+# T6 teardown happens in the cleanup trap

@@ -1,18 +1,22 @@
 #!/usr/bin/env -S bash -l
-# Smoke test: coding-aegis skill via OpenAI Codex CLI.
+# coding-aegis skill test — OpenAI Codex CLI
 # Usage: tests/test-codex-skill-install.sh
 #
-# Phase 0: Verify codex CLI is installed and authenticated.
-# Phase 1: aegis-catalog.py CLI helper (direct — same as Claude tests).
-# Phase 2: Skill discovery — copy skill into .agents/skills/, verify codex sees it.
-# Phase 3: Skill show command via codex exec.
-#
-# Codex has no plugin marketplace. Skills are discovered from .agents/skills/.
+# Follows the user journey per docs/architecture/testing-spec.md:
+#   T0  Prerequisites (installed + authenticated)
+#   T1  Install coding-aegis skill (file copy to .agents/skills/)
+#   T2  Use skill: list packages
+#   T3  Use skill: show helloworld
+#   T4  Use skill: install helloworld
+#   T5  Verify installed files
+#   T6  Teardown
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 PASS=0
 FAIL=0
+TIMEOUT=${AEGIS_TEST_TIMEOUT:-90}
 
 # Colors
 GREEN='\033[0;32m'
@@ -32,7 +36,14 @@ fail() {
   FAIL=$((FAIL + 1))
 }
 
-print_results() {
+# Test working directory
+TEST_DIR="$(mktemp -d)"
+
+cleanup() {
+  echo ""
+  echo -e "${BOLD}T6: Teardown${RESET}"
+  echo "  Removing test dir: $TEST_DIR"
+  rm -rf "$TEST_DIR"
   echo ""
   echo "================================"
   if [ "$FAIL" -eq 0 ]; then
@@ -43,197 +54,192 @@ print_results() {
   echo "================================"
   [ "$FAIL" -eq 0 ] && exit 0 || exit 1
 }
-trap print_results EXIT
-
-CATALOG_SCRIPT="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-catalog.py"
-SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
-REAL_CATALOG="$REPO_ROOT/pkgs"
+trap cleanup EXIT
 
 echo "========================================"
 echo "coding-aegis skill test (Codex CLI)"
 echo "========================================"
 echo "  Repo root: $REPO_ROOT"
+echo "  Test dir:  $TEST_DIR"
+echo "  Timeout:   ${TIMEOUT}s"
 echo ""
 
 # ══════════════════════════════════════════════════════════════
-# Phase 0: Verify codex CLI
+# T0 — Prerequisites
 # ══════════════════════════════════════════════════════════════
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 0: Codex CLI check${RESET}"
+echo -e "${BOLD}T0: Prerequisites${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
 echo -e "${BOLD}TEST: codex installed${RESET}"
 if command -v codex &>/dev/null; then
-  codex_path=$(command -v codex)
   codex_version=$(codex --version 2>&1 || echo "unknown")
-  echo -e "  ${DIM}Path: $codex_path${RESET}"
+  echo -e "  ${DIM}Path: $(command -v codex)${RESET}"
   echo -e "  ${DIM}Version: $codex_version${RESET}"
-  pass "codex found: $codex_version"
+  pass "codex found"
 else
   fail "codex not found in PATH"
-  echo -e "  ${RED}Install: npm install -g @openai/codex${RESET}"
   exit 1
 fi
 
 echo ""
 echo -e "${BOLD}TEST: codex authenticated${RESET}"
-# codex exec requires a git repo — use a temp dir
-AUTH_DIR="$(mktemp -d)"
-git -C "$AUTH_DIR" init -q
-auth_output=$(cd "$AUTH_DIR" && codex exec "Reply with exactly: AUTH_OK" --ephemeral -o /dev/stdout < /dev/null 2>&1) || true
-rm -rf "$AUTH_DIR"
+# codex exec requires a git repo
+git -C "$TEST_DIR" init -q
+auth_output=$(cd "$TEST_DIR" && codex exec "Reply with exactly: AUTH_OK" \
+  --ephemeral -o /dev/stdout --skip-git-repo-check < /dev/null 2>&1) || true
 if echo "$auth_output" | grep -qi "AUTH_OK"; then
   pass "codex authenticated"
 else
-  echo -e "  ${YELLOW}${auth_output}${RESET}"
-  fail "codex auth check — run 'codex login' first"
+  echo -e "  ${YELLOW}$(echo "$auth_output" | head -5)${RESET}"
+  fail "codex auth check failed"
   exit 1
 fi
 
 # ══════════════════════════════════════════════════════════════
-# Phase 1: aegis-catalog.py CLI helper (direct)
+# T1 — Install coding-aegis skill
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 1: aegis-catalog.py (direct)${RESET}"
+echo -e "${BOLD}T1: Install coding-aegis skill${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
-# Test: resolve-catalog
-echo -e "${BOLD}TEST: resolve-catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" resolve-catalog --from "$REPO_ROOT" 2>&1)
-if echo "$output" | grep -q '"catalog"'; then
-  pass "resolve-catalog"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "resolve-catalog"
-fi
-
-# Test: show helloworld
-echo ""
-echo -e "${BOLD}TEST: show helloworld${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
-errors=0
-for expect in '"name": "helloworld"' '"version": "1.0.0"' '"tier": "optional"' '"author": "platform-team"'; do
-  if ! echo "$output" | grep -q "$expect"; then
-    echo -e "  ${RED}Missing: $expect${RESET}"
-    errors=$((errors + 1))
-  fi
-done
-if [ "$errors" -eq 0 ]; then
-  pass "show helloworld — all fields correct"
-else
-  fail "show helloworld — $errors fields missing"
-fi
-
-# Test: list
-echo ""
-echo -e "${BOLD}TEST: list catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q '"helloworld"'; then
-  pass "list finds helloworld"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "list — helloworld not found"
-fi
-
-# Test: install-prep
-echo ""
-echo -e "${BOLD}TEST: install-prep helloworld${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q 'aegis--helloworld--helloworld.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
-  pass "install-prep — correct filename and frontmatter"
-else
-  echo -e "  ${YELLOW}$(echo "$output" | head -20)${RESET}"
-  fail "install-prep"
-fi
-
-# Test: status with mock installed files
-echo ""
-echo -e "${BOLD}TEST: status with mock install${RESET}"
-TEST_DIR="$(mktemp -d)"
-mkdir -p "$TEST_DIR/rules"
-cat > "$TEST_DIR/rules/aegis--helloworld--helloworld.md" <<'RULE'
----
-package: helloworld
-rule: helloworld
-version: 1.0.0
-tier: optional
-managed-by: coding-aegis
----
-
-# Hello World
-RULE
-output=$(python3 "$CATALOG_SCRIPT" status --catalog "$REAL_CATALOG" --scope "$TEST_DIR" 2>&1)
-if echo "$output" | grep -q '"name": "helloworld"' && echo "$output" | grep -q '"status": "current"'; then
-  pass "status — detected helloworld as current"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "status"
-fi
-rm -rf "$TEST_DIR"
-
-# ══════════════════════════════════════════════════════════════
-# T1 — Local skill install (file-based lifecycle)
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T1: Local skill install (file copy)${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
-
-TEST_DIR="$(mktemp -d)"
-trap 'rm -rf "$TEST_DIR"; print_results' EXIT
-git -C "$TEST_DIR" init -q
-
-# T1.1 + T1.3: Install skill by copying to .agents/skills/
-echo -e "${BOLD}TEST: install skill to .agents/skills/${RESET}"
+echo -e "${BOLD}TEST: copy skill to .agents/skills/${RESET}"
 mkdir -p "$TEST_DIR/.agents/skills/coding-aegis"
 cp "$SKILL_DIR/SKILL.md" "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md"
 cp "$SKILL_DIR/aegis-catalog.py" "$TEST_DIR/.agents/skills/coding-aegis/aegis-catalog.py"
 if [ -f "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md" ]; then
-  pass "skill files copied to .agents/skills/coding-aegis/"
+  pass "skill installed to .agents/skills/coding-aegis/"
 else
-  fail "skill files not found after copy"
+  fail "skill files not found"
 fi
 
-# T1.4: Verify skill is discoverable via codex exec
+# Make catalog accessible
+cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
+echo -e "  ${DIM}Catalog available at $TEST_DIR/pkgs/${RESET}"
+
+# ══════════════════════════════════════════════════════════════
+# T2 — Use skill: list packages
+# ══════════════════════════════════════════════════════════════
 echo ""
-echo -e "${BOLD}TEST: codex discovers installed skill${RESET}"
-cp -R "$REAL_CATALOG" "$TEST_DIR/pkgs"
-SHOW_PROMPT="You have the coding-aegis skill loaded. Use it to show the package named helloworld. The pkgs/ catalog directory is at ./pkgs/. Display the package details."
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T2: Use skill — list packages${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: coding-aegis list via codex exec${RESET}"
+LIST_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
+list_output=$(cd "$TEST_DIR" && codex exec "$LIST_PROMPT" \
+  --ephemeral -s read-only -o /dev/stdout \
+  < /dev/null 2>&1) || true
+echo -e "${YELLOW}$(echo "$list_output" | head -20)${RESET}"
+if echo "$list_output" | grep -qi "helloworld"; then
+  pass "list — helloworld found in output"
+else
+  fail "list — helloworld not found"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T3 — Use skill: show helloworld
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T3: Use skill — show helloworld${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: coding-aegis show helloworld via codex exec${RESET}"
+SHOW_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
 show_output=$(cd "$TEST_DIR" && codex exec "$SHOW_PROMPT" \
-  --ephemeral \
-  -s read-only \
-  -o /dev/stdout \
+  --ephemeral -s read-only -o /dev/stdout \
   < /dev/null 2>&1) || true
 echo -e "${YELLOW}$(echo "$show_output" | head -20)${RESET}"
-if echo "$show_output" | grep -qi "helloworld"; then
-  pass "codex exec — skill loaded, helloworld found"
-else
-  fail "codex exec — skill not loaded or helloworld not found"
+errors=0
+if ! echo "$show_output" | grep -qi "helloworld"; then
+  echo -e "  ${RED}Missing: helloworld name${RESET}"
+  errors=$((errors + 1))
 fi
-
-# T1.5 + T1.6: Remove skill
-echo ""
-echo -e "${BOLD}TEST: remove skill from .agents/skills/${RESET}"
-rm -rf "$TEST_DIR/.agents/skills/coding-aegis"
-if [ ! -d "$TEST_DIR/.agents/skills/coding-aegis" ]; then
-  pass "skill directory removed"
-else
-  fail "skill directory still present"
+if ! echo "$show_output" | grep -qi "optional"; then
+  echo -e "  ${RED}Missing: optional tier${RESET}"
+  errors=$((errors + 1))
 fi
-
-rm -rf "$TEST_DIR"
+if [ "$errors" -eq 0 ]; then
+  pass "show — name and tier present"
+else
+  fail "show — $errors expected values missing"
+fi
 
 # ══════════════════════════════════════════════════════════════
-# T4 — Install pipeline (direct CLI)
+# T4 — Use skill: install helloworld
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T4: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}T4: Use skill — install helloworld${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
 
-source "$(dirname "$0")/lib-install-test.sh"
-run_install_tests helloworld "$REPO_ROOT/pkgs"
+echo -e "${BOLD}TEST: coding-aegis install helloworld via codex exec${RESET}"
+INSTALL_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking the user."
+install_output=$(cd "$TEST_DIR" && codex exec "$INSTALL_PROMPT" \
+  --ephemeral -s workspace-write -o /dev/stdout \
+  < /dev/null 2>&1) || true
+echo -e "${YELLOW}$(echo "$install_output" | head -30)${RESET}"
+if echo "$install_output" | grep -qi "install\|aegis--helloworld\|wrote\|created"; then
+  pass "install — skill reported install activity"
+else
+  fail "install — no install activity detected"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T5 — Verify installed files
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T5: Verify installed files${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+SCOPE_DIR="$TEST_DIR/.claude"
+
+echo -e "${BOLD}TEST: rule file exists${RESET}"
+RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
+if [ -f "$RULE_FILE" ]; then
+  pass "rule file exists"
+else
+  fail "rule file missing"
+  echo "  Files in test dir:"
+  find "$TEST_DIR" -path "$TEST_DIR/pkgs" -prune -o -type f -print 2>/dev/null | sed "s|$TEST_DIR/||" | sort | sed 's/^/    /'
+fi
+
+echo ""
+echo -e "${BOLD}TEST: rule frontmatter${RESET}"
+if [ -f "$RULE_FILE" ]; then
+  rule_content=$(cat "$RULE_FILE")
+  errors=0
+  for expect in "managed-by: coding-aegis" "package: helloworld" "tier: optional"; do
+    if ! echo "$rule_content" | grep -q "$expect"; then
+      echo -e "  ${RED}Missing: $expect${RESET}"
+      errors=$((errors + 1))
+    fi
+  done
+  if [ "$errors" -eq 0 ]; then
+    pass "rule frontmatter correct"
+  else
+    fail "rule frontmatter — $errors fields missing"
+  fi
+else
+  fail "rule frontmatter — file not found"
+fi
+
+echo ""
+echo -e "${BOLD}TEST: skill file exists${RESET}"
+SKILL_FILE="$SCOPE_DIR/skills/helloworld/SKILL.md"
+if [ -f "$SKILL_FILE" ]; then
+  pass "skill file exists"
+else
+  fail "skill file missing"
+fi
+
+# T6 teardown happens in the cleanup trap

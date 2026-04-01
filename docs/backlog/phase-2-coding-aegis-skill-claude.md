@@ -8,10 +8,10 @@
 - [ ] `coding-aegis-b5z.10` Add Gemini remote skill install test (git URL)
 - [ ] `coding-aegis-b5z.11` Update install/testing docs for Claude, Codex, and Gemini CLI
 - [x] `coding-aegis-b5z.12` Cross-tool testing specification for skill setup pipeline
-- [ ] `coding-aegis-b5z.13` Restructure test scripts to follow install-then-use user journey
-- [ ] `coding-aegis-b5z.14` Claude test: install coding-aegis plugin then use skill to install helloworld
-- [ ] `coding-aegis-b5z.15` Codex test: install coding-aegis skill then use it to install helloworld
-- [ ] `coding-aegis-b5z.16` Gemini test: install coding-aegis skill then use it to install helloworld
+- [x] `coding-aegis-b5z.13` Restructure test scripts to follow install-then-use user journey
+- [x] `coding-aegis-b5z.14` Claude test: install coding-aegis plugin then use skill to install helloworld
+- [x] `coding-aegis-b5z.15` Codex test: install coding-aegis skill then use it to install helloworld
+- [x] `coding-aegis-b5z.16` Gemini test: install coding-aegis skill then use it to install helloworld
 - [ ] `coding-aegis-b5z.17` Fix SKILL.md prompting gaps exposed by agent-mediated tests
 - [x] `coding-aegis-b5z.18` Update testing spec to require skill-mediated user journey
 - [x] `coding-aegis-b5z.2` Test Claude Code bootstrap flow
@@ -23,4 +23,4 @@
 - [x] `coding-aegis-b5z.8` Update install/testing docs for Claude, Codex, and Gemini CLI
 - [x] `coding-aegis-b5z.9` Add Codex skill lifecycle tests (file-based install/verify/remove)
 
-**Progress**: 10/18 tasks complete
+**Progress**: 14/18 tasks complete

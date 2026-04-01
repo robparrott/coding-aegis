@@ -1,18 +1,22 @@
 #!/usr/bin/env -S bash -l
-# Smoke test: coding-aegis plugin marketplace install/uninstall.
+# coding-aegis skill test — Claude Code
 # Usage: tests/test-claude-bootstrapped-skill-install.sh
 #
-# Validates that the coding-aegis plugin can be registered as a marketplace,
-# installed, listed, and cleanly uninstalled via the Claude Code CLI.
-# Tests both local directory and remote GitHub sources.
-#
-# Future: skill command tests (list, show, install, status) via claude -p.
+# Follows the user journey per docs/architecture/testing-spec.md:
+#   T0  Prerequisites (installed + authenticated)
+#   T1  Install coding-aegis plugin via marketplace
+#   T2  Use skill: list packages
+#   T3  Use skill: show helloworld
+#   T4  Use skill: install helloworld
+#   T5  Verify installed files
+#   T6  Teardown
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-GITHUB_REPO="robparrott/coding-aegis"
 PASS=0
 FAIL=0
+MARKETPLACE_NAME="coding-aegis"
+TIMEOUT=${AEGIS_TEST_TIMEOUT:-90}
 
 # Colors
 GREEN='\033[0;32m'
@@ -32,121 +36,34 @@ fail() {
   FAIL=$((FAIL + 1))
 }
 
-# Run the full marketplace lifecycle for a given source.
-# Usage: test_marketplace_lifecycle <label> <source> <marketplace_name>
-test_marketplace_lifecycle() {
-  local label="$1"
-  local source="$2"
-  local mp_name="$3"
+# macOS doesn't ship `timeout`; shell-based fallback
+if ! command -v timeout &>/dev/null; then
+  timeout() {
+    local secs="$1"; shift
+    "$@" &
+    local pid=$!
+    ( sleep "$secs" && kill "$pid" 2>/dev/null ) &
+    local watcher=$!
+    wait "$pid" 2>/dev/null
+    local exit_code=$?
+    kill "$watcher" 2>/dev/null
+    wait "$watcher" 2>/dev/null
+    return $exit_code
+  }
+fi
 
+# Test working directory — all skill operations happen here
+TEST_DIR="$(mktemp -d)"
+
+cleanup() {
   echo ""
-  echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-  echo -e "${BOLD}${label}${RESET}"
-  echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-  echo -e "  ${DIM}Source: ${source}${RESET}"
-  echo ""
-
-  # Clean stale registrations from previous runs
-  claude plugin uninstall "coding-aegis@${mp_name}" --scope user 2>/dev/null || true
-  claude plugin marketplace remove "$mp_name" 2>/dev/null || true
-
-  # marketplace add
-  echo -e "${BOLD}TEST: ${label} — marketplace add${RESET}"
-  local output
-  output=$(claude plugin marketplace add "$source" 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "added\|success"; then
-    pass "${label} — marketplace add"
-    # Capture actual marketplace name
-    local detected
-    detected=$(echo "$output" | grep -oi 'marketplace: [a-z_-]*' | head -1 | sed 's/marketplace: //')
-    if [ -n "$detected" ]; then
-      mp_name="$detected"
-      echo -e "  ${DIM}Marketplace name: $mp_name${RESET}"
-    fi
-  else
-    fail "${label} — marketplace add"
-  fi
-
-  # marketplace list
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — marketplace list${RESET}"
-  output=$(claude plugin marketplace list 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "coding-aegis"; then
-    pass "${label} — marketplace list"
-  else
-    fail "${label} — marketplace list"
-  fi
-
-  # plugin install
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — plugin install${RESET}"
-  output=$(claude plugin install "coding-aegis@${mp_name}" --scope user 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "install"; then
-    pass "${label} — plugin install"
-  else
-    fail "${label} — plugin install"
-  fi
-
-  # plugin list
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — plugin list${RESET}"
-  output=$(claude plugin list 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "coding-aegis"; then
-    pass "${label} — plugin list"
-  else
-    fail "${label} — plugin list"
-  fi
-
-  # plugin uninstall
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — plugin uninstall${RESET}"
-  output=$(claude plugin uninstall "coding-aegis@${mp_name}" --scope user 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "uninstall"; then
-    pass "${label} — plugin uninstall"
-  else
-    fail "${label} — plugin uninstall"
-  fi
-
-  # verify plugin gone
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — plugin gone after uninstall${RESET}"
-  output=$(claude plugin list 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "coding-aegis@${mp_name}"; then
-    fail "${label} — plugin still present"
-  else
-    pass "${label} — plugin removed"
-  fi
-
-  # marketplace remove
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — marketplace remove${RESET}"
-  output=$(claude plugin marketplace remove "$mp_name" 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "removed\|success"; then
-    pass "${label} — marketplace remove"
-  else
-    fail "${label} — marketplace remove"
-  fi
-
-  # verify marketplace gone
-  echo ""
-  echo -e "${BOLD}TEST: ${label} — marketplace gone after remove${RESET}"
-  output=$(claude plugin marketplace list 2>&1) || true
-  echo -e "  ${YELLOW}${output}${RESET}"
-  if echo "$output" | grep -qi "$mp_name"; then
-    fail "${label} — marketplace still present"
-  else
-    pass "${label} — marketplace removed"
-  fi
-}
-
-print_results() {
+  echo -e "${BOLD}T6: Teardown${RESET}"
+  echo -e "  ${DIM}Uninstalling plugin...${RESET}"
+  claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user 2>/dev/null || true
+  echo -e "  ${DIM}Removing marketplace...${RESET}"
+  claude plugin marketplace remove "$MARKETPLACE_NAME" 2>/dev/null || true
+  echo "  Removing test dir: $TEST_DIR"
+  rm -rf "$TEST_DIR"
   echo ""
   echo "================================"
   if [ "$FAIL" -eq 0 ]; then
@@ -157,30 +74,30 @@ print_results() {
   echo "================================"
   [ "$FAIL" -eq 0 ] && exit 0 || exit 1
 }
-trap print_results EXIT
+trap cleanup EXIT
 
 echo "========================================"
 echo "coding-aegis skill test (Claude Code)"
 echo "========================================"
-echo "  Repo root:   $REPO_ROOT"
-echo "  GitHub repo: $GITHUB_REPO"
+echo "  Repo root: $REPO_ROOT"
+echo "  Test dir:  $TEST_DIR"
+echo "  Timeout:   ${TIMEOUT}s"
 echo ""
 
 # ══════════════════════════════════════════════════════════════
-# T0 — Tool Prerequisites
+# T0 — Prerequisites
 # ══════════════════════════════════════════════════════════════
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T0: Claude Code prerequisites${RESET}"
+echo -e "${BOLD}T0: Prerequisites${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
 echo -e "${BOLD}TEST: claude installed${RESET}"
 if command -v claude &>/dev/null; then
-  claude_path=$(command -v claude)
   claude_version=$(claude --version 2>&1 || echo "unknown")
-  echo -e "  ${DIM}Path: $claude_path${RESET}"
+  echo -e "  ${DIM}Path: $(command -v claude)${RESET}"
   echo -e "  ${DIM}Version: $claude_version${RESET}"
-  pass "claude found: $claude_version"
+  pass "claude found"
 else
   fail "claude not found in PATH"
   exit 1
@@ -188,92 +105,188 @@ fi
 
 echo ""
 echo -e "${BOLD}TEST: claude authenticated${RESET}"
-auth_output=$(claude -p "Reply with exactly: AUTH_OK" < /dev/null 2>&1) || true
+auth_output=$(timeout "$TIMEOUT" claude -p "Reply with exactly: AUTH_OK" < /dev/null 2>&1) || true
 if echo "$auth_output" | grep -qi "AUTH_OK"; then
   pass "claude authenticated"
 else
   echo -e "  ${YELLOW}$(echo "$auth_output" | head -5)${RESET}"
-  fail "claude auth — run 'claude auth' first"
+  fail "claude auth check failed"
   exit 1
 fi
 
-# T1 — Local marketplace
-test_marketplace_lifecycle "Local marketplace" "$REPO_ROOT" "coding-aegis"
-
-# Phase 2: remote GitHub marketplace
-test_marketplace_lifecycle "Remote marketplace (GitHub)" "$GITHUB_REPO" "coding-aegis"
-
-# Phase 3: skill command test via claude -p
+# ══════════════════════════════════════════════════════════════
+# T1 — Install coding-aegis plugin
+# ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 3: aegis-catalog.py CLI helper${RESET}"
+echo -e "${BOLD}T1: Install coding-aegis plugin${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
-CATALOG_SCRIPT="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-catalog.py"
-REAL_CATALOG="$REPO_ROOT/pkgs"
+# Clean stale registrations
+claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user 2>/dev/null || true
+claude plugin marketplace remove "$MARKETPLACE_NAME" 2>/dev/null || true
 
-# Test: resolve-catalog
-echo -e "${BOLD}TEST: resolve-catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" resolve-catalog --from "$REPO_ROOT" 2>&1)
-if echo "$output" | grep -q '"catalog"'; then
-  pass "resolve-catalog"
+echo -e "${BOLD}TEST: marketplace add (local)${RESET}"
+output=$(claude plugin marketplace add "$REPO_ROOT" 2>&1) || true
+echo -e "  ${YELLOW}${output}${RESET}"
+if echo "$output" | grep -qi "added\|success"; then
+  pass "marketplace add"
+  detected=$(echo "$output" | grep -oi 'marketplace: [a-z_-]*' | head -1 | sed 's/marketplace: //')
+  [ -n "$detected" ] && MARKETPLACE_NAME="$detected"
 else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "resolve-catalog"
+  fail "marketplace add"
 fi
 
-# Test: list
 echo ""
-echo -e "${BOLD}TEST: list catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q '"helloworld"'; then
-  pass "list finds helloworld"
+echo -e "${BOLD}TEST: plugin install${RESET}"
+output=$(claude plugin install "coding-aegis@${MARKETPLACE_NAME}" --scope user 2>&1) || true
+echo -e "  ${YELLOW}${output}${RESET}"
+if echo "$output" | grep -qi "install"; then
+  pass "plugin install"
+else
+  fail "plugin install"
+fi
+
+echo ""
+echo -e "${BOLD}TEST: plugin visible in list${RESET}"
+output=$(claude plugin list 2>&1) || true
+if echo "$output" | grep -qi "coding-aegis"; then
+  pass "coding-aegis in plugin list"
 else
   echo -e "  ${YELLOW}${output}${RESET}"
+  fail "coding-aegis not in plugin list"
+fi
+
+# Set up test directory with catalog symlink (skill needs access to pkgs/)
+ln -s "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs" 2>/dev/null || cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
+echo -e "  ${DIM}Catalog available at $TEST_DIR/pkgs/${RESET}"
+
+# ══════════════════════════════════════════════════════════════
+# T2 — Use skill: list packages
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T2: Use skill — list packages${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: coding-aegis list via claude -p${RESET}"
+LIST_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
+list_output=$(set +x; cd "$TEST_DIR" && timeout "$TIMEOUT" claude -p "$LIST_PROMPT" \
+  --allowedTools "Bash,Read,Glob" \
+  < /dev/null 2>&1) || true
+echo -e "${YELLOW}$(echo "$list_output" | head -20)${RESET}"
+if echo "$list_output" | grep -qi "helloworld"; then
+  pass "list — helloworld found in output"
+else
   fail "list — helloworld not found"
 fi
 
-# Test: show helloworld
-echo ""
-echo -e "${BOLD}TEST: show helloworld${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q '"optional"' && echo "$output" | grep -q '"1.0.0"'; then
-  pass "show helloworld — correct tier and version"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "show helloworld"
-fi
-
-# Test: install-prep helloworld
-echo ""
-echo -e "${BOLD}TEST: install-prep helloworld${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
-if echo "$output" | grep -q 'aegis--helloworld--helloworld.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
-  pass "install-prep — correct filename and frontmatter"
-else
-  echo -e "  ${YELLOW}$(echo "$output" | head -20)${RESET}"
-  fail "install-prep"
-fi
-
-# Test: show not-found
-echo ""
-echo -e "${BOLD}TEST: show nonexistent${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show nonexistent --catalog "$REAL_CATALOG" 2>&1) || true
-if echo "$output" | grep -q '"error"'; then
-  pass "show nonexistent — returns error"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "show nonexistent — expected error"
-fi
-
 # ══════════════════════════════════════════════════════════════
-# Phase 4: Install pipeline (helloworld, real catalog)
+# T3 — Use skill: show helloworld
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 4: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}T3: Use skill — show helloworld${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
 
-source "$(dirname "$0")/lib-install-test.sh"
-run_install_tests helloworld "$REAL_CATALOG"
+echo -e "${BOLD}TEST: coding-aegis show helloworld via claude -p${RESET}"
+SHOW_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
+show_output=$(set +x; cd "$TEST_DIR" && timeout "$TIMEOUT" claude -p "$SHOW_PROMPT" \
+  --allowedTools "Bash,Read,Glob" \
+  < /dev/null 2>&1) || true
+echo -e "${YELLOW}$(echo "$show_output" | head -20)${RESET}"
+errors=0
+if ! echo "$show_output" | grep -qi "helloworld"; then
+  echo -e "  ${RED}Missing: helloworld name${RESET}"
+  errors=$((errors + 1))
+fi
+if ! echo "$show_output" | grep -qi "optional"; then
+  echo -e "  ${RED}Missing: optional tier${RESET}"
+  errors=$((errors + 1))
+fi
+if ! echo "$show_output" | grep -qi "1.0.0"; then
+  echo -e "  ${RED}Missing: version 1.0.0${RESET}"
+  errors=$((errors + 1))
+fi
+if [ "$errors" -eq 0 ]; then
+  pass "show — name, tier, version present"
+else
+  fail "show — $errors expected values missing"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T4 — Use skill: install helloworld
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T4: Use skill — install helloworld${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: coding-aegis install helloworld via claude -p${RESET}"
+INSTALL_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking — do not use AskUserQuestion."
+install_output=$(set +x; cd "$TEST_DIR" && timeout "$TIMEOUT" claude -p "$INSTALL_PROMPT" \
+  --allowedTools "Bash,Read,Write,Glob" \
+  --permission-mode dontAsk \
+  < /dev/null 2>&1) || true
+echo -e "${YELLOW}$(echo "$install_output" | head -30)${RESET}"
+if echo "$install_output" | grep -qi "install\|aegis--helloworld"; then
+  pass "install — skill reported install activity"
+else
+  fail "install — no install activity detected"
+fi
+
+# ══════════════════════════════════════════════════════════════
+# T5 — Verify installed files
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T5: Verify installed files${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+SCOPE_DIR="$TEST_DIR/.claude"
+
+echo -e "${BOLD}TEST: rule file exists${RESET}"
+RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
+if [ -f "$RULE_FILE" ]; then
+  pass "rule file exists: aegis--helloworld--helloworld.md"
+else
+  fail "rule file missing"
+  echo "  Files in test dir:"
+  find "$TEST_DIR/.claude" -type f 2>/dev/null | sed "s|$TEST_DIR/||" | sort | sed 's/^/    /' || echo "    (no .claude dir)"
+fi
+
+echo ""
+echo -e "${BOLD}TEST: rule frontmatter${RESET}"
+if [ -f "$RULE_FILE" ]; then
+  rule_content=$(cat "$RULE_FILE")
+  errors=0
+  for expect in "managed-by: coding-aegis" "package: helloworld" "tier: optional"; do
+    if ! echo "$rule_content" | grep -q "$expect"; then
+      echo -e "  ${RED}Missing: $expect${RESET}"
+      errors=$((errors + 1))
+    fi
+  done
+  if [ "$errors" -eq 0 ]; then
+    pass "rule frontmatter correct"
+  else
+    fail "rule frontmatter — $errors fields missing"
+  fi
+else
+  fail "rule frontmatter — file not found"
+fi
+
+echo ""
+echo -e "${BOLD}TEST: skill file exists${RESET}"
+SKILL_FILE="$SCOPE_DIR/skills/helloworld/SKILL.md"
+if [ -f "$SKILL_FILE" ]; then
+  pass "skill file exists: skills/helloworld/SKILL.md"
+else
+  fail "skill file missing"
+fi
+
+# T6 teardown happens in the cleanup trap

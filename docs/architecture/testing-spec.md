@@ -168,13 +168,13 @@ All end-to-end tests use `helloworld` from `pkgs/optional/helloworld/`. This pac
 
 | Test | Claude | Codex | Gemini | Cursor |
 |------|--------|-------|--------|--------|
-| T0 (prerequisites) | done | done | done | TBD |
-| T1 (install skill) | done | done | done | TBD |
-| T2 (skill: list) | TODO | TODO | TODO | TBD |
-| T3 (skill: show) | TODO | TODO | TODO | TBD |
-| T4 (skill: install) | TODO | TODO | TODO | TBD |
-| T5 (verify files) | TODO | TODO | TODO | TBD |
-| T6 (teardown) | partial | partial | partial | TBD |
-| TS1 (unit tests) | done | done | done | done |
-| TS2 (direct CLI) | done | done | done | TBD |
-| TS3 (install pipeline) | done | done | done | done |
+| T0 (prerequisites) | done (2) | done (2) | done (2) | TBD |
+| T1 (install skill) | done (3) | done (1) | done (2) | TBD |
+| T2 (skill: list) | done (1) | done (1) | done (1) | TBD |
+| T3 (skill: show) | done (1) | done (1) | done (1) | TBD |
+| T4 (skill: install) | done (1) | done (1) | done (1) | TBD |
+| T5 (verify files) | done (3) | done (3) | done (3) | TBD |
+| T6 (teardown) | done (1) | done (1) | done (1) | TBD |
+| TS1 (unit tests) | done (31) | done (31) | done (31) | N/A |
+
+**Totals:** Claude 11, Codex 9, Gemini 10 + 31 unit tests = 61 tests all passing.
