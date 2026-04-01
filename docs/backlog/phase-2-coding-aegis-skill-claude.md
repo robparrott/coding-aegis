@@ -9,5 +9,6 @@
 - [x] `coding-aegis-b5z.3` Implement skill catalog browsing
 - [x] `coding-aegis-b5z.4` Implement package installation
 - [ ] `coding-aegis-b5z.5` Add install-required command to coding-aegis skill
+- [ ] `coding-aegis-b5z.6` Fix automated skill testing — claude -p hangs with --plugin-dir
 
-**Progress**: 3/5 tasks complete
+**Progress**: 3/6 tasks complete
