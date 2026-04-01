@@ -2,7 +2,7 @@
 # coding-aegis skill test — Google Gemini CLI
 # Usage: tests/test-gemini-skill-install.sh
 #
-# Follows the user journey per docs/architecture/testing-spec.md:
+# Follows the user journey per docs/test/testing-spec.md:
 #   T0  Prerequisites (installed + authenticated)
 #   T1  Install coding-aegis skill (gemini skills link)
 #   T2  Use skill: list packages
