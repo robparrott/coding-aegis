@@ -4,12 +4,13 @@
 #
 # Follows the user journey per docs/test/testing-spec.md:
 #   T0  Prerequisites (installed + authenticated)
-#   T1  Install coding-aegis plugin via marketplace
-#   T2  Use skill: list packages
-#   T3  Use skill: show helloworld
-#   T4  Use skill: install helloworld
-#   T5  Verify installed files
-#   T6  Teardown
+#   T1  Register marketplace
+#   T2  Install coding-aegis plugin
+#   T3  Use skill: list packages
+#   T4  Use skill: show helloworld
+#   T5  Use skill: install helloworld
+#   T6  Verify installed files
+#   T7  Teardown
 #
 # Prompts are piped via stdin to avoid shell quoting issues.
 # MCP servers are disabled via --strict-mcp-config to avoid startup hangs.
@@ -25,7 +26,7 @@ TEST_DIR="$(mktemp -d)"
 CLAUDE_COMMON="--strict-mcp-config --mcp-config {\"mcpServers\":{}}"
 
 cleanup() {
-  section "T6: Teardown"
+  section "T7: Teardown"
   run_cli "uninstall plugin" claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user || true
   run_cli "remove marketplace" claude plugin marketplace remove "$MARKETPLACE_NAME" || true
   echo "  Removing test dir: $TEST_DIR"
@@ -57,8 +58,8 @@ CLI_PROMPT="Reply with exactly: AUTH_OK"
 run_cli "auth check" claude -p $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "AUTH_OK" "claude authenticated"
 
-# ── T1: Install coding-aegis plugin ──────────────────────────
-section "T1: Install coding-aegis plugin"
+# ── T1: Register Marketplace ─────────────────────────────────
+section "T1: Register marketplace"
 
 # Clean stale registrations
 claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user 2>/dev/null || true
@@ -69,6 +70,13 @@ run_cli "marketplace add" claude plugin marketplace add "$REPO_ROOT"
 assert_contains "$LAST_OUTPUT" "added\|success" "marketplace add"
 detected=$(echo "$LAST_OUTPUT" | grep -oi 'marketplace: [a-z_-]*' | head -1 | sed 's/marketplace: //')
 [ -n "$detected" ] && MARKETPLACE_NAME="$detected"
+
+test_header "marketplace visible in list"
+run_cli "marketplace list" claude plugin marketplace list
+assert_contains "$LAST_OUTPUT" "$MARKETPLACE_NAME" "marketplace in list"
+
+# ── T2: Install coding-aegis plugin ──────────────────────────
+section "T2: Install coding-aegis plugin"
 
 test_header "plugin install"
 run_cli "plugin install" claude plugin install "coding-aegis@${MARKETPLACE_NAME}" --scope user
@@ -81,8 +89,8 @@ assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in plugin list"
 # Set up test directory with catalog
 ln -s "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs" 2>/dev/null || cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
-# ── T2: Use skill — list ─────────────────────────────────────
-section "T2: Use skill — list packages"
+# ── T3: Use skill — list ─────────────────────────────────────
+section "T3: Use skill — list packages"
 
 test_header "coding-aegis list"
 CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
@@ -90,8 +98,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill list" claude -p \
   --allowedTools "Bash,Read,Glob" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
-# ── T3: Use skill — show ─────────────────────────────────────
-section "T3: Use skill — show helloworld"
+# ── T4: Use skill — show ─────────────────────────────────────
+section "T4: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 CLI_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
@@ -101,8 +109,8 @@ assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 
-# ── T4: Use skill — install ──────────────────────────────────
-section "T4: Use skill — install helloworld"
+# ── T5: Use skill — install ──────────────────────────────────
+section "T5: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
 CLI_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking — do not use AskUserQuestion."
@@ -110,8 +118,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill install" claude -p \
   --allowedTools "Bash,Read,Write,Glob" --permission-mode dontAsk $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld" "install — activity reported"
 
-# ── T5: Verify installed files ────────────────────────────────
-section "T5: Verify installed files"
+# ── T6: Verify installed files ────────────────────────────────
+section "T6: Verify installed files"
 
 SCOPE_DIR="$TEST_DIR/.claude"
 RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
@@ -127,4 +135,4 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
 
-# T6 teardown happens in cleanup trap
+# T7 teardown happens in cleanup trap

@@ -4,12 +4,13 @@
 #
 # Follows the user journey per docs/test/testing-spec.md:
 #   T0  Prerequisites (installed + authenticated)
-#   T1  Install coding-aegis skill (gemini skills link)
-#   T2  Use skill: list packages
-#   T3  Use skill: show helloworld
-#   T4  Use skill: install helloworld
-#   T5  Verify installed files
-#   T6  Teardown
+#   T1  Register marketplace (N/A for Gemini — skipped)
+#   T2  Install coding-aegis skill (gemini skills link)
+#   T3  Use skill: list packages
+#   T4  Use skill: show helloworld
+#   T5  Use skill: install helloworld
+#   T6  Verify installed files
+#   T7  Teardown
 #
 # Note: Gemini CLI on Homebrew emits keytar/keychain warnings.
 # We filter them via gemini_quiet wrapper.
@@ -27,7 +28,7 @@ gemini_quiet() {
 }
 
 cleanup() {
-  section "T6: Teardown"
+  section "T7: Teardown"
   echo -e "  ${DIM}\$ gemini skills uninstall coding-aegis --scope user${RESET}"
   gemini_quiet skills uninstall coding-aegis --scope user > /dev/null || true
   echo "  Removing test dir: $TEST_DIR"
@@ -57,10 +58,15 @@ fi
 test_header "gemini authenticated"
 CLI_PROMPT="Reply with exactly: AUTH_OK"
 run_cli "auth check" gemini_quiet -o text
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "AUTH_OK" "gemini authenticated"
 
-# ── T1: Install coding-aegis skill ───────────────────────────
-section "T1: Install coding-aegis skill"
+# ── T1: Register marketplace (N/A for Gemini) ────────────────
+# Gemini uses `skills link` directly — no separate marketplace registration.
+# Skipping to T2 per testing-spec.md.
+
+# ── T2: Install coding-aegis skill ───────────────────────────
+section "T2: Install coding-aegis skill"
 
 # Clean stale registration
 gemini_quiet skills uninstall coding-aegis --scope user > /dev/null || true
@@ -77,33 +83,37 @@ assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in skills list"
 git -C "$TEST_DIR" init -q
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
-# ── T2: Use skill — list ─────────────────────────────────────
-section "T2: Use skill — list packages"
+# ── T3: Use skill — list ─────────────────────────────────────
+section "T3: Use skill — list packages"
 
 test_header "coding-aegis list"
 CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
-RUN_DIR="$TEST_DIR" run_cli "skill list" gemini_quiet -o text
+RUN_DIR="$TEST_DIR" run_cli "skill list" gemini_quiet -o text --yolo
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
-# ── T3: Use skill — show ─────────────────────────────────────
-section "T3: Use skill — show helloworld"
+# ── T4: Use skill — show ─────────────────────────────────────
+section "T4: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 CLI_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
-RUN_DIR="$TEST_DIR" run_cli "skill show" gemini_quiet -o text
+RUN_DIR="$TEST_DIR" run_cli "skill show" gemini_quiet -o text --yolo
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
+assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 
-# ── T4: Use skill — install ──────────────────────────────────
-section "T4: Use skill — install helloworld"
+# ── T5: Use skill — install ──────────────────────────────────
+section "T5: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
 CLI_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking the user. Write all files immediately."
 RUN_DIR="$TEST_DIR" run_cli "skill install" gemini_quiet -o text --yolo
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 
-# ── T5: Verify installed files ────────────────────────────────
-section "T5: Verify installed files"
+# ── T6: Verify installed files ────────────────────────────────
+section "T6: Verify installed files"
 
 SCOPE_DIR="$TEST_DIR/.claude"
 RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
@@ -119,4 +129,4 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
 
-# T6 teardown happens in cleanup trap
+# T7 teardown happens in cleanup trap

@@ -36,7 +36,7 @@ if ! command -v timeout &>/dev/null; then
     local secs="$1"; shift
     "$@" &
     local pid=$!
-    ( sleep "$secs" && kill "$pid" 2>/dev/null ) &
+    ( sleep "$secs" && kill "$pid" 2>/dev/null ) >/dev/null 2>&1 &
     local watcher=$!
     wait "$pid" 2>/dev/null
     local exit_code=$?
@@ -80,21 +80,43 @@ print_results() {
 # Set RUN_DIR before calling to execute in a different directory.
 # Set CLI_PROMPT to pipe a prompt via stdin (avoids shell quoting issues).
 # When CLI_PROMPT is set, stdin is piped; otherwise stdin is /dev/null.
-# Both reset after each call.
+# RUN_DIR and CLI_PROMPT reset after each call.
 RUN_DIR=""
 CLI_PROMPT=""
 
 run_cli() {
   local description="$1"; shift
 
-  # Print command in dim text
+  # Build display command: strip _quiet suffix from wrapper function names
   local display_cmd="$*"
-  if [ ${#display_cmd} -gt 120 ]; then
-    display_cmd="${display_cmd:0:117}..."
+  if [[ "$1" == *_quiet ]]; then
+    display_cmd="${1%_quiet} ${*:2}"
   fi
-  echo -e "  ${DIM}\$ ${display_cmd}${RESET}"
-  [ -n "$RUN_DIR" ] && echo -e "  ${DIM}  (in $RUN_DIR)${RESET}"
-  [ -n "$CLI_PROMPT" ] && echo -e "  ${DIM}  prompt: ${CLI_PROMPT:0:100}${RESET}"
+
+  # Show as: $ echo "prompt" | command   or just   $ command
+  if [ -n "$CLI_PROMPT" ]; then
+    # Wrap prompt text and pipe to command
+    local prompt_lines
+    prompt_lines=$(echo "$CLI_PROMPT" | fmt -w 68)
+    local first_line last_line
+    first_line=$(echo "$prompt_lines" | head -1)
+    local line_count
+    line_count=$(echo "$prompt_lines" | wc -l | tr -d ' ')
+
+    if [ "$line_count" -eq 1 ]; then
+      echo -e "  ${DIM}\$ echo \"${first_line}\" \\\\${RESET}"
+      echo -e "  ${DIM}    | ${display_cmd}${RESET}"
+    else
+      echo -e "  ${DIM}\$ echo \"${first_line}${RESET}"
+      echo "$prompt_lines" | tail -n +2 | while IFS= read -r line; do
+        echo -e "  ${DIM}    ${line}${RESET}"
+      done
+      echo -e "  ${DIM}    \" | ${display_cmd}${RESET}"
+    fi
+  else
+    echo -e "  ${DIM}\$ ${display_cmd}${RESET}"
+  fi
+  [ -n "$RUN_DIR" ] && echo -e "  ${DIM}    (in $RUN_DIR)${RESET}"
 
   local start_time
   start_time=$(date +%s)
@@ -116,11 +138,12 @@ run_cli() {
   end_time=$(date +%s)
   elapsed=$((end_time - start_time))
 
-  # Normalize timeout exit codes
+  # Normalize timeout exit codes — register as a failure and return 0
+  # so set -e doesn't abort the script before subsequent assertions run.
   if [ "$LAST_EXIT" -eq 124 ] || [ "$LAST_EXIT" -eq 142 ] || [ "$LAST_EXIT" -eq 143 ]; then
-    echo -e "  ${RED}TIMEOUT after ${TIMEOUT}s${RESET}"
     echo -e "  ${DIM}(${elapsed}s elapsed)${RESET}"
-    return "$LAST_EXIT"
+    fail "TIMEOUT after ${TIMEOUT}s: $description"
+    return 0
   fi
 
   echo -e "  ${DIM}(${elapsed}s elapsed, exit ${LAST_EXIT})${RESET}"
@@ -190,6 +213,26 @@ assert_file_contains() {
     pass "$description"
   else
     fail "$description — '$pattern' not found in $(basename "$path")"
+  fi
+}
+
+# ── Quota / rate-limit guard ────────────────────────────────
+
+# assert_no_quota_error <output> [tool-name]
+# Check if output contains quota/rate-limit errors. If detected,
+# register a FAIL and exit (cleanup trap handles teardown).
+assert_no_quota_error() {
+  local output="$1"
+  local tool="${2:-agent}"
+
+  if echo "$output" | grep -qi "quota\|rate.limit\|RESOURCE_EXHAUSTED\|429\|too many requests\|limit exceeded\|try again later"; then
+    fail "${tool} API quota exhausted — aborting test run"
+    echo ""
+    echo -e "  ${RED}Quota/rate-limit error detected in ${tool} output:${RESET}"
+    echo "$output" | grep -i "quota\|rate.limit\|RESOURCE_EXHAUSTED\|429\|too many requests\|limit exceeded\|try again later" | head -5 | while IFS= read -r line; do
+      echo -e "    ${DIM}${line}${RESET}"
+    done
+    exit 1
   fi
 }
 

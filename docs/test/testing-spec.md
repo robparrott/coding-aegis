@@ -64,7 +64,7 @@ Every tool follows the same stdin pattern. The only differences are the binary n
 
 **Gemini flags:**
 - `-o text` — plain text output
-- `--yolo` — auto-approve for install
+- `--yolo` — auto-approve tool use for all agent-mediated steps (T3-T5); without this, Gemini prompts for approval which hangs in headless mode
 - `gemini_quiet` wrapper filters Homebrew keytar warnings
 
 ### Non-prompt CLI calls
@@ -81,11 +81,12 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 
 | Function | Purpose |
 |----------|---------|
-| `run_cli <desc> <cmd...>` | Execute command. If `CLI_PROMPT` set, pipes via stdin. If `RUN_DIR` set, runs there. Sets `$LAST_OUTPUT`, `$LAST_EXIT`. Both reset after call. |
+| `run_cli <desc> <cmd...>` | Execute command. If `CLI_PROMPT` set, pipes via stdin and displays as `echo "prompt" \| cmd`. If `RUN_DIR` set, runs there. Timeouts register as FAIL. Wrapper names (`*_quiet`) are auto-resolved for display. Sets `$LAST_OUTPUT`, `$LAST_EXIT`. `CLI_PROMPT` and `RUN_DIR` reset after call. |
 | `assert_contains <output> <pattern> <desc>` | Case-insensitive grep, pass/fail |
 | `assert_not_contains <output> <pattern> <desc>` | Inverse |
 | `assert_file_exists <path> <desc>` | File existence |
 | `assert_file_contains <path> <pattern> <desc>` | Grep file content |
+| `assert_no_quota_error <output> [tool]` | Detect quota/rate-limit errors; FAIL + abort if found |
 | `pass <desc>` / `fail <desc>` | Counters + colored output |
 | `print_results` | Final summary, exit 0/1 |
 | `section <title>` / `test_header <title>` | Formatted headers |
@@ -119,7 +120,7 @@ Add the coding-aegis catalog as a source the tool can install from.
 | Tool | T1.1 | T1.2 |
 |------|------|------|
 | Claude | `claude plugin marketplace add <path>` | `claude plugin marketplace list` |
-| Codex | N/A (no marketplace — skip to T2) | N/A |
+| Codex | Verify `install-skill-from-github.py` exists | Built-in installer present |
 | Gemini | N/A (uses `skills link` directly — skip to T2) | N/A |
 
 ### T2 — Install coding-aegis Skill
@@ -134,7 +135,7 @@ Install the skill from the registered source (T1) or via the best available mech
 | Tool | T2.1 | T2.2 |
 |------|------|------|
 | Claude | `claude plugin install coding-aegis@<mp>` | `claude plugin list` |
-| Codex | `cp` skill to `.agents/skills/` | `assert_file_exists` |
+| Codex | `install-skill-from-github.py --repo --path --dest` | `assert_file_exists` |
 | Gemini | `gemini skills link <path> --consent` | `gemini skills list` |
 
 ### T3 — Use Skill: List Packages
@@ -208,4 +209,4 @@ Filesystem checks, no agent.
 | T7 Teardown | done | done | done | TBD |
 | Unit tests | done (31) | — | — | — |
 
-**Note:** Test scripts need to be renumbered to match this T0-T7 sequence (tracked in b5z.27).
+All test scripts conform to the T0-T7 sequence defined above.

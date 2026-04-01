@@ -23,8 +23,9 @@
 - [x] `coding-aegis-b5z.24` Refactor Codex test script to use lib-test-harness.sh
 - [x] `coding-aegis-b5z.25` Refactor Gemini test script to use lib-test-harness.sh
 - [x] `coding-aegis-b5z.26` Standardize stdin prompt delivery for Gemini test script
-- [ ] `coding-aegis-b5z.27` Validate all 3 test scripts conform to testing-spec.md
-- [ ] `coding-aegis-b5z.28` Fix elapsed time display in lib-test-harness.sh
+- [x] `coding-aegis-b5z.27` Validate all 3 test scripts conform to testing-spec.md
+- [x] `coding-aegis-b5z.28` Fix elapsed time display in lib-test-harness.sh
+- [x] `coding-aegis-b5z.29` Research Codex remote skill install mechanism (eliminate local file copy)
 - [x] `coding-aegis-b5z.3` Implement skill catalog browsing
 - [x] `coding-aegis-b5z.4` Implement package installation
 - [ ] `coding-aegis-b5z.5` Add install-required command to coding-aegis skill
@@ -33,4 +34,4 @@
 - [x] `coding-aegis-b5z.8` Update install/testing docs for Claude, Codex, and Gemini CLI
 - [x] `coding-aegis-b5z.9` Add Codex skill lifecycle tests (file-based install/verify/remove)
 
-**Progress**: 23/28 tasks complete
+**Progress**: 26/29 tasks complete
