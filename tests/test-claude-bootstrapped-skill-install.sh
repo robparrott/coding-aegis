@@ -237,75 +237,137 @@ else
 fi
 
 # ══════════════════════════════════════════════════════════════
-# Phase 4: Skill end-to-end via claude -p (show command)
+# Phase 4: Skill commands via aegis-catalog.py (direct)
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 4: Skill show via claude -p${RESET}"
+echo -e "${BOLD}Phase 4: Skill commands (direct CLI)${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
-SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
-TIMEOUT_SKILL=${AEGIS_TEST_TIMEOUT_SKILL:-60}
+# Test: show — full detail validation
+echo -e "${BOLD}TEST: show test-stub — full detail${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+errors=0
+for expect in '"name": "test-stub"' '"version": "1.0.0"' '"tier": "goodies"' '"author": "test-team"' '"artifact_summary": "1 rule, 1 skill"'; do
+  if ! echo "$output" | grep -q "$expect"; then
+    echo -e "  ${RED}Missing: $expect${RESET}"
+    errors=$((errors + 1))
+  fi
+done
+if echo "$output" | grep -q '"readme"'; then
+  : # readme field present
+else
+  echo -e "  ${RED}Missing: readme field${RESET}"
+  errors=$((errors + 1))
+fi
+if [ "$errors" -eq 0 ]; then
+  pass "show test-stub — all fields correct"
+else
+  fail "show test-stub — $errors fields missing"
+fi
+
+# Test: list — tier structure and package presence
+echo ""
+echo -e "${BOLD}TEST: list — tier structure${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" list --catalog "$FIXTURE_CATALOG" 2>&1)
+errors=0
+# Verify all 4 tiers present
+for tier in required best-practices optional goodies; do
+  if ! echo "$output" | grep -q "\"name\": \"$tier\""; then
+    echo -e "  ${RED}Missing tier: $tier${RESET}"
+    errors=$((errors + 1))
+  fi
+done
+# Verify test-stub appears in goodies
+if ! echo "$output" | grep -q '"test-stub"'; then
+  echo -e "  ${RED}Missing: test-stub in listing${RESET}"
+  errors=$((errors + 1))
+fi
+# Verify empty tiers have no packages
+required_pkgs=$(echo "$output" | python3 -c "import sys,json; d=json.load(sys.stdin); t=[x for x in d['tiers'] if x['name']=='required'][0]; print(len(t['packages']))" 2>/dev/null || echo "?")
+if [ "$required_pkgs" = "0" ]; then
+  : # correct
+else
+  echo -e "  ${RED}required tier should be empty, got $required_pkgs packages${RESET}"
+  errors=$((errors + 1))
+fi
+if [ "$errors" -eq 0 ]; then
+  pass "list — 4 tiers, test-stub in goodies, empty tiers correct"
+else
+  fail "list — $errors issues"
+fi
+
+# Test: install-prep — full artifact validation
+echo ""
+echo -e "${BOLD}TEST: install-prep test-stub — artifact detail${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" install-prep test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+errors=0
+# Rule artifact checks
+if ! echo "$output" | grep -q '"target_filename": "aegis--test-stub--test-rule.md"'; then
+  echo -e "  ${RED}Missing: rule target filename${RESET}"
+  errors=$((errors + 1))
+fi
+if ! echo "$output" | grep -q '"target_subdir": "rules"'; then
+  echo -e "  ${RED}Missing: rules subdir${RESET}"
+  errors=$((errors + 1))
+fi
+# Frontmatter in content
+if ! echo "$output" | grep -q 'managed-by: coding-aegis'; then
+  echo -e "  ${RED}Missing: managed-by in content${RESET}"
+  errors=$((errors + 1))
+fi
+if ! echo "$output" | grep -q 'package: test-stub'; then
+  echo -e "  ${RED}Missing: package in frontmatter${RESET}"
+  errors=$((errors + 1))
+fi
+# Skill artifact checks
+if ! echo "$output" | grep -q '"target_subdir": "skills/test-stub"'; then
+  echo -e "  ${RED}Missing: skill subdir${RESET}"
+  errors=$((errors + 1))
+fi
+# Verify original description preserved
+if ! echo "$output" | grep -q 'test rule for validation'; then
+  echo -e "  ${RED}Missing: original description preserved${RESET}"
+  errors=$((errors + 1))
+fi
+if [ "$errors" -eq 0 ]; then
+  pass "install-prep — rule filename, frontmatter, skill copy all correct"
+else
+  fail "install-prep — $errors issues"
+fi
+
+# Test: status — with mock installed files
+echo ""
+echo -e "${BOLD}TEST: status — detects installed package${RESET}"
 TEST_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEST_DIR"; print_results' EXIT
+mkdir -p "$TEST_DIR/rules"
+cat > "$TEST_DIR/rules/aegis--test-stub--test-rule.md" <<'RULE'
+---
+package: test-stub
+rule: test-rule
+version: 1.0.0
+tier: goodies
+managed-by: coding-aegis
+---
 
-# Set up: copy skill + helper + fixture catalog into test dir
-mkdir -p "$TEST_DIR/.claude/skills/coding-aegis"
-cp "$SKILL_DIR/SKILL.md" "$TEST_DIR/.claude/skills/coding-aegis/SKILL.md"
-cp "$SKILL_DIR/aegis-catalog.py" "$TEST_DIR/.claude/skills/coding-aegis/aegis-catalog.py"
-cp -R "$FIXTURE_CATALOG" "$TEST_DIR/pkgs"
-echo -e "  ${DIM}Test dir: $TEST_DIR${RESET}"
-
-# macOS doesn't ship `timeout`; use a shell-based fallback
-if ! command -v timeout &>/dev/null; then
-  timeout() {
-    local secs="$1"; shift
-    "$@" &
-    local pid=$!
-    ( sleep "$secs" && kill "$pid" 2>/dev/null ) &
-    local watcher=$!
-    wait "$pid" 2>/dev/null
-    local exit_code=$?
-    kill "$watcher" 2>/dev/null
-    wait "$watcher" 2>/dev/null
-    return $exit_code
-  }
+# Test Rule
+RULE
+output=$(python3 "$CATALOG_SCRIPT" status --catalog "$FIXTURE_CATALOG" --scope "$TEST_DIR" 2>&1)
+errors=0
+if ! echo "$output" | grep -q '"name": "test-stub"'; then
+  echo -e "  ${RED}Missing: test-stub in status${RESET}"
+  errors=$((errors + 1))
 fi
-
-SHOW_PROMPT="You have the coding-aegis skill loaded. Follow its instructions to execute the show command for the package named test-stub. The pkgs/ catalog directory exists at ./pkgs/ in the current working directory. Display the package details."
-echo -e "${BOLD}TEST: skill show test-stub via claude -p${RESET}"
-echo -e "  ${DIM}Timeout: ${TIMEOUT_SKILL}s${RESET}"
-
-output=""
-exit_code=0
-output=$(set +x; cd "$TEST_DIR" && timeout "$TIMEOUT_SKILL" claude -p "$SHOW_PROMPT" \
-  --allowedTools "Bash,Read,Glob" \
-  < /dev/null 2>&1) || exit_code=$?
-
-if [ "$exit_code" -eq 124 ] || [ "$exit_code" -eq 142 ] || [ "$exit_code" -eq 143 ]; then
-  echo -e "  ${RED}TIMEOUT after ${TIMEOUT_SKILL}s${RESET}"
-  fail "skill show test-stub — timed out"
+if ! echo "$output" | grep -q '"status": "current"'; then
+  echo -e "  ${RED}Missing: current status${RESET}"
+  errors=$((errors + 1))
+fi
+if [ "$errors" -eq 0 ]; then
+  pass "status — detected test-stub as current"
 else
-  echo -e "${YELLOW}$(echo "$output" | head -30)${RESET}"
-  errors=0
-  if ! echo "$output" | grep -qi "test-stub"; then
-    echo -e "  ${RED}Missing: test-stub name${RESET}"
-    errors=$((errors + 1))
-  fi
-  if ! echo "$output" | grep -qi "goodies"; then
-    echo -e "  ${RED}Missing: goodies tier${RESET}"
-    errors=$((errors + 1))
-  fi
-  if ! echo "$output" | grep -qi "1.0.0"; then
-    echo -e "  ${RED}Missing: version 1.0.0${RESET}"
-    errors=$((errors + 1))
-  fi
-  if [ "$errors" -eq 0 ]; then
-    pass "skill show test-stub — name, tier, version all present"
-  else
-    fail "skill show test-stub — $errors expected values missing"
-  fi
+  echo -e "  ${YELLOW}${output}${RESET}"
+  fail "status — $errors issues"
 fi
-
 rm -rf "$TEST_DIR"
