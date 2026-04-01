@@ -61,7 +61,7 @@ trap cleanup EXIT
 
 CATALOG_SCRIPT="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-catalog.py"
 SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
-FIXTURE_CATALOG="$REPO_ROOT/tests/fixtures/pkgs"
+REAL_CATALOG="$REPO_ROOT/pkgs"
 
 echo "========================================"
 echo "coding-aegis skill test (Gemini CLI)"
@@ -120,35 +120,35 @@ else
 fi
 
 echo ""
-echo -e "${BOLD}TEST: show test-stub${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+echo -e "${BOLD}TEST: show helloworld${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
 errors=0
-for expect in '"name": "test-stub"' '"version": "1.0.0"' '"tier": "goodies"' '"author": "test-team"'; do
+for expect in '"name": "helloworld"' '"version": "1.0.0"' '"tier": "optional"' '"author": "platform-team"'; do
   if ! echo "$output" | grep -q "$expect"; then
     echo -e "  ${RED}Missing: $expect${RESET}"
     errors=$((errors + 1))
   fi
 done
 if [ "$errors" -eq 0 ]; then
-  pass "show test-stub — all fields correct"
+  pass "show helloworld — all fields correct"
 else
-  fail "show test-stub — $errors fields missing"
+  fail "show helloworld — $errors fields missing"
 fi
 
 echo ""
 echo -e "${BOLD}TEST: list fixture catalog${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$FIXTURE_CATALOG" 2>&1)
-if echo "$output" | grep -q '"test-stub"'; then
-  pass "list finds test-stub"
+output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
+if echo "$output" | grep -q '"helloworld"'; then
+  pass "list finds helloworld"
 else
   echo -e "  ${YELLOW}${output}${RESET}"
-  fail "list — test-stub not found"
+  fail "list — helloworld not found"
 fi
 
 echo ""
-echo -e "${BOLD}TEST: install-prep test-stub${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
-if echo "$output" | grep -q 'aegis--test-stub--test-rule.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
+echo -e "${BOLD}TEST: install-prep helloworld${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
+if echo "$output" | grep -q 'aegis--helloworld--helloworld.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
   pass "install-prep — correct filename and frontmatter"
 else
   echo -e "  ${YELLOW}$(echo "$output" | head -20)${RESET}"
@@ -159,20 +159,20 @@ echo ""
 echo -e "${BOLD}TEST: status with mock install${RESET}"
 MOCK_DIR="$(mktemp -d)"
 mkdir -p "$MOCK_DIR/rules"
-cat > "$MOCK_DIR/rules/aegis--test-stub--test-rule.md" <<'RULE'
+cat > "$MOCK_DIR/rules/aegis--helloworld--helloworld.md" <<'RULE'
 ---
-package: test-stub
-rule: test-rule
+package: helloworld
+rule: helloworld
 version: 1.0.0
-tier: goodies
+tier: optional
 managed-by: coding-aegis
 ---
 
-# Test Rule
+# Hello World
 RULE
-output=$(python3 "$CATALOG_SCRIPT" status --catalog "$FIXTURE_CATALOG" --scope "$MOCK_DIR" 2>&1)
-if echo "$output" | grep -q '"name": "test-stub"' && echo "$output" | grep -q '"status": "current"'; then
-  pass "status — detected test-stub as current"
+output=$(python3 "$CATALOG_SCRIPT" status --catalog "$REAL_CATALOG" --scope "$MOCK_DIR" 2>&1)
+if echo "$output" | grep -q '"name": "helloworld"' && echo "$output" | grep -q '"status": "current"'; then
+  pass "status — detected helloworld as current"
 else
   echo -e "  ${YELLOW}${output}${RESET}"
   fail "status"
@@ -244,25 +244,25 @@ echo -e "${BOLD}═════════════════════�
 echo ""
 
 # Test: show — full detail validation
-echo -e "${BOLD}TEST: show test-stub — full detail${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+echo -e "${BOLD}TEST: show helloworld — full detail${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
 errors=0
-for expect in '"name": "test-stub"' '"version": "1.0.0"' '"tier": "goodies"' '"author": "test-team"' '"artifact_summary": "1 rule, 1 skill"'; do
+for expect in '"name": "helloworld"' '"version": "1.0.0"' '"tier": "optional"' '"author": "platform-team"' '"artifact_summary": "1 rule, 1 skill"'; do
   if ! echo "$output" | grep -q "$expect"; then
     echo -e "  ${RED}Missing: $expect${RESET}"
     errors=$((errors + 1))
   fi
 done
 if [ "$errors" -eq 0 ]; then
-  pass "show test-stub — all fields correct"
+  pass "show helloworld — all fields correct"
 else
-  fail "show test-stub — $errors fields missing"
+  fail "show helloworld — $errors fields missing"
 fi
 
 # Test: list — tier structure
 echo ""
 echo -e "${BOLD}TEST: list — tier structure${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$FIXTURE_CATALOG" 2>&1)
+output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
 errors=0
 for tier in required best-practices optional goodies; do
   if ! echo "$output" | grep -q "\"name\": \"$tier\""; then
@@ -270,22 +270,22 @@ for tier in required best-practices optional goodies; do
     errors=$((errors + 1))
   fi
 done
-if ! echo "$output" | grep -q '"test-stub"'; then
-  echo -e "  ${RED}Missing: test-stub in listing${RESET}"
+if ! echo "$output" | grep -q '"helloworld"'; then
+  echo -e "  ${RED}Missing: helloworld in listing${RESET}"
   errors=$((errors + 1))
 fi
 if [ "$errors" -eq 0 ]; then
-  pass "list — 4 tiers, test-stub in goodies"
+  pass "list — 4 tiers, helloworld in optional"
 else
   fail "list — $errors issues"
 fi
 
 # Test: install-prep — artifact validation
 echo ""
-echo -e "${BOLD}TEST: install-prep test-stub — artifact detail${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
+echo -e "${BOLD}TEST: install-prep helloworld — artifact detail${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
 errors=0
-if ! echo "$output" | grep -q '"target_filename": "aegis--test-stub--test-rule.md"'; then
+if ! echo "$output" | grep -q '"target_filename": "aegis--helloworld--helloworld.md"'; then
   echo -e "  ${RED}Missing: rule target filename${RESET}"
   errors=$((errors + 1))
 fi
@@ -293,7 +293,7 @@ if ! echo "$output" | grep -q 'managed-by: coding-aegis'; then
   echo -e "  ${RED}Missing: managed-by in content${RESET}"
   errors=$((errors + 1))
 fi
-if ! echo "$output" | grep -q '"target_subdir": "skills/test-stub"'; then
+if ! echo "$output" | grep -q '"target_subdir": "skills/helloworld"'; then
   echo -e "  ${RED}Missing: skill subdir${RESET}"
   errors=$((errors + 1))
 fi
@@ -312,4 +312,4 @@ echo -e "${BOLD}Phase 4: Install pipeline (direct CLI)${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 
 source "$(dirname "$0")/lib-install-test.sh"
-run_install_tests
+run_install_tests helloworld "$REPO_ROOT/pkgs"

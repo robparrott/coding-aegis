@@ -13,7 +13,7 @@
 - [ ] `coding-aegis-b5z.5` Add install-required command to coding-aegis skill
 - [x] `coding-aegis-b5z.6` Fix automated skill testing — claude -p hangs with --plugin-dir
 - [x] `coding-aegis-b5z.7` Test install command — direct CLI (install-prep + file write)
-- [ ] `coding-aegis-b5z.8` Update install/testing docs for Claude, Codex, and Gemini CLI
+- [x] `coding-aegis-b5z.8` Update install/testing docs for Claude, Codex, and Gemini CLI
 - [ ] `coding-aegis-b5z.9` Add Codex skill lifecycle tests (file-based install/verify/remove)
 
-**Progress**: 6/11 tasks complete
+**Progress**: 7/11 tasks complete

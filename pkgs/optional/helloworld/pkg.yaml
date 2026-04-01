@@ -1,0 +1,9 @@
+name: helloworld
+version: 1.0.0
+description: Minimal governance package for end-to-end validation
+author: platform-team
+artifacts:
+  - type: rule
+    path: rules/helloworld.md
+  - type: skill
+    path: skills/helloworld/SKILL.md

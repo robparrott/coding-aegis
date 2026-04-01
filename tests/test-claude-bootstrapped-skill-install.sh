@@ -180,45 +180,45 @@ echo -e "${BOLD}═════════════════════�
 echo ""
 
 CATALOG_SCRIPT="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-catalog.py"
-FIXTURE_CATALOG="$REPO_ROOT/tests/fixtures/pkgs"
+REAL_CATALOG="$REPO_ROOT/pkgs"
 
 # Test: resolve-catalog
-echo -e "${BOLD}TEST: aegis-catalog.py resolve-catalog${RESET}"
+echo -e "${BOLD}TEST: resolve-catalog${RESET}"
 output=$(python3 "$CATALOG_SCRIPT" resolve-catalog --from "$REPO_ROOT" 2>&1)
-echo -e "  ${YELLOW}${output}${RESET}"
 if echo "$output" | grep -q '"catalog"'; then
   pass "resolve-catalog"
 else
+  echo -e "  ${YELLOW}${output}${RESET}"
   fail "resolve-catalog"
 fi
 
-# Test: list (using test fixture catalog)
+# Test: list
 echo ""
-echo -e "${BOLD}TEST: aegis-catalog.py list (fixture)${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$FIXTURE_CATALOG" 2>&1)
-if echo "$output" | grep -q '"test-stub"'; then
-  pass "list finds test-stub in fixture catalog"
+echo -e "${BOLD}TEST: list catalog${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" list --catalog "$REAL_CATALOG" 2>&1)
+if echo "$output" | grep -q '"helloworld"'; then
+  pass "list finds helloworld"
 else
   echo -e "  ${YELLOW}${output}${RESET}"
-  fail "list — test-stub not found"
+  fail "list — helloworld not found"
 fi
 
-# Test: show (using test fixture catalog)
+# Test: show helloworld
 echo ""
-echo -e "${BOLD}TEST: aegis-catalog.py show test-stub (fixture)${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
-if echo "$output" | grep -q '"goodies"' && echo "$output" | grep -q '"1.0.0"'; then
-  pass "show test-stub — correct tier and version"
+echo -e "${BOLD}TEST: show helloworld${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show helloworld --catalog "$REAL_CATALOG" 2>&1)
+if echo "$output" | grep -q '"optional"' && echo "$output" | grep -q '"1.0.0"'; then
+  pass "show helloworld — correct tier and version"
 else
   echo -e "  ${YELLOW}${output}${RESET}"
-  fail "show test-stub"
+  fail "show helloworld"
 fi
 
-# Test: install-prep (using test fixture catalog)
+# Test: install-prep helloworld
 echo ""
-echo -e "${BOLD}TEST: aegis-catalog.py install-prep test-stub (fixture)${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
-if echo "$output" | grep -q 'aegis--test-stub--test-rule.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
+echo -e "${BOLD}TEST: install-prep helloworld${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" install-prep helloworld --catalog "$REAL_CATALOG" 2>&1)
+if echo "$output" | grep -q 'aegis--helloworld--helloworld.md' && echo "$output" | grep -q 'managed-by: coding-aegis'; then
   pass "install-prep — correct filename and frontmatter"
 else
   echo -e "  ${YELLOW}$(echo "$output" | head -20)${RESET}"
@@ -227,8 +227,8 @@ fi
 
 # Test: show not-found
 echo ""
-echo -e "${BOLD}TEST: aegis-catalog.py show nonexistent (fixture)${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show nonexistent --catalog "$FIXTURE_CATALOG" 2>&1) || true
+echo -e "${BOLD}TEST: show nonexistent${RESET}"
+output=$(python3 "$CATALOG_SCRIPT" show nonexistent --catalog "$REAL_CATALOG" 2>&1) || true
 if echo "$output" | grep -q '"error"'; then
   pass "show nonexistent — returns error"
 else
@@ -237,148 +237,12 @@ else
 fi
 
 # ══════════════════════════════════════════════════════════════
-# Phase 4: Skill commands via aegis-catalog.py (direct)
+# Phase 4: Install pipeline (helloworld, real catalog)
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 4: Skill commands (direct CLI)${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
-
-# Test: show — full detail validation
-echo -e "${BOLD}TEST: show test-stub — full detail${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" show test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
-errors=0
-for expect in '"name": "test-stub"' '"version": "1.0.0"' '"tier": "goodies"' '"author": "test-team"' '"artifact_summary": "1 rule, 1 skill"'; do
-  if ! echo "$output" | grep -q "$expect"; then
-    echo -e "  ${RED}Missing: $expect${RESET}"
-    errors=$((errors + 1))
-  fi
-done
-if echo "$output" | grep -q '"readme"'; then
-  : # readme field present
-else
-  echo -e "  ${RED}Missing: readme field${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "show test-stub — all fields correct"
-else
-  fail "show test-stub — $errors fields missing"
-fi
-
-# Test: list — tier structure and package presence
-echo ""
-echo -e "${BOLD}TEST: list — tier structure${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" list --catalog "$FIXTURE_CATALOG" 2>&1)
-errors=0
-# Verify all 4 tiers present
-for tier in required best-practices optional goodies; do
-  if ! echo "$output" | grep -q "\"name\": \"$tier\""; then
-    echo -e "  ${RED}Missing tier: $tier${RESET}"
-    errors=$((errors + 1))
-  fi
-done
-# Verify test-stub appears in goodies
-if ! echo "$output" | grep -q '"test-stub"'; then
-  echo -e "  ${RED}Missing: test-stub in listing${RESET}"
-  errors=$((errors + 1))
-fi
-# Verify empty tiers have no packages
-required_pkgs=$(echo "$output" | python3 -c "import sys,json; d=json.load(sys.stdin); t=[x for x in d['tiers'] if x['name']=='required'][0]; print(len(t['packages']))" 2>/dev/null || echo "?")
-if [ "$required_pkgs" = "0" ]; then
-  : # correct
-else
-  echo -e "  ${RED}required tier should be empty, got $required_pkgs packages${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "list — 4 tiers, test-stub in goodies, empty tiers correct"
-else
-  fail "list — $errors issues"
-fi
-
-# Test: install-prep — full artifact validation
-echo ""
-echo -e "${BOLD}TEST: install-prep test-stub — artifact detail${RESET}"
-output=$(python3 "$CATALOG_SCRIPT" install-prep test-stub --catalog "$FIXTURE_CATALOG" 2>&1)
-errors=0
-# Rule artifact checks
-if ! echo "$output" | grep -q '"target_filename": "aegis--test-stub--test-rule.md"'; then
-  echo -e "  ${RED}Missing: rule target filename${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$output" | grep -q '"target_subdir": "rules"'; then
-  echo -e "  ${RED}Missing: rules subdir${RESET}"
-  errors=$((errors + 1))
-fi
-# Frontmatter in content
-if ! echo "$output" | grep -q 'managed-by: coding-aegis'; then
-  echo -e "  ${RED}Missing: managed-by in content${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$output" | grep -q 'package: test-stub'; then
-  echo -e "  ${RED}Missing: package in frontmatter${RESET}"
-  errors=$((errors + 1))
-fi
-# Skill artifact checks
-if ! echo "$output" | grep -q '"target_subdir": "skills/test-stub"'; then
-  echo -e "  ${RED}Missing: skill subdir${RESET}"
-  errors=$((errors + 1))
-fi
-# Verify original description preserved
-if ! echo "$output" | grep -q 'test rule for validation'; then
-  echo -e "  ${RED}Missing: original description preserved${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "install-prep — rule filename, frontmatter, skill copy all correct"
-else
-  fail "install-prep — $errors issues"
-fi
-
-# Test: status — with mock installed files
-echo ""
-echo -e "${BOLD}TEST: status — detects installed package${RESET}"
-TEST_DIR="$(mktemp -d)"
-trap 'rm -rf "$TEST_DIR"; print_results' EXIT
-mkdir -p "$TEST_DIR/rules"
-cat > "$TEST_DIR/rules/aegis--test-stub--test-rule.md" <<'RULE'
----
-package: test-stub
-rule: test-rule
-version: 1.0.0
-tier: goodies
-managed-by: coding-aegis
----
-
-# Test Rule
-RULE
-output=$(python3 "$CATALOG_SCRIPT" status --catalog "$FIXTURE_CATALOG" --scope "$TEST_DIR" 2>&1)
-errors=0
-if ! echo "$output" | grep -q '"name": "test-stub"'; then
-  echo -e "  ${RED}Missing: test-stub in status${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$output" | grep -q '"status": "current"'; then
-  echo -e "  ${RED}Missing: current status${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "status — detected test-stub as current"
-else
-  echo -e "  ${YELLOW}${output}${RESET}"
-  fail "status — $errors issues"
-fi
-rm -rf "$TEST_DIR"
-
-# ══════════════════════════════════════════════════════════════
-# Phase 5: Install command — full pipeline
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 5: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}Phase 4: Install pipeline (direct CLI)${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 
 source "$(dirname "$0")/lib-install-test.sh"
-run_install_tests
+run_install_tests helloworld "$REAL_CATALOG"

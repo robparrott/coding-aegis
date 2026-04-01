@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Unit tests for aegis-catalog.py CLI helper.
 
-Uses the test-stub fixture package under tests/fixtures/pkgs/
-instead of the real catalog. Stdlib only (unittest).
+Uses the helloworld package from the real catalog (pkgs/optional/helloworld/).
+Stdlib only (unittest).
 """
 import json
 import os
@@ -14,7 +14,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis" / "aegis-catalog.py"
-FIXTURE_CATALOG = REPO_ROOT / "tests" / "fixtures" / "pkgs"
+CATALOG = REPO_ROOT / "pkgs"
 
 
 def run_cmd(*args, catalog=None):
@@ -49,28 +49,28 @@ class TestResolveCatalog(unittest.TestCase):
 class TestList(unittest.TestCase):
 
     def test_list_fixture_catalog(self):
-        data = run_cmd("list", catalog=FIXTURE_CATALOG)
+        data = run_cmd("list", catalog=CATALOG)
         self.assertIn("tiers", data)
         tier_names = [t["name"] for t in data["tiers"]]
         self.assertEqual(tier_names, ["required", "best-practices", "optional", "goodies"])
 
-    def test_list_finds_test_stub(self):
-        data = run_cmd("list", catalog=FIXTURE_CATALOG)
-        goodies = [t for t in data["tiers"] if t["name"] == "goodies"][0]
-        names = [p["name"] for p in goodies["packages"]]
-        self.assertIn("test-stub", names)
+    def test_list_finds_helloworld(self):
+        data = run_cmd("list", catalog=CATALOG)
+        optional = [t for t in data["tiers"] if t["name"] == "optional"][0]
+        names = [p["name"] for p in optional["packages"]]
+        self.assertIn("helloworld", names)
 
     def test_list_package_fields(self):
-        data = run_cmd("list", catalog=FIXTURE_CATALOG)
-        goodies = [t for t in data["tiers"] if t["name"] == "goodies"][0]
-        pkg = [p for p in goodies["packages"] if p["name"] == "test-stub"][0]
+        data = run_cmd("list", catalog=CATALOG)
+        optional = [t for t in data["tiers"] if t["name"] == "optional"][0]
+        pkg = [p for p in optional["packages"] if p["name"] == "helloworld"][0]
         self.assertEqual(pkg["version"], "1.0.0")
-        self.assertEqual(pkg["tier"], "goodies")
+        self.assertEqual(pkg["tier"], "optional")
         self.assertEqual(pkg["artifact_count"], 2)
         self.assertEqual(pkg["artifact_summary"], "1 rule, 1 skill")
 
     def test_list_empty_tiers(self):
-        data = run_cmd("list", catalog=FIXTURE_CATALOG)
+        data = run_cmd("list", catalog=CATALOG)
         required = [t for t in data["tiers"] if t["name"] == "required"][0]
         self.assertEqual(required["packages"], [])
 
@@ -78,65 +78,65 @@ class TestList(unittest.TestCase):
 class TestShow(unittest.TestCase):
 
     def test_show_test_stub(self):
-        data = run_cmd("show", "test-stub", catalog=FIXTURE_CATALOG)
-        self.assertEqual(data["name"], "test-stub")
+        data = run_cmd("show", "helloworld", catalog=CATALOG)
+        self.assertEqual(data["name"], "helloworld")
         self.assertEqual(data["version"], "1.0.0")
-        self.assertEqual(data["tier"], "goodies")
-        self.assertEqual(data["author"], "test-team")
+        self.assertEqual(data["tier"], "optional")
+        self.assertEqual(data["author"], "platform-team")
         self.assertEqual(len(data["artifacts"]), 2)
 
     def test_show_readme(self):
-        data = run_cmd("show", "test-stub", catalog=FIXTURE_CATALOG)
+        data = run_cmd("show", "helloworld", catalog=CATALOG)
         self.assertIsNotNone(data["readme"])
-        self.assertIn("test-stub", data["readme"])
+        self.assertIn("helloworld", data["readme"])
 
     def test_show_artifact_summary(self):
-        data = run_cmd("show", "test-stub", catalog=FIXTURE_CATALOG)
+        data = run_cmd("show", "helloworld", catalog=CATALOG)
         self.assertEqual(data["artifact_summary"], "1 rule, 1 skill")
 
     def test_show_not_found(self):
-        data = run_cmd("show", "nonexistent", catalog=FIXTURE_CATALOG)
+        data = run_cmd("show", "nonexistent", catalog=CATALOG)
         self.assertIn("error", data)
 
 
 class TestInstallPrep(unittest.TestCase):
 
     def test_prep_test_stub(self):
-        data = run_cmd("install-prep", "test-stub", catalog=FIXTURE_CATALOG)
-        self.assertEqual(data["name"], "test-stub")
+        data = run_cmd("install-prep", "helloworld", catalog=CATALOG)
+        self.assertEqual(data["name"], "helloworld")
         self.assertEqual(data["version"], "1.0.0")
-        self.assertEqual(data["tier"], "goodies")
+        self.assertEqual(data["tier"], "optional")
         self.assertGreaterEqual(len(data["artifacts"]), 2)
 
     def test_prep_rule_frontmatter(self):
-        data = run_cmd("install-prep", "test-stub", catalog=FIXTURE_CATALOG)
+        data = run_cmd("install-prep", "helloworld", catalog=CATALOG)
         rules = [a for a in data["artifacts"] if a["type"] == "rule"]
         self.assertEqual(len(rules), 1)
         rule = rules[0]
-        self.assertEqual(rule["target_filename"], "aegis--test-stub--test-rule.md")
+        self.assertEqual(rule["target_filename"], "aegis--helloworld--helloworld.md")
         self.assertEqual(rule["target_subdir"], "rules")
         self.assertIn("managed-by: coding-aegis", rule["content"])
-        self.assertIn("package: test-stub", rule["content"])
+        self.assertIn("package: helloworld", rule["content"])
         self.assertIn("version: 1.0.0", rule["content"])
-        self.assertIn("tier: goodies", rule["content"])
+        self.assertIn("tier: optional", rule["content"])
 
     def test_prep_preserves_source_description(self):
-        data = run_cmd("install-prep", "test-stub", catalog=FIXTURE_CATALOG)
+        data = run_cmd("install-prep", "helloworld", catalog=CATALOG)
         rules = [a for a in data["artifacts"] if a["type"] == "rule"]
         rule = rules[0]
-        self.assertIn("test rule for validation", rule["content"])
+        self.assertIn("helloworld governance", rule["content"])
 
     def test_prep_skill_copy(self):
-        data = run_cmd("install-prep", "test-stub", catalog=FIXTURE_CATALOG)
+        data = run_cmd("install-prep", "helloworld", catalog=CATALOG)
         skills = [a for a in data["artifacts"] if a["type"] == "skill"]
         self.assertGreaterEqual(len(skills), 1)
         skill = skills[0]
-        self.assertEqual(skill["target_subdir"], "skills/test-stub")
+        self.assertEqual(skill["target_subdir"], "skills/helloworld")
         self.assertIn("SKILL.md", skill["target_filename"])
-        self.assertIn("test-stub", skill["content"])
+        self.assertIn("helloworld", skill["content"])
 
     def test_prep_not_found(self):
-        data = run_cmd("install-prep", "nonexistent", catalog=FIXTURE_CATALOG)
+        data = run_cmd("install-prep", "nonexistent", catalog=CATALOG)
         self.assertIn("error", data)
 
 
@@ -146,7 +146,7 @@ class TestStatus(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             scope = Path(d) / ".claude"
             scope.mkdir()
-            data = run_cmd("status", "--scope", str(scope), catalog=FIXTURE_CATALOG)
+            data = run_cmd("status", "--scope", str(scope), catalog=CATALOG)
             self.assertIn("scopes", data)
             self.assertEqual(len(data["scopes"]), 1)
             self.assertEqual(data["scopes"][0]["packages"], [])
@@ -158,20 +158,20 @@ class TestStatus(unittest.TestCase):
             rules_dir.mkdir(parents=True)
 
             # Write a managed rule file
-            (rules_dir / "aegis--test-stub--test-rule.md").write_text(
+            (rules_dir / "aegis--helloworld--test-rule.md").write_text(
                 "---\n"
-                "package: test-stub\n"
+                "package: helloworld\n"
                 "rule: test-rule\n"
                 "version: 1.0.0\n"
-                "tier: goodies\n"
+                "tier: optional\n"
                 "managed-by: coding-aegis\n"
                 "---\n\n# Test Rule\n"
             )
 
-            data = run_cmd("status", "--scope", str(scope), catalog=FIXTURE_CATALOG)
+            data = run_cmd("status", "--scope", str(scope), catalog=CATALOG)
             pkgs = data["scopes"][0]["packages"]
             self.assertEqual(len(pkgs), 1)
-            self.assertEqual(pkgs[0]["name"], "test-stub")
+            self.assertEqual(pkgs[0]["name"], "helloworld")
             self.assertEqual(pkgs[0]["status"], "current")
             self.assertEqual(pkgs[0]["installed_version"], "1.0.0")
 
@@ -182,17 +182,17 @@ class TestStatus(unittest.TestCase):
             rules_dir.mkdir(parents=True)
 
             # Write a rule with an old version
-            (rules_dir / "aegis--test-stub--test-rule.md").write_text(
+            (rules_dir / "aegis--helloworld--test-rule.md").write_text(
                 "---\n"
-                "package: test-stub\n"
+                "package: helloworld\n"
                 "rule: test-rule\n"
                 "version: 0.5.0\n"
-                "tier: goodies\n"
+                "tier: optional\n"
                 "managed-by: coding-aegis\n"
                 "---\n\n# Test Rule\n"
             )
 
-            data = run_cmd("status", "--scope", str(scope), catalog=FIXTURE_CATALOG)
+            data = run_cmd("status", "--scope", str(scope), catalog=CATALOG)
             pkgs = data["scopes"][0]["packages"]
             self.assertEqual(pkgs[0]["status"], "outdated")
             self.assertEqual(pkgs[0]["installed_version"], "0.5.0")
