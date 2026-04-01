@@ -30,13 +30,10 @@ gemini_quiet() {
 cleanup() {
   section "T7: Teardown"
 
-  # T7.1: uninstall helloworld via coding-aegis skill (not yet implemented)
-  # When the skill supports `uninstall`, this should be:
-  #   CLI_PROMPT="/coding-aegis uninstall helloworld"
-  #   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" gemini_quiet -o text --yolo
-  test_header "T7.1 uninstall helloworld (not yet implemented — manual cleanup)"
-  rm -f "$TEST_DIR/.claude/rules/aegis--helloworld--helloworld.md"
-  rm -rf "$TEST_DIR/.claude/skills/helloworld"
+  test_header "T7.1 uninstall helloworld via skill"
+  CLI_PROMPT="/coding-aegis uninstall helloworld"
+  RUN_DIR="$TEST_DIR" run_cli "skill uninstall" gemini_quiet -o text --yolo
+  assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 
   test_header "T7.2 uninstall coding-aegis skill"
   run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope user || true

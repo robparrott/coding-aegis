@@ -28,14 +28,11 @@ CLAUDE_COMMON="--strict-mcp-config --mcp-config {\"mcpServers\":{}}"
 cleanup() {
   section "T7: Teardown"
 
-  # T7.1: uninstall helloworld via coding-aegis skill (not yet implemented)
-  # When the skill supports `uninstall`, this should be:
-  #   CLI_PROMPT="/coding-aegis uninstall helloworld"
-  #   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" claude -p \
-  #     --allowedTools "Bash,Read,Write,Glob,Skill" --permission-mode bypassPermissions $CLAUDE_COMMON
-  test_header "T7.1 uninstall helloworld (not yet implemented — manual cleanup)"
-  rm -rf "$TEST_DIR/.claude/rules/aegis--helloworld--helloworld.md"
-  rm -rf "$TEST_DIR/.claude/skills/helloworld"
+  test_header "T7.1 uninstall helloworld via skill"
+  CLI_PROMPT="/coding-aegis uninstall helloworld"
+  RUN_DIR="$TEST_DIR" run_cli "skill uninstall" claude -p \
+    --allowedTools "Bash,Read,Glob,Skill" --dangerously-skip-permissions $CLAUDE_COMMON
+  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
 
   test_header "T7.2 uninstall coding-aegis plugin"
   run_cli "uninstall plugin" claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user || true

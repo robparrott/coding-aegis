@@ -36,12 +36,10 @@ SKILL_INSTALL_DIR="$TEST_DIR/.agents/skills/helloworld"
 cleanup() {
   section "T7: Teardown"
 
-  # T7.1: uninstall helloworld via coding-aegis skill (not yet implemented)
-  # When the skill supports `uninstall`, this should be:
-  #   CLI_PROMPT="\$coding-aegis uninstall helloworld"
-  #   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
-  test_header "T7.1 uninstall helloworld (not yet implemented — manual cleanup)"
-  rm -rf "$SKILL_INSTALL_DIR"
+  test_header "T7.1 uninstall helloworld via skill"
+  CLI_PROMPT="\$coding-aegis uninstall helloworld"
+  RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
+  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
 
   test_header "T7.2 uninstall coding-aegis skill"

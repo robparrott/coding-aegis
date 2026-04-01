@@ -566,6 +566,47 @@ def cmd_status(args):
     print(json.dumps({"scopes": scopes_out}, indent=2))
 
 
+def cmd_uninstall_prep(args):
+    """Find all installed artifacts for a package and return paths to remove."""
+    name = args.package
+    tool = args.tool if args.tool else _detect_tool()
+    tool_cfg = TOOL_PATHS.get(tool, TOOL_PATHS["claude"])
+
+    scope_base = Path(args.scope) if args.scope else Path.cwd() / tool_cfg["scope_base"]
+
+    files_to_remove = []
+    dirs_to_remove = []
+
+    # Scan rules: aegis--{name}--*.md
+    rules_dir = scope_base / "rules"
+    if rules_dir.is_dir():
+        for f in sorted(rules_dir.glob(f"aegis--{name}--*")):
+            if f.is_file():
+                files_to_remove.append(str(f))
+
+    # Scan skills under scope_base (Claude, Cursor, Windsurf)
+    skills_dir = scope_base / "skills" / name
+    if skills_dir.is_dir():
+        dirs_to_remove.append(str(skills_dir))
+
+    # Scan skills under .agents/skills/ (Codex)
+    if tool == "codex":
+        agents_skills = Path.cwd() / ".agents" / "skills" / name
+        if agents_skills.is_dir():
+            dirs_to_remove.append(str(agents_skills))
+
+    if not files_to_remove and not dirs_to_remove:
+        _error(f"Package '{name}' is not installed in {scope_base}")
+
+    print(json.dumps({
+        "name": name,
+        "tool": tool,
+        "scope_base": str(scope_base),
+        "files_to_remove": files_to_remove,
+        "dirs_to_remove": dirs_to_remove,
+    }, indent=2))
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -602,6 +643,14 @@ def main():
     p_status.add_argument("--catalog", help="Path to pkgs/ directory")
     p_status.add_argument("--scope", nargs="*", help="Paths to scan for installed files")
 
+    # uninstall-prep
+    p_uninst = sub.add_parser("uninstall-prep", help="Find installed artifacts to remove")
+    p_uninst.add_argument("package", help="Package name")
+    p_uninst.add_argument("--scope", help="Scope base path (default: auto-detect)")
+    p_uninst.add_argument("--tool", default=None,
+                          choices=["claude", "codex", "cursor", "windsurf", "copilot"],
+                          help="Override auto-detected tool")
+
     args = parser.parse_args()
 
     if args.command == "resolve-catalog":
@@ -614,6 +663,8 @@ def main():
         cmd_install_prep(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "uninstall-prep":
+        cmd_uninstall_prep(args)
     else:
         parser.print_help()
         sys.exit(1)

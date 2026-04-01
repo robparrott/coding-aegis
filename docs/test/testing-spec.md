@@ -221,7 +221,7 @@ Remove artifacts in reverse install order: target package first, then the coding
 
 | Step | Pass criteria |
 |------|---------------|
-| T7.1 Uninstall helloworld via skill | `/coding-aegis uninstall helloworld` (**not yet implemented** — manual cleanup until skill supports uninstall) |
+| T7.1 Uninstall helloworld via skill | `/coding-aegis uninstall helloworld` — no errors, installed files removed |
 | T7.2 Uninstall coding-aegis skill | CLI success or files removed |
 | T7.3 Remove marketplace/registry | CLI success (skip for tools without marketplace) |
 | T7.4 Remove test directory | Deleted |

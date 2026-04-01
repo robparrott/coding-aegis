@@ -30,6 +30,7 @@ response using the Output Format sections below.
 | `list [--catalog PATH]` | List all packages by tier |
 | `show <name> [--catalog PATH]` | Full package details + README |
 | `install-prep <name> [--catalog PATH]` | Prepare install artifacts with frontmatter |
+| `uninstall-prep <name> [--scope PATH]` | Find installed artifacts to remove |
 | `status [--catalog PATH] [--scope PATH...]` | Installed packages and version status |
 
 If `--catalog` is omitted, the helper resolves it from the current working directory.
@@ -44,6 +45,7 @@ Parse the user input after `/coding-aegis`. Route to the matching section below.
 | `list` | Run **list** |
 | `show <name>` | Run **show** for `<name>` |
 | `install <name>` | Run **install** for `<name>` |
+| `uninstall <name>` | Run **uninstall** for `<name>` |
 | `status` | Run **status** |
 | anything else | Print help text |
 
@@ -54,6 +56,7 @@ Usage:
   /coding-aegis list              List available packages by tier
   /coding-aegis show <package>    Show package details
   /coding-aegis install <package> Install a package into the current project
+  /coding-aegis uninstall <package> Remove an installed package
   /coding-aegis status            Show installed packages and versions
 ```
 
@@ -216,6 +219,48 @@ Print a summary:
 If AGENTS.md was updated, add: "AGENTS.md updated with installed governance rules table."
 
 **Important**: After installing skills, remind the user: "Restart Claude Code to load newly installed skills."
+
+## uninstall
+
+Remove an installed package's artifacts from the target project or user configuration.
+
+### Step 1 — Find installed artifacts
+
+1. Run: `python3 "{skill-dir}/aegis-catalog.py" uninstall-prep <name>`
+   The script auto-detects the active tool and scans for artifacts managed by the package.
+2. If the JSON contains `"error"`, print the error and stop.
+3. The response contains `files_to_remove` (individual files) and `dirs_to_remove` (skill directories).
+
+### Step 2 — Remove artifacts
+
+Use Bash to delete all files and directories listed in the JSON:
+
+```bash
+rm -f <file1> <file2> ...
+rm -rf <dir1> <dir2> ...
+```
+
+Issue all removals in a single Bash call.
+
+### Step 3 — Update AGENTS.md (Project scope only)
+
+If AGENTS.md exists and contains `## Installed Governance Rules`, rebuild the table
+by scanning remaining `aegis--*` files (same as install Step 4). If no governance
+files remain, remove the section entirely.
+
+### Step 4 — Confirm
+
+Print a summary:
+
+```
+## Uninstalled: {name}
+
+Removed:
+- {file_or_dir_1}
+- {file_or_dir_2}
+```
+
+**Important**: After removing skills, remind the user: "Restart Claude Code to unload removed skills."
 
 ## status
 
