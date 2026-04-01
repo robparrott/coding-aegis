@@ -32,6 +32,28 @@ TOOL_PATHS = {
 }
 
 
+def _detect_tool():
+    """Auto-detect the active coding agent tool from environment signals.
+
+    Detection order (first match wins):
+      - CODEX_HOME env var → codex
+      - .cursor/ directory in CWD or repo root → cursor
+      - .windsurf/ directory in CWD or repo root → windsurf
+      - .github/copilot-instructions.md → copilot
+      - Default → claude
+    """
+    if os.environ.get("CODEX_HOME"):
+        return "codex"
+    cwd = Path.cwd()
+    if (cwd / ".cursor").is_dir():
+        return "cursor"
+    if (cwd / ".windsurf").is_dir():
+        return "windsurf"
+    if (cwd / ".github" / "copilot-instructions.md").is_file():
+        return "copilot"
+    return "claude"
+
+
 # ---------------------------------------------------------------------------
 # Minimal YAML parser
 # ---------------------------------------------------------------------------
@@ -329,7 +351,8 @@ def cmd_show(args):
 def cmd_install_prep(args):
     cat = _resolve_or_error(args)
     name = args.package
-    tool = getattr(args, "tool", "claude")
+    explicit_tool = getattr(args, "tool", None)
+    tool = explicit_tool if explicit_tool else _detect_tool()
     tool_cfg = TOOL_PATHS.get(tool, TOOL_PATHS["claude"])
 
     # Find the package
@@ -569,9 +592,9 @@ def main():
     p_prep = sub.add_parser("install-prep", help="Prepare install artifacts")
     p_prep.add_argument("package", help="Package name")
     p_prep.add_argument("--catalog", help="Path to pkgs/ directory")
-    p_prep.add_argument("--tool", default="claude",
+    p_prep.add_argument("--tool", default=None,
                         choices=["claude", "codex", "cursor", "windsurf", "copilot"],
-                        help="Target tool — adjusts install paths for skill discovery")
+                        help="Override auto-detected tool (default: auto-detect from environment)")
 
     # status
     p_status = sub.add_parser("status", help="Show installed package status")

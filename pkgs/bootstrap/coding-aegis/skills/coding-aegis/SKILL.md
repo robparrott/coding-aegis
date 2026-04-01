@@ -135,15 +135,14 @@ Install a package's artifacts into the target project or user configuration.
 
 ### Step 1 — Resolve and prepare
 
-1. Detect the active tool: if running in Codex, use `--tool codex`. If running
-   in Cursor, use `--tool cursor`. Otherwise default to `--tool claude`.
-   Detection: Codex sets `CODEX_HOME` env var; Cursor has `.cursor/` directory.
-2. Run: `python3 "{skill-dir}/aegis-catalog.py" install-prep <name> --tool <tool>`
-3. If the JSON contains `"error"`, print the error and stop.
-4. The response contains `name`, `version`, `tier`, `tool`, `scope_base`, and
+1. Run: `python3 "{skill-dir}/aegis-catalog.py" install-prep <name>`
+   The script auto-detects the active tool (Claude, Codex, Cursor, etc.) from
+   environment signals and adjusts install paths accordingly.
+2. If the JSON contains `"error"`, print the error and stop.
+3. The response contains `name`, `version`, `tier`, `tool`, `scope_base`, and
    an `artifacts` array. Each artifact has: `type`, `target_subdir`,
    `target_filename`, `content`, and optionally `base_path`.
-5. If the artifacts array is empty, warn and stop.
+4. If the artifacts array is empty, warn and stop.
 
 ### Step 2 — Scope picker
 

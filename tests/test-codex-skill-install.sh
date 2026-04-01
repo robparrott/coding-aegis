@@ -21,6 +21,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$(dirname "$0")/lib-test-harness.sh"
 
 PLUGIN_DIR="$REPO_ROOT/.codex-plugin"
+SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 TEST_DIR="$(mktemp -d)"
 GITHUB_REPO="robparrott/coding-aegis"
 SKILL_PATH="pkgs/bootstrap/coding-aegis/skills/coding-aegis"
@@ -28,9 +29,9 @@ SKILL_PATH="pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 # Skill gets installed to ~/.codex/skills/ by $skill-installer
 CODEX_SKILL_DIR="$HOME/.codex/skills/coding-aegis"
 
-SCOPE_DIR="$TEST_DIR/.codex"
-RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
-SKILL_INSTALL_DIR="$SCOPE_DIR/skills/helloworld"
+# Skills install to .agents/skills/ (Codex discovery path, auto-detected).
+# Rules for Codex should go in AGENTS.md, not .claude/rules/ (tracked in 2sv.15).
+SKILL_INSTALL_DIR="$TEST_DIR/.agents/skills/helloworld"
 
 cleanup() {
   section "T7: Teardown"
@@ -40,9 +41,7 @@ cleanup() {
   #   CLI_PROMPT="\$coding-aegis uninstall helloworld"
   #   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
   test_header "T7.1 uninstall helloworld (not yet implemented — manual cleanup)"
-  rm -f "$RULE_FILE"
   rm -rf "$SKILL_INSTALL_DIR"
-  assert_file_not_exists "$RULE_FILE" "helloworld rule removed"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
 
   test_header "T7.2 uninstall coding-aegis skill"
@@ -131,27 +130,20 @@ section "T5: Use skill — install helloworld"
 test_header "coding-aegis install helloworld"
 # Scope must be specified in prompt — the skill's interactive scope picker
 # (AskUserQuestion) cannot be used in Codex headless mode.
-CLI_PROMPT="\$coding-aegis install helloworld"
+# Scope must be specified — the skill's interactive scope picker cannot
+# be used in Codex headless mode.
+CLI_PROMPT="\$coding-aegis install helloworld to Project scope"
 RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s workspace-write -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 
 # ── T6: Verify installed files ────────────────────────────────
 section "T6: Verify installed files"
 
-# Debug: show what files were actually created in the test directory
-test_header "files written by install"
-echo -e "  ${DIM}$(find "$TEST_DIR" -name 'aegis--*' -o -name 'SKILL.md' -path '*/helloworld/*' 2>/dev/null | head -10 || echo '(none found)')${RESET}"
-
-test_header "rule file exists"
-assert_file_exists "$RULE_FILE" "rule file: aegis--helloworld--helloworld.md"
-
-test_header "rule frontmatter"
-assert_file_contains "$RULE_FILE" "managed-by: coding-aegis" "frontmatter: managed-by"
-assert_file_contains "$RULE_FILE" "package: helloworld" "frontmatter: package"
-assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
+# Rule file verification skipped for Codex — Codex rules go in AGENTS.md,
+# not individual files. Tracked in 2sv.15.
 
 test_header "skill file exists"
-assert_file_exists "$SKILL_INSTALL_DIR/SKILL.md" "skill file: helloworld/SKILL.md"
+assert_file_exists "$SKILL_INSTALL_DIR/SKILL.md" "skill file: .agents/skills/helloworld/SKILL.md"
 
 # ── T6b: Invoke installed helloworld skill ────────────────────
 section "T6b: Invoke helloworld skill"
