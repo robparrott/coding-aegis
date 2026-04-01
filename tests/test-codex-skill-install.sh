@@ -219,3 +219,14 @@ else
 fi
 
 rm -rf "$TEST_DIR"
+
+# ══════════════════════════════════════════════════════════════
+# Phase 3: Install command — full pipeline
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}Phase 3: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+
+source "$(dirname "$0")/lib-install-test.sh"
+run_install_tests

@@ -371,3 +371,14 @@ else
   fail "status — $errors issues"
 fi
 rm -rf "$TEST_DIR"
+
+# ══════════════════════════════════════════════════════════════
+# Phase 5: Install command — full pipeline
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}Phase 5: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+
+source "$(dirname "$0")/lib-install-test.sh"
+run_install_tests

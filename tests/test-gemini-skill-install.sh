@@ -302,3 +302,14 @@ if [ "$errors" -eq 0 ]; then
 else
   fail "install-prep — $errors issues"
 fi
+
+# ══════════════════════════════════════════════════════════════
+# Phase 4: Install command — full pipeline
+# ══════════════════════════════════════════════════════════════
+echo ""
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}Phase 4: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+
+source "$(dirname "$0")/lib-install-test.sh"
+run_install_tests
