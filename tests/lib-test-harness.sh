@@ -102,21 +102,22 @@ run_cli() {
     first_line=$(echo "$prompt_lines" | head -1)
     local line_count
     line_count=$(echo "$prompt_lines" | wc -l | tr -d ' ')
+ 
+    echo -e "  ${DIM}\$ echo \$PROMPT | ${display_cmd}${RESET}"
 
     if [ "$line_count" -eq 1 ]; then
-      echo -e "  ${DIM}\$ echo \"${first_line}\" \\\\${RESET}"
-      echo -e "  ${DIM}    | ${display_cmd}${RESET}"
+      echo -e "  ${DIM}PROMPT: \"${first_line}\" ${RESET}"
     else
-      echo -e "  ${DIM}\$ echo \"${first_line}${RESET}"
+      echo -e "  ${DIM}PROMPT: \"${first_line}${RESET}"
       echo "$prompt_lines" | tail -n +2 | while IFS= read -r line; do
-        echo -e "  ${DIM}    ${line}${RESET}"
+        echo -e "    ${DIM}    ${line}${RESET}"
       done
-      echo -e "  ${DIM}    \" | ${display_cmd}${RESET}"
+      echo -e "    ${DIM}    \" ${RESET}"
     fi
   else
     echo -e "  ${DIM}\$ ${display_cmd}${RESET}"
   fi
-  [ -n "$RUN_DIR" ] && echo -e "  ${DIM}    (in $RUN_DIR)${RESET}"
+  [ -n "$RUN_DIR" ] && echo -e "  ${DIM}run directory: $RUN_DIR${RESET}"
 
   local start_time
   start_time=$(date +%s)
@@ -141,12 +142,12 @@ run_cli() {
   # Normalize timeout exit codes — register as a failure and return 0
   # so set -e doesn't abort the script before subsequent assertions run.
   if [ "$LAST_EXIT" -eq 124 ] || [ "$LAST_EXIT" -eq 142 ] || [ "$LAST_EXIT" -eq 143 ]; then
-    echo -e "  ${DIM}(${elapsed}s elapsed)${RESET}"
+    echo -e "  ${DIM}result: ${elapsed}s elapsed${RESET}"
     fail "TIMEOUT after ${TIMEOUT}s: $description"
     return 0
   fi
 
-  echo -e "  ${DIM}(${elapsed}s elapsed, exit ${LAST_EXIT})${RESET}"
+  echo -e "  ${DIM}result: ${elapsed}s elapsed, exit ${LAST_EXIT}${RESET}"
 
   # Print output snippet (first 20 lines)
   if [ -n "$LAST_OUTPUT" ]; then
@@ -249,5 +250,6 @@ section() {
 
 # test_header <title>
 test_header() {
+  echo ""
   echo -e "${BOLD}TEST: $1${RESET}"
 }
