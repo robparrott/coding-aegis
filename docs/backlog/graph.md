@@ -4,19 +4,17 @@ Auto-generated from `bd graph --all --compact`.
 
 ```
 
-📊 Dependency graph for coding-aegis-b5z (30 issues, 5 layers)
+📊 Dependency graph for coding-aegis-b5z (29 issues, 5 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
-  │   ├── ○ coding-aegis-b5z.17 ● P1 Fix SKILL.md prompting gaps exposed by agent-medi…
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   │   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
-  ├── ○ coding-aegis-b5z.17 ● P1 Fix SKILL.md prompting gaps exposed by agent-medi…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
 
   LAYER 1
@@ -193,7 +191,6 @@ Auto-generated from `bd graph --all --compact`.
 ## Task Index
 
 - [`coding-aegis-b5z`](phase-2-coding-aegis-skill-claude.md)
-- [`coding-aegis-b5z.17`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.10`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.11`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.5`](phase-2-coding-aegis-skill-claude.md)

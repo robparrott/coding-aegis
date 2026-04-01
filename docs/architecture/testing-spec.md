@@ -115,10 +115,26 @@ Quick validation of `aegis-catalog.py` resolve-catalog, list, show, install-prep
 
 Direct filesystem test of install-prep → write → verify → status. Validates the install data flow without an agent.
 
+## Prompt Delivery Standard
+
+All agent-mediated tests (T2-T4) MUST deliver prompts via stdin using the `CLI_PROMPT` variable in `lib-test-harness.sh`. This avoids shell quoting issues when prompts contain special characters, spaces, or long text.
+
+```bash
+CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command."
+RUN_DIR="$TEST_DIR" run_cli "skill list" <tool-command> <flags>
+```
+
+The harness pipes `CLI_PROMPT` to the command's stdin. Each tool accepts stdin:
+- **Claude**: `echo "$prompt" | claude -p --allowedTools ...` (no positional arg)
+- **Codex**: `echo "$prompt" | codex exec --ephemeral ...` (no positional arg)
+- **Gemini**: `echo "$prompt" | gemini -p ...` (piped stdin appended to prompt)
+
+Do NOT pass prompts as positional command-line arguments. Do NOT pass prompts via `-p "long string"` flag values.
+
 ## Tool-Specific Notes
 
 ### Claude Code
-- `claude -p` requires `< /dev/null` to prevent stdin hang.
+- `--strict-mcp-config --mcp-config '{"mcpServers":{}}'` disables MCP servers to avoid startup hangs.
 - `--allowedTools "Bash,Read,Write,Glob"` needed for install (Write for file creation).
 - Plugin marketplace has a two-step model: marketplace add → plugin install.
 - Skills discovered from `.claude/skills/` (project) or `~/.claude/skills/` (user).
@@ -140,6 +156,61 @@ Direct filesystem test of install-prep → write → verify → status. Validate
 ### Cursor
 - TBD — research CLI availability.
 - `.cursor-plugin/` marketplace manifest exists in repo.
+
+## Test Harness Library (`tests/lib-test-harness.sh`)
+
+All test scripts source a shared harness that provides consistent CLI invocation, output formatting, timing, and assertions. No test script should implement its own pass/fail counters or CLI wrappers.
+
+### Setup
+
+```bash
+source "$(dirname "$0")/lib-test-harness.sh"
+```
+
+The harness provides colors, counters, timeout fallback, and all functions below.
+
+### `run_cli <description> <command...>`
+
+Wraps any CLI invocation. Captures output, measures elapsed time, prints diagnostics.
+
+**Behavior:**
+1. Prints the command in dim text: `$ command args...`
+2. Executes the command with `$TIMEOUT` (default 90s), stdin from `/dev/null`
+3. Prints elapsed time in dim text
+4. Prints first 20 lines of output in yellow
+5. Sets `$LAST_OUTPUT` to the full captured output
+6. Sets `$LAST_EXIT` to the exit code
+7. Returns the exit code
+
+**Example:**
+```bash
+run_cli "list packages" claude -p "Execute coding-aegis list" --allowedTools "Bash,Read,Glob"
+assert_contains "$LAST_OUTPUT" "helloworld" "list contains helloworld"
+```
+
+### `assert_contains <output> <pattern> <description>`
+
+Checks that `output` contains `pattern` (case-insensitive grep). Calls `pass` or `fail`.
+
+### `assert_not_contains <output> <pattern> <description>`
+
+Inverse of `assert_contains`. Passes if pattern is absent.
+
+### `assert_file_exists <path> <description>`
+
+Checks file exists at `path`. Calls `pass` or `fail`.
+
+### `assert_file_contains <path> <pattern> <description>`
+
+Greps file content for `pattern`. Calls `pass` or `fail`.
+
+### `pass <description>` / `fail <description>`
+
+Increment counters, print colored result. Provided by the harness — do not redefine.
+
+### `print_results`
+
+Print final pass/fail summary. Exit 0 if all pass, 1 otherwise. Typically set as trap.
 
 ## Test Script Structure
 

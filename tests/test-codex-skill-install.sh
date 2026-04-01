@@ -13,46 +13,16 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$(dirname "$0")/lib-test-harness.sh"
+
 SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
-PASS=0
-FAIL=0
-TIMEOUT=${AEGIS_TEST_TIMEOUT:-90}
-
-# Colors
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-DIM='\033[2m'
-BOLD='\033[1m'
-RESET='\033[0m'
-
-pass() {
-  echo -e "  ${GREEN}PASS${RESET}: $1"
-  PASS=$((PASS + 1))
-}
-
-fail() {
-  echo -e "  ${RED}FAIL${RESET}: $1"
-  FAIL=$((FAIL + 1))
-}
-
-# Test working directory
 TEST_DIR="$(mktemp -d)"
 
 cleanup() {
-  echo ""
-  echo -e "${BOLD}T6: Teardown${RESET}"
+  section "T6: Teardown"
   echo "  Removing test dir: $TEST_DIR"
   rm -rf "$TEST_DIR"
-  echo ""
-  echo "================================"
-  if [ "$FAIL" -eq 0 ]; then
-    echo -e "  ${GREEN}Results: $PASS passed, $FAIL failed${RESET}"
-  else
-    echo -e "  ${RED}Results: $PASS passed, $FAIL failed${RESET}"
-  fi
-  echo "================================"
-  [ "$FAIL" -eq 0 ] && exit 0 || exit 1
+  print_results
 }
 trap cleanup EXIT
 
@@ -62,184 +32,76 @@ echo "========================================"
 echo "  Repo root: $REPO_ROOT"
 echo "  Test dir:  $TEST_DIR"
 echo "  Timeout:   ${TIMEOUT}s"
-echo ""
 
-# ══════════════════════════════════════════════════════════════
-# T0 — Prerequisites
-# ══════════════════════════════════════════════════════════════
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T0: Prerequisites${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
+# ── T0: Prerequisites ────────────────────────────────────────
+section "T0: Prerequisites"
 
-echo -e "${BOLD}TEST: codex installed${RESET}"
+test_header "codex installed"
 if command -v codex &>/dev/null; then
-  codex_version=$(codex --version 2>&1 || echo "unknown")
-  echo -e "  ${DIM}Path: $(command -v codex)${RESET}"
-  echo -e "  ${DIM}Version: $codex_version${RESET}"
-  pass "codex found"
+  pass "codex found: $(codex --version 2>&1 || echo unknown)"
 else
   fail "codex not found in PATH"
   exit 1
 fi
 
-echo ""
-echo -e "${BOLD}TEST: codex authenticated${RESET}"
-# codex exec requires a git repo
+test_header "codex authenticated"
 git -C "$TEST_DIR" init -q
-auth_output=$(cd "$TEST_DIR" && codex exec "Reply with exactly: AUTH_OK" \
-  --ephemeral -o /dev/stdout --skip-git-repo-check < /dev/null 2>&1) || true
-if echo "$auth_output" | grep -qi "AUTH_OK"; then
-  pass "codex authenticated"
-else
-  echo -e "  ${YELLOW}$(echo "$auth_output" | head -5)${RESET}"
-  fail "codex auth check failed"
-  exit 1
-fi
+CLI_PROMPT="Reply with exactly: AUTH_OK"
+RUN_DIR="$TEST_DIR" run_cli "auth check" codex exec --ephemeral -o /dev/stdout
+assert_contains "$LAST_OUTPUT" "AUTH_OK" "codex authenticated"
 
-# ══════════════════════════════════════════════════════════════
-# T1 — Install coding-aegis skill
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T1: Install coding-aegis skill${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
+# ── T1: Install coding-aegis skill ───────────────────────────
+section "T1: Install coding-aegis skill"
 
-echo -e "${BOLD}TEST: copy skill to .agents/skills/${RESET}"
+test_header "copy skill to .agents/skills/"
 mkdir -p "$TEST_DIR/.agents/skills/coding-aegis"
 cp "$SKILL_DIR/SKILL.md" "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md"
 cp "$SKILL_DIR/aegis-catalog.py" "$TEST_DIR/.agents/skills/coding-aegis/aegis-catalog.py"
-if [ -f "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md" ]; then
-  pass "skill installed to .agents/skills/coding-aegis/"
-else
-  fail "skill files not found"
-fi
+assert_file_exists "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md" "skill installed to .agents/skills/"
 
 # Make catalog accessible
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
-echo -e "  ${DIM}Catalog available at $TEST_DIR/pkgs/${RESET}"
 
-# ══════════════════════════════════════════════════════════════
-# T2 — Use skill: list packages
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T2: Use skill — list packages${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
+# ── T2: Use skill — list ─────────────────────────────────────
+section "T2: Use skill — list packages"
 
-echo -e "${BOLD}TEST: coding-aegis list via codex exec${RESET}"
-LIST_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
-list_output=$(cd "$TEST_DIR" && codex exec "$LIST_PROMPT" \
-  --ephemeral -s read-only -o /dev/stdout \
-  < /dev/null 2>&1) || true
-echo -e "${YELLOW}$(echo "$list_output" | head -20)${RESET}"
-if echo "$list_output" | grep -qi "helloworld"; then
-  pass "list — helloworld found in output"
-else
-  fail "list — helloworld not found"
-fi
+test_header "coding-aegis list"
+CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
+RUN_DIR="$TEST_DIR" run_cli "skill list" codex exec --ephemeral -s read-only -o /dev/stdout
+assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
-# ══════════════════════════════════════════════════════════════
-# T3 — Use skill: show helloworld
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T3: Use skill — show helloworld${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
+# ── T3: Use skill — show ─────────────────────────────────────
+section "T3: Use skill — show helloworld"
 
-echo -e "${BOLD}TEST: coding-aegis show helloworld via codex exec${RESET}"
-SHOW_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
-show_output=$(cd "$TEST_DIR" && codex exec "$SHOW_PROMPT" \
-  --ephemeral -s read-only -o /dev/stdout \
-  < /dev/null 2>&1) || true
-echo -e "${YELLOW}$(echo "$show_output" | head -20)${RESET}"
-errors=0
-if ! echo "$show_output" | grep -qi "helloworld"; then
-  echo -e "  ${RED}Missing: helloworld name${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$show_output" | grep -qi "optional"; then
-  echo -e "  ${RED}Missing: optional tier${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "show — name and tier present"
-else
-  fail "show — $errors expected values missing"
-fi
+test_header "coding-aegis show helloworld"
+CLI_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
+RUN_DIR="$TEST_DIR" run_cli "skill show" codex exec --ephemeral -s read-only -o /dev/stdout
+assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
+assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 
-# ══════════════════════════════════════════════════════════════
-# T4 — Use skill: install helloworld
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T4: Use skill — install helloworld${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
+# ── T4: Use skill — install ──────────────────────────────────
+section "T4: Use skill — install helloworld"
 
-echo -e "${BOLD}TEST: coding-aegis install helloworld via codex exec${RESET}"
-INSTALL_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking the user."
-install_output=$(cd "$TEST_DIR" && codex exec "$INSTALL_PROMPT" \
-  --ephemeral -s workspace-write -o /dev/stdout \
-  < /dev/null 2>&1) || true
-echo -e "${YELLOW}$(echo "$install_output" | head -30)${RESET}"
-if echo "$install_output" | grep -qi "install\|aegis--helloworld\|wrote\|created"; then
-  pass "install — skill reported install activity"
-else
-  fail "install — no install activity detected"
-fi
+test_header "coding-aegis install helloworld"
+CLI_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking the user."
+RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s workspace-write -o /dev/stdout
+assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 
-# ══════════════════════════════════════════════════════════════
-# T5 — Verify installed files
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}T5: Verify installed files${RESET}"
-echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo ""
+# ── T5: Verify installed files ────────────────────────────────
+section "T5: Verify installed files"
 
 SCOPE_DIR="$TEST_DIR/.claude"
-
-echo -e "${BOLD}TEST: rule file exists${RESET}"
 RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
-if [ -f "$RULE_FILE" ]; then
-  pass "rule file exists"
-else
-  fail "rule file missing"
-  echo "  Files in test dir:"
-  find "$TEST_DIR" -path "$TEST_DIR/pkgs" -prune -o -type f -print 2>/dev/null | sed "s|$TEST_DIR/||" | sort | sed 's/^/    /'
-fi
 
-echo ""
-echo -e "${BOLD}TEST: rule frontmatter${RESET}"
-if [ -f "$RULE_FILE" ]; then
-  rule_content=$(cat "$RULE_FILE")
-  errors=0
-  for expect in "managed-by: coding-aegis" "package: helloworld" "tier: optional"; do
-    if ! echo "$rule_content" | grep -q "$expect"; then
-      echo -e "  ${RED}Missing: $expect${RESET}"
-      errors=$((errors + 1))
-    fi
-  done
-  if [ "$errors" -eq 0 ]; then
-    pass "rule frontmatter correct"
-  else
-    fail "rule frontmatter — $errors fields missing"
-  fi
-else
-  fail "rule frontmatter — file not found"
-fi
+test_header "rule file exists"
+assert_file_exists "$RULE_FILE" "rule file: aegis--helloworld--helloworld.md"
 
-echo ""
-echo -e "${BOLD}TEST: skill file exists${RESET}"
-SKILL_FILE="$SCOPE_DIR/skills/helloworld/SKILL.md"
-if [ -f "$SKILL_FILE" ]; then
-  pass "skill file exists"
-else
-  fail "skill file missing"
-fi
+test_header "rule frontmatter"
+assert_file_contains "$RULE_FILE" "managed-by: coding-aegis" "frontmatter: managed-by"
+assert_file_contains "$RULE_FILE" "package: helloworld" "frontmatter: package"
+assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 
-# T6 teardown happens in the cleanup trap
+test_header "skill file exists"
+assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
+
+# T6 teardown happens in cleanup trap
