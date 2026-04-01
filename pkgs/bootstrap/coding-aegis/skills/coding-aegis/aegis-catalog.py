@@ -42,7 +42,8 @@ def _detect_tool():
       - .github/copilot-instructions.md → copilot
       - Default → claude
     """
-    if os.environ.get("CODEX_HOME"):
+    # Codex sets CODEX_SANDBOX, CODEX_CI, CODEX_THREAD_ID in its sandbox
+    if any(k.startswith("CODEX_") for k in os.environ):
         return "codex"
     cwd = Path.cwd()
     if (cwd / ".cursor").is_dir():

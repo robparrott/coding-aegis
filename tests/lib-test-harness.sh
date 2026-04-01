@@ -149,9 +149,9 @@ run_cli() {
 
   echo -e "  ${DIM}result: ${elapsed}s elapsed, exit ${LAST_EXIT}${RESET}"
 
-  # Print output snippet (first 20 lines)
+  # Print output snippet (first 50 lines)
   if [ -n "$LAST_OUTPUT" ]; then
-    echo -e "${YELLOW}$(echo "$LAST_OUTPUT" | head -20)${RESET}"
+    echo -e "${YELLOW}$(echo "$LAST_OUTPUT" | head -50)${RESET}"
   fi
 
   # Always return 0 so set -e doesn't abort the script.

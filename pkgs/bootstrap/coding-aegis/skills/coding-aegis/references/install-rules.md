@@ -10,7 +10,7 @@ When running inside a coding agent, detect the active tool:
 | Tool | Detection signal |
 |------|-----------------|
 | Claude Code | Default — if no other tool detected |
-| Codex | `CODEX_HOME` env var set, or `.agents/` directory exists at repo root |
+| Codex | Any `CODEX_*` env var set (e.g. `CODEX_SANDBOX`, `CODEX_CI`) |
 | Cursor | `.cursor/` directory exists at repo root, or `.cursorrc` present |
 | Windsurf | `.windsurf/` directory exists at repo root |
 | Copilot | `.github/copilot-instructions.md` exists |

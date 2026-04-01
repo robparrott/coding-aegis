@@ -4,17 +4,19 @@ Auto-generated from `bd graph --all --compact`.
 
 ```
 
-📊 Dependency graph for coding-aegis-b5z (29 issues, 5 layers)
+📊 Dependency graph for coding-aegis-b5z (30 issues, 5 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
+  │   ├── ○ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   │   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
+  ├── ○ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
 
   LAYER 1
@@ -72,12 +74,13 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-2sv (13 issues, 2 layers)
+📊 Dependency graph for coding-aegis-2sv (14 issues, 2 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-2sv ● P1 Cross-tool artifact model refactor
+  │   ├── ○ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
   │   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
   │   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   │   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
@@ -94,6 +97,7 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   ├── ○ coding-aegis-2sv.11 ● P3 Add MCP server stub to pirate-speak package
   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
+  ├── ○ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   ├── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
@@ -195,6 +199,7 @@ Auto-generated from `bd graph --all --compact`.
 ## Task Index
 
 - [`coding-aegis-b5z`](phase-2-coding-aegis-skill-claude.md)
+- [`coding-aegis-b5z.34`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.10`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.11`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.5`](phase-2-coding-aegis-skill-claude.md)
@@ -224,6 +229,7 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-cdb.5`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.6`](phase-8-external-package-references.md)
 - [`coding-aegis-2sv`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-2sv.15`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.1`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.10`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.12`](cross-tool-artifact-model-refactor.md)

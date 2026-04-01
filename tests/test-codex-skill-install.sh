@@ -142,6 +142,9 @@ section "T6: Verify installed files"
 # Rule file verification skipped for Codex — Codex rules go in AGENTS.md,
 # not individual files. Tracked in 2sv.15.
 
+test_header "files written by install"
+echo -e "  ${DIM}$(find "$TEST_DIR" \( -name 'aegis--*' -o -name 'SKILL.md' -o -name 'AGENTS.md' \) -not -path '*/pkgs/*' 2>/dev/null | head -10 || echo '(none found)')${RESET}"
+
 test_header "skill file exists"
 assert_file_exists "$SKILL_INSTALL_DIR/SKILL.md" "skill file: .agents/skills/helloworld/SKILL.md"
 
