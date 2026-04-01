@@ -160,13 +160,44 @@ print_results() {
 trap print_results EXIT
 
 echo "========================================"
-echo "coding-aegis plugin marketplace test"
+echo "coding-aegis skill test (Claude Code)"
 echo "========================================"
 echo "  Repo root:   $REPO_ROOT"
 echo "  GitHub repo: $GITHUB_REPO"
-echo -e "  ${DIM}claude: $(command -v claude)${RESET}"
+echo ""
 
-# Phase 1: local directory marketplace
+# ══════════════════════════════════════════════════════════════
+# T0 — Tool Prerequisites
+# ══════════════════════════════════════════════════════════════
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo -e "${BOLD}T0: Claude Code prerequisites${RESET}"
+echo -e "${BOLD}══════════════════════════════════════════${RESET}"
+echo ""
+
+echo -e "${BOLD}TEST: claude installed${RESET}"
+if command -v claude &>/dev/null; then
+  claude_path=$(command -v claude)
+  claude_version=$(claude --version 2>&1 || echo "unknown")
+  echo -e "  ${DIM}Path: $claude_path${RESET}"
+  echo -e "  ${DIM}Version: $claude_version${RESET}"
+  pass "claude found: $claude_version"
+else
+  fail "claude not found in PATH"
+  exit 1
+fi
+
+echo ""
+echo -e "${BOLD}TEST: claude authenticated${RESET}"
+auth_output=$(claude -p "Reply with exactly: AUTH_OK" < /dev/null 2>&1) || true
+if echo "$auth_output" | grep -qi "AUTH_OK"; then
+  pass "claude authenticated"
+else
+  echo -e "  ${YELLOW}$(echo "$auth_output" | head -5)${RESET}"
+  fail "claude auth — run 'claude auth' first"
+  exit 1
+fi
+
+# T1 — Local marketplace
 test_marketplace_lifecycle "Local marketplace" "$REPO_ROOT" "coding-aegis"
 
 # Phase 2: remote GitHub marketplace

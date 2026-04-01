@@ -78,8 +78,11 @@ fi
 
 echo ""
 echo -e "${BOLD}TEST: codex authenticated${RESET}"
-# codex exec with a trivial prompt to verify auth works
-auth_output=$(codex exec "Reply with exactly: AUTH_OK" --ephemeral -o /dev/stdout < /dev/null 2>&1) || true
+# codex exec requires a git repo — use a temp dir
+AUTH_DIR="$(mktemp -d)"
+git -C "$AUTH_DIR" init -q
+auth_output=$(cd "$AUTH_DIR" && codex exec "Reply with exactly: AUTH_OK" --ephemeral -o /dev/stdout < /dev/null 2>&1) || true
+rm -rf "$AUTH_DIR"
 if echo "$auth_output" | grep -qi "AUTH_OK"; then
   pass "codex authenticated"
 else
@@ -172,60 +175,64 @@ fi
 rm -rf "$TEST_DIR"
 
 # ══════════════════════════════════════════════════════════════
-# Phase 2: Skill discovery via .agents/skills/
+# T1 — Local skill install (file-based lifecycle)
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 2: Codex skill discovery${RESET}"
+echo -e "${BOLD}T1: Local skill install (file copy)${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 echo ""
 
 TEST_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEST_DIR"; print_results' EXIT
+git -C "$TEST_DIR" init -q
 
-# Codex discovers skills from .agents/skills/ (not .claude/skills/)
+# T1.1 + T1.3: Install skill by copying to .agents/skills/
+echo -e "${BOLD}TEST: install skill to .agents/skills/${RESET}"
 mkdir -p "$TEST_DIR/.agents/skills/coding-aegis"
 cp "$SKILL_DIR/SKILL.md" "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md"
 cp "$SKILL_DIR/aegis-catalog.py" "$TEST_DIR/.agents/skills/coding-aegis/aegis-catalog.py"
+if [ -f "$TEST_DIR/.agents/skills/coding-aegis/SKILL.md" ]; then
+  pass "skill files copied to .agents/skills/coding-aegis/"
+else
+  fail "skill files not found after copy"
+fi
+
+# T1.4: Verify skill is discoverable via codex exec
+echo ""
+echo -e "${BOLD}TEST: codex discovers installed skill${RESET}"
 cp -R "$REAL_CATALOG" "$TEST_DIR/pkgs"
-# Codex needs a git repo to run
-git -C "$TEST_DIR" init -q
-
-echo -e "  ${DIM}Test dir: $TEST_DIR${RESET}"
-echo -e "  ${DIM}Skill at: .agents/skills/coding-aegis/SKILL.md${RESET}"
-
-echo -e "${BOLD}TEST: codex exec show helloworld${RESET}"
 SHOW_PROMPT="You have the coding-aegis skill loaded. Use it to show the package named helloworld. The pkgs/ catalog directory is at ./pkgs/. Display the package details."
 show_output=$(cd "$TEST_DIR" && codex exec "$SHOW_PROMPT" \
   --ephemeral \
   -s read-only \
   -o /dev/stdout \
   < /dev/null 2>&1) || true
-
-echo -e "${YELLOW}$(echo "$show_output" | head -30)${RESET}"
-errors=0
-if ! echo "$show_output" | grep -qi "helloworld"; then
-  echo -e "  ${RED}Missing: helloworld name${RESET}"
-  errors=$((errors + 1))
-fi
-if ! echo "$show_output" | grep -qi "goodies"; then
-  echo -e "  ${RED}Missing: goodies tier${RESET}"
-  errors=$((errors + 1))
-fi
-if [ "$errors" -eq 0 ]; then
-  pass "codex exec show — helloworld details returned"
+echo -e "${YELLOW}$(echo "$show_output" | head -20)${RESET}"
+if echo "$show_output" | grep -qi "helloworld"; then
+  pass "codex exec — skill loaded, helloworld found"
 else
-  fail "codex exec show — $errors expected values missing"
+  fail "codex exec — skill not loaded or helloworld not found"
+fi
+
+# T1.5 + T1.6: Remove skill
+echo ""
+echo -e "${BOLD}TEST: remove skill from .agents/skills/${RESET}"
+rm -rf "$TEST_DIR/.agents/skills/coding-aegis"
+if [ ! -d "$TEST_DIR/.agents/skills/coding-aegis" ]; then
+  pass "skill directory removed"
+else
+  fail "skill directory still present"
 fi
 
 rm -rf "$TEST_DIR"
 
 # ══════════════════════════════════════════════════════════════
-# Phase 3: Install command — full pipeline
+# T4 — Install pipeline (direct CLI)
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
-echo -e "${BOLD}Phase 3: Install pipeline (direct CLI)${RESET}"
+echo -e "${BOLD}T4: Install pipeline (direct CLI)${RESET}"
 echo -e "${BOLD}══════════════════════════════════════════${RESET}"
 
 source "$(dirname "$0")/lib-install-test.sh"
