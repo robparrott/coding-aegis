@@ -1,0 +1,7 @@
+{
+  "name": "coding-aegis",
+  "version": "1.0.0",
+  "description": "Browse, install, and manage coding agent governance packages",
+  "author": { "name": "platform-team" },
+  "skills": "./pkgs/bootstrap/coding-aegis/skills/"
+}

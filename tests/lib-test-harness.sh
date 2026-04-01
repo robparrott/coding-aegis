@@ -217,6 +217,30 @@ assert_file_contains() {
   fi
 }
 
+# assert_file_not_exists <path> <description>
+assert_file_not_exists() {
+  local path="$1"
+  local description="$2"
+
+  if [ -f "$path" ]; then
+    fail "$description — file still exists: $path"
+  else
+    pass "$description"
+  fi
+}
+
+# assert_dir_not_exists <path> <description>
+assert_dir_not_exists() {
+  local path="$1"
+  local description="$2"
+
+  if [ -d "$path" ]; then
+    fail "$description — directory still exists: $path"
+  else
+    pass "$description"
+  fi
+}
+
 # ── Quota / rate-limit guard ────────────────────────────────
 
 # assert_no_quota_error <output> [tool-name]

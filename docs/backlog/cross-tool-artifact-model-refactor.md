@@ -11,6 +11,7 @@ Canonical cross-tool concept mapping and downstream spec/artifact table fixes. S
 - [ ] `coding-aegis-2sv.11` Add MCP server stub to pirate-speak package
 - [ ] `coding-aegis-2sv.12` Design AGENTS.md management strategy for installed packages
 - [ ] `coding-aegis-2sv.13` Add AGENTS.md integration to pirate-speak package
+- [x] `coding-aegis-2sv.14` Detect active tool and install to correct skill path
 - [ ] `coding-aegis-2sv.2` Spike: Research GitHub Copilot agent mode and sub-agent capabilities
 - [ ] `coding-aegis-2sv.3` Add Codex tool support
 - [ ] `coding-aegis-2sv.4` Add Gemini Code Assist support
@@ -20,4 +21,4 @@ Canonical cross-tool concept mapping and downstream spec/artifact table fixes. S
 - [ ] `coding-aegis-2sv.8` Windsurf skills delivery
 - [x] `coding-aegis-2sv.9` Create example package covering all artifact types
 
-**Progress**: 1/13 tasks complete
+**Progress**: 2/14 tasks complete

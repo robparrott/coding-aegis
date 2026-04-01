@@ -20,6 +20,17 @@ TIERS = ["required", "best-practices", "optional", "goodies"]
 
 ARTIFACT_TYPE_ORDER = ["rule", "skill", "agent", "mcp", "plugin"]
 
+# Per-tool install path configuration.
+# See references/install-rules.md for the full cross-tool mapping.
+TOOL_PATHS = {
+    "claude":   {"scope_base": ".claude",   "skills_dir": "skills"},
+    "codex":    {"scope_base": ".claude",   "skills_dir": ".agents/skills",
+                 "skills_base": "."},  # skills install relative to CWD, not scope_base
+    "cursor":   {"scope_base": ".cursor",   "skills_dir": "skills"},
+    "windsurf": {"scope_base": ".windsurf", "skills_dir": "skills"},
+    "copilot":  {"scope_base": ".github",   "skills_dir": "skills"},
+}
+
 
 # ---------------------------------------------------------------------------
 # Minimal YAML parser
@@ -318,6 +329,8 @@ def cmd_show(args):
 def cmd_install_prep(args):
     cat = _resolve_or_error(args)
     name = args.package
+    tool = getattr(args, "tool", "claude")
+    tool_cfg = TOOL_PATHS.get(tool, TOOL_PATHS["claude"])
 
     # Find the package
     pkg_data = None
@@ -377,29 +390,40 @@ def cmd_install_prep(args):
             })
 
         elif a_type == "skill":
-            # Skills: copy the entire skill directory
+            # Skills: copy the entire skill directory.
+            # Path varies by tool (e.g. .claude/skills/ vs .agents/skills/).
             skill_name = Path(a_path).parent.name
             skill_dir = pkg_dir / "skills" / skill_name
+            skills_prefix = tool_cfg["skills_dir"]
+            skill_target = f"{skills_prefix}/{skill_name}"
+            # Some tools (Codex) install skills relative to CWD, not scope_base
+            skill_base = tool_cfg.get("skills_base")
             if skill_dir.is_dir():
                 for f in sorted(skill_dir.rglob("*")):
                     if f.is_file():
                         rel = f.relative_to(skill_dir)
-                        artifacts_out.append({
+                        entry = {
                             "type": "skill",
                             "source_path": str(f),
-                            "target_subdir": f"skills/{skill_name}",
+                            "target_subdir": skill_target,
                             "target_filename": str(rel),
                             "content": f.read_text(),
-                        })
+                        }
+                        if skill_base is not None:
+                            entry["base_path"] = skill_base
+                        artifacts_out.append(entry)
             else:
                 # Single file skill
-                artifacts_out.append({
+                entry = {
                     "type": "skill",
                     "source_path": str(source_path),
-                    "target_subdir": f"skills/{skill_name}",
+                    "target_subdir": skill_target,
                     "target_filename": Path(a_path).name,
                     "content": source_text,
-                })
+                }
+                if skill_base is not None:
+                    entry["base_path"] = skill_base
+                artifacts_out.append(entry)
 
         else:
             # mcp, plugin, etc. — pass through as-is
@@ -415,6 +439,8 @@ def cmd_install_prep(args):
         "name": name,
         "version": pkg_data.get("version"),
         "tier": pkg_data["tier"],
+        "tool": tool,
+        "scope_base": tool_cfg["scope_base"],
         "artifacts": artifacts_out,
     }, indent=2))
 
@@ -543,6 +569,9 @@ def main():
     p_prep = sub.add_parser("install-prep", help="Prepare install artifacts")
     p_prep.add_argument("package", help="Package name")
     p_prep.add_argument("--catalog", help="Path to pkgs/ directory")
+    p_prep.add_argument("--tool", default="claude",
+                        choices=["claude", "codex", "cursor", "windsurf", "copilot"],
+                        help="Target tool — adjusts install paths for skill discovery")
 
     # status
     p_status = sub.add_parser("status", help="Show installed package status")

@@ -29,10 +29,21 @@ gemini_quiet() {
 
 cleanup() {
   section "T7: Teardown"
-  echo -e "  ${DIM}\$ gemini skills uninstall coding-aegis --scope user${RESET}"
-  gemini_quiet skills uninstall coding-aegis --scope user > /dev/null || true
-  echo "  Removing test dir: $TEST_DIR"
+
+  # T7.1: uninstall helloworld via coding-aegis skill (not yet implemented)
+  # When the skill supports `uninstall`, this should be:
+  #   CLI_PROMPT="/coding-aegis uninstall helloworld"
+  #   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" gemini_quiet -o text --yolo
+  test_header "T7.1 uninstall helloworld (not yet implemented — manual cleanup)"
+  rm -f "$TEST_DIR/.claude/rules/aegis--helloworld--helloworld.md"
+  rm -rf "$TEST_DIR/.claude/skills/helloworld"
+
+  test_header "T7.2 uninstall coding-aegis skill"
+  run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope user || true
+
+  test_header "T7.3 remove test directory"
   rm -rf "$TEST_DIR"
+
   print_results
 }
 trap cleanup EXIT
@@ -87,7 +98,7 @@ cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 section "T3: Use skill — list packages"
 
 test_header "coding-aegis list"
-CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
+CLI_PROMPT="/coding-aegis list"
 RUN_DIR="$TEST_DIR" run_cli "skill list" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
@@ -96,7 +107,7 @@ assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 section "T4: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
-CLI_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
+CLI_PROMPT="/coding-aegis show helloworld"
 RUN_DIR="$TEST_DIR" run_cli "skill show" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
@@ -107,7 +118,9 @@ assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 section "T5: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
-CLI_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking the user. Write all files immediately."
+# Scope specified in prompt — the skill's interactive scope picker cannot
+# be used in headless mode.
+CLI_PROMPT="/coding-aegis install helloworld to Project scope"
 RUN_DIR="$TEST_DIR" run_cli "skill install" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
@@ -128,5 +141,14 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
+
+# ── T6b: Invoke installed helloworld skill ────────────────────
+section "T6b: Invoke helloworld skill"
+
+test_header "helloworld responds"
+CLI_PROMPT="/helloworld"
+RUN_DIR="$TEST_DIR" run_cli "invoke helloworld" gemini_quiet -o text --yolo
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
+assert_contains "$LAST_OUTPUT" "Hello, World" "helloworld skill responded"
 
 # T7 teardown happens in cleanup trap

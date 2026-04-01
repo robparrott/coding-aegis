@@ -27,6 +27,10 @@
 - [x] `coding-aegis-b5z.28` Fix elapsed time display in lib-test-harness.sh
 - [x] `coding-aegis-b5z.29` Research Codex remote skill install mechanism (eliminate local file copy)
 - [x] `coding-aegis-b5z.3` Implement skill catalog browsing
+- [x] `coding-aegis-b5z.30` Replace install-skill-from-github.py with Codex-native skill install in test
+- [x] `coding-aegis-b5z.31` Implement proper T7 teardown in Codex test script
+- [x] `coding-aegis-b5z.32` Create .codex-plugin/plugin.json manifest
+- [x] `coding-aegis-b5z.33` Add assert_file_not_exists and assert_dir_not_exists to test harness
 - [x] `coding-aegis-b5z.4` Implement package installation
 - [ ] `coding-aegis-b5z.5` Add install-required command to coding-aegis skill
 - [x] `coding-aegis-b5z.6` Fix automated skill testing — claude -p hangs with --plugin-dir
@@ -34,4 +38,4 @@
 - [x] `coding-aegis-b5z.8` Update install/testing docs for Claude, Codex, and Gemini CLI
 - [x] `coding-aegis-b5z.9` Add Codex skill lifecycle tests (file-based install/verify/remove)
 
-**Progress**: 26/29 tasks complete
+**Progress**: 30/33 tasks complete

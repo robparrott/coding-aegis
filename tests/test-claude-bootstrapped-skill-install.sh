@@ -27,10 +27,25 @@ CLAUDE_COMMON="--strict-mcp-config --mcp-config {\"mcpServers\":{}}"
 
 cleanup() {
   section "T7: Teardown"
+
+  # T7.1: uninstall helloworld via coding-aegis skill (not yet implemented)
+  # When the skill supports `uninstall`, this should be:
+  #   CLI_PROMPT="/coding-aegis uninstall helloworld"
+  #   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" claude -p \
+  #     --allowedTools "Bash,Read,Write,Glob,Skill" --permission-mode bypassPermissions $CLAUDE_COMMON
+  test_header "T7.1 uninstall helloworld (not yet implemented — manual cleanup)"
+  rm -rf "$TEST_DIR/.claude/rules/aegis--helloworld--helloworld.md"
+  rm -rf "$TEST_DIR/.claude/skills/helloworld"
+
+  test_header "T7.2 uninstall coding-aegis plugin"
   run_cli "uninstall plugin" claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user || true
+
+  test_header "T7.3 remove marketplace"
   run_cli "remove marketplace" claude plugin marketplace remove "$MARKETPLACE_NAME" || true
-  echo "  Removing test dir: $TEST_DIR"
+
+  test_header "T7.4 remove test directory"
   rm -rf "$TEST_DIR"
+
   print_results
 }
 trap cleanup EXIT
@@ -93,18 +108,18 @@ ln -s "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs" 2>/dev/null || cp -R "$REPO_ROOT/pkgs" 
 section "T3: Use skill — list packages"
 
 test_header "coding-aegis list"
-CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command. The pkgs/ catalog is at ./pkgs/ in the current directory."
+CLI_PROMPT="/coding-aegis list"
 RUN_DIR="$TEST_DIR" run_cli "skill list" claude -p \
-  --allowedTools "Bash,Read,Glob" $CLAUDE_COMMON
+  --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
 # ── T4: Use skill — show ─────────────────────────────────────
 section "T4: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
-CLI_PROMPT="You have the coding-aegis skill loaded. Execute its show command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory."
+CLI_PROMPT="/coding-aegis show helloworld"
 RUN_DIR="$TEST_DIR" run_cli "skill show" claude -p \
-  --allowedTools "Bash,Read,Glob" $CLAUDE_COMMON
+  --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
@@ -112,11 +127,19 @@ assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 # ── T5: Use skill — install ──────────────────────────────────
 section "T5: Use skill — install helloworld"
 
+# Pre-create .claude/ directory structure so the agent doesn't balk at
+# writing to a "sensitive" path that doesn't exist yet.
+mkdir -p "$TEST_DIR/.claude/rules" "$TEST_DIR/.claude/skills"
+
 test_header "coding-aegis install helloworld"
-CLI_PROMPT="You have the coding-aegis skill loaded. Execute its install command for the package named helloworld. The pkgs/ catalog is at ./pkgs/ in the current directory. Use Project scope (.claude/ in the current directory) without asking — do not use AskUserQuestion."
+# Scope specified in prompt — the skill's interactive scope picker may not
+# resolve correctly in headless (-p) mode.
+CLI_PROMPT="/coding-aegis install helloworld to Project scope"
 RUN_DIR="$TEST_DIR" run_cli "skill install" claude -p \
-  --allowedTools "Bash,Read,Write,Glob" --permission-mode dontAsk $CLAUDE_COMMON
-assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld" "install — activity reported"
+  --allowedTools "Bash,Read,Write,Glob,Skill,AskUserQuestion" \
+  --dangerously-skip-permissions $CLAUDE_COMMON
+assert_contains "$LAST_OUTPUT" "aegis--helloworld\|Installed\|helloworld.*rule\|helloworld.*skill" "install — files written"
+assert_not_contains "$LAST_OUTPUT" "denied\|unable to write\|permission" "install — no permission errors"
 
 # ── T6: Verify installed files ────────────────────────────────
 section "T6: Verify installed files"
@@ -134,5 +157,14 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
+
+# ── T6b: Invoke installed helloworld skill ────────────────────
+section "T6b: Invoke helloworld skill"
+
+test_header "helloworld responds"
+CLI_PROMPT="/helloworld"
+RUN_DIR="$TEST_DIR" run_cli "invoke helloworld" claude -p \
+  --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
+assert_contains "$LAST_OUTPUT" "Hello, World" "helloworld skill responded"
 
 # T7 teardown happens in cleanup trap

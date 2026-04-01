@@ -107,6 +107,23 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-bg5 (5 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-bg5 ● P2 coding-aegis Skill UX
+  │   ├── ○ coding-aegis-bg5.1 ● P2 Add install-required and install-best-practices c…
+  │   ├── ○ coding-aegis-bg5.2 ● P2 Add uninstall command to coding-aegis skill
+  │   ├── ○ coding-aegis-bg5.3 ● P2 Update test scripts T7.1 to use skill-mediated un…
+  │   └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
+  ├── ○ coding-aegis-bg5.1 ● P2 Add install-required and install-best-practices c…
+  ├── ○ coding-aegis-bg5.2 ● P2 Add uninstall command to coding-aegis skill
+  ├── ○ coding-aegis-bg5.3 ● P2 Update test scripts T7.1 to use skill-mediated un…
+  └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -117,19 +134,6 @@ Auto-generated from `bd graph --all --compact`.
   │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-bg5 (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-bg5 ● P2 coding-aegis Skill UX
-  │   ├── ○ coding-aegis-bg5.1 ● P2 Add install-required and install-best-practices c…
-  │   └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
-  ├── ○ coding-aegis-bg5.1 ● P2 Add install-required and install-best-practices c…
-  └── ○ coding-aegis-z61 ● P2 Design coding-aegis skill UX
 
 ────────────────────────────────────────────────────────────
 
@@ -232,12 +236,14 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-2sv.13`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
+- [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
+- [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
+- [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
+- [`coding-aegis-z61`](standalone.md)
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
-- [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
-- [`coding-aegis-z61`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-avj`](standalone.md)

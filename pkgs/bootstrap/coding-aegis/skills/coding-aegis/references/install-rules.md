@@ -10,6 +10,7 @@ When running inside a coding agent, detect the active tool:
 | Tool | Detection signal |
 |------|-----------------|
 | Claude Code | Default — if no other tool detected |
+| Codex | `CODEX_HOME` env var set, or `.agents/` directory exists at repo root |
 | Cursor | `.cursor/` directory exists at repo root, or `.cursorrc` present |
 | Windsurf | `.windsurf/` directory exists at repo root |
 | Copilot | `.github/copilot-instructions.md` exists |
@@ -40,6 +41,7 @@ Source rules are authored as `.md`. Adapt extension per target tool:
 | Tool | Target directory |
 |------|-----------------|
 | Claude Code | `.claude/skills/{name}/` |
+| Codex | `.agents/skills/{name}/` |
 | Cursor | `.cursor/skills/{name}/` |
 | Windsurf | `.agents/skills/{name}/` |
 | Copilot | Not supported |

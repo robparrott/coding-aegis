@@ -18,15 +18,26 @@ This is the flow every test script validates, in order:
 
 The skill is the product. Every agent-mediated test goes through it.
 
-### Install mechanism preference (T1)
+### Principle: exercise the real user journey
+
+Prompts must invoke the tool's **built-in mechanisms** — never instruct the agent to bypass them. For example, Codex has a built-in `$skill-installer` skill for installing skills from GitHub. The test prompt says "Use the skill-installer to install a skill from GitHub repo X, path Y" and lets the agent invoke `$skill-installer` naturally. It does NOT call `install-skill-from-github.py` directly or copy files manually.
+
+Similarly, T3-T5 prompts should reference the skill by name ("Use the coding-aegis skill to list packages") rather than providing implementation details about internal scripts or directory paths.
+
+### Install mechanism preference (T2)
 
 | Preference | Mechanism | When to use |
 |-----------|-----------|-------------|
-| **1st** | Marketplace/registry | Tool has a plugin/skill marketplace (Claude, Gemini) |
-| **2nd** | Git-based install | Tool supports `install <git-url>` (Gemini, Codex via clone) |
-| **3rd** | Local file copy | Tool has NO marketplace or registry (Codex `.agents/skills/`) |
+| **1st** | Marketplace/registry | Tool has a plugin/skill marketplace (Claude) |
+| **2nd** | Built-in skill installer | Tool has an agent-mediated install mechanism (Codex `$skill-installer`) |
+| **3rd** | CLI skill management | Tool has a skills CLI (Gemini `skills link`) |
+| **4th** | Local file copy | Tool has NO install mechanism — last resort |
 
-Only Codex currently requires local file copy. Claude uses plugin marketplace. Gemini uses `skills link` (local) or `skills install` (remote). If a tool adds marketplace support later, its test MUST be updated to use it.
+| Tool | T2 mechanism |
+|------|-------------|
+| Claude | `claude plugin install` (marketplace CLI) |
+| Codex | Agent-mediated via `$skill-installer` (installs from GitHub to `~/.codex/skills/`) |
+| Gemini | `gemini skills link` (local path) or `gemini skills install` (remote) |
 
 ## CLI Invocation Standard
 
@@ -53,12 +64,12 @@ Every tool follows the same stdin pattern. The only differences are the binary n
 
 **Claude flags:**
 - `--strict-mcp-config --mcp-config '{"mcpServers":{}}'` — disables MCP servers (prevents startup hangs)
-- `--allowedTools "Bash,Read,Glob"` — read-only commands (list, show)
-- `--allowedTools "Bash,Read,Write,Glob" --permission-mode dontAsk` — install (needs Write)
+- `--allowedTools "Bash,Read,Glob,Skill"` — read-only commands (list, show); Skill tool required for `/coding-aegis` invocation
+- `--allowedTools "Bash,Read,Write,Glob,Skill,AskUserQuestion" --dangerously-skip-permissions` — install (needs Write + Skill + AskUserQuestion; `--dangerously-skip-permissions` required because `.claude/` is a protected path that even `--permission-mode bypassPermissions` won't override)
 
 **Codex flags:**
 - `--ephemeral` — no session persistence
-- `-s read-only` — read-only commands; `-s workspace-write` — install
+- `-s read-only` — read-only commands (list, show); `-s workspace-write` — local writes (install helloworld); `-s danger-full-access` — network + writes (skill-installer needs GitHub access)
 - `-o /dev/stdout` — captures output
 - Requires `git init` in working directory
 
@@ -86,6 +97,8 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 | `assert_not_contains <output> <pattern> <desc>` | Inverse |
 | `assert_file_exists <path> <desc>` | File existence |
 | `assert_file_contains <path> <pattern> <desc>` | Grep file content |
+| `assert_file_not_exists <path> <desc>` | File absence (for teardown) |
+| `assert_dir_not_exists <path> <desc>` | Directory absence (for teardown) |
 | `assert_no_quota_error <output> [tool]` | Detect quota/rate-limit errors; FAIL + abort if found |
 | `pass <desc>` / `fail <desc>` | Counters + colored output |
 | `print_results` | Final summary, exit 0/1 |
@@ -120,7 +133,7 @@ Add the coding-aegis catalog as a source the tool can install from.
 | Tool | T1.1 | T1.2 |
 |------|------|------|
 | Claude | `claude plugin marketplace add <path>` | `claude plugin marketplace list` |
-| Codex | Verify `install-skill-from-github.py` exists | Built-in installer present |
+| Codex | Validate `.codex-plugin/plugin.json` exists with required fields | Plugin manifest present |
 | Gemini | N/A (uses `skills link` directly — skip to T2) | N/A |
 
 ### T2 — Install coding-aegis Skill
@@ -135,10 +148,18 @@ Install the skill from the registered source (T1) or via the best available mech
 | Tool | T2.1 | T2.2 |
 |------|------|------|
 | Claude | `claude plugin install coding-aegis@<mp>` | `claude plugin list` |
-| Codex | `install-skill-from-github.py --repo --path --dest` | `assert_file_exists` |
+| Codex | Agent invokes `$skill-installer` to install from GitHub | `assert_file_exists` SKILL.md in `~/.codex/skills/` |
 | Gemini | `gemini skills link <path> --consent` | `gemini skills list` |
 
 ### T3 — Use Skill: List Packages
+
+Invoke the skill using the tool's native syntax — not natural language descriptions.
+
+| Tool | Prompt (stdin) |
+|------|---------------|
+| Claude | `/coding-aegis list` |
+| Codex | `$coding-aegis list` |
+| Gemini | `/coding-aegis list` |
 
 | Step | Pass criteria |
 |------|---------------|
@@ -146,17 +167,29 @@ Install the skill from the registered source (T1) or via the best available mech
 
 ### T4 — Use Skill: Show Package
 
+| Tool | Prompt (stdin) |
+|------|---------------|
+| Claude | `/coding-aegis show helloworld` |
+| Codex | `$coding-aegis show helloworld` |
+| Gemini | `/coding-aegis show helloworld` |
+
 | Step | Pass criteria |
 |------|---------------|
 | T4.1 Agent shows helloworld | Output contains name, tier "optional", version "1.0.0" |
 
 ### T5 — Use Skill: Install Package
 
+The install command's interactive scope picker (`AskUserQuestion`) cannot be used in headless mode. The prompt includes "to Project scope" so the agent can complete the install without interactive input.
+
+| Tool | Prompt (stdin) |
+|------|---------------|
+| Claude | `/coding-aegis install helloworld to Project scope` |
+| Codex | `$coding-aegis install helloworld to Project scope (.claude/ in the current directory)` |
+| Gemini | `/coding-aegis install helloworld to Project scope` |
+
 | Step | Pass criteria |
 |------|---------------|
 | T5.1 Agent installs helloworld | Agent reports install activity |
-
-Prompt instructs agent to use Project scope without asking.
 
 ### T6 — Verify Installed Files
 
@@ -168,13 +201,30 @@ Filesystem checks, no agent.
 | T6.2 Rule frontmatter | `managed-by: coding-aegis`, `package: helloworld`, `tier: optional` |
 | T6.3 Skill file exists | `skills/helloworld/SKILL.md` present |
 
-### T7 — Teardown
+### T6b — Invoke Installed Skill
+
+Exercise the installed helloworld skill to confirm it is functional, not just present on disk.
+
+| Tool | Prompt (stdin) |
+|------|---------------|
+| Claude | `/helloworld` |
+| Codex | `$helloworld` |
+| Gemini | `/helloworld` |
 
 | Step | Pass criteria |
 |------|---------------|
-| T7.1 Uninstall skill | CLI success or files removed |
-| T7.2 Remove marketplace/registry | CLI success (skip for tools without marketplace) |
-| T7.3 Remove test directory | Deleted |
+| T6b.1 Skill responds | Output contains "Hello, World" |
+
+### T7 — Teardown
+
+Remove artifacts in reverse install order: target package first, then the coding-aegis skill, then the marketplace/registry, then the test directory.
+
+| Step | Pass criteria |
+|------|---------------|
+| T7.1 Uninstall helloworld via skill | `/coding-aegis uninstall helloworld` (**not yet implemented** — manual cleanup until skill supports uninstall) |
+| T7.2 Uninstall coding-aegis skill | CLI success or files removed |
+| T7.3 Remove marketplace/registry | CLI success (skip for tools without marketplace) |
+| T7.4 Remove test directory | Deleted |
 
 ## Test Package
 
@@ -206,6 +256,7 @@ Filesystem checks, no agent.
 | T4 Skill: show | done | done | done | TBD |
 | T5 Skill: install | done | done | done | TBD |
 | T6 Verify files | done | done | done | TBD |
+| T6b Invoke helloworld | done | done | done | TBD |
 | T7 Teardown | done | done | done | TBD |
 | Unit tests | done (31) | — | — | — |
 
