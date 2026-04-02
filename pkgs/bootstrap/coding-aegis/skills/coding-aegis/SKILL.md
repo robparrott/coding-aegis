@@ -161,55 +161,59 @@ Display full details for a single package.
 
 Install a package's artifacts into the target project or user configuration.
 
-> **Note**: This skill currently supports **Claude Code only** (per AD-8).
+### Step 1 — Choose scope
 
-### Step 1 — Resolve and prepare
-
-1. Run: `python3 "{skill-dir}/aegis-catalog.py" install-prep <name>`
-   The script auto-detects the active tool (Claude, Codex, Cursor, etc.) from
-   environment signals and adjusts install paths accordingly.
-2. If the JSON contains `"error"`, print the error and stop.
-3. The response contains `name`, `version`, `tier`, `tool`, `scope_base`, and
-   an `artifacts` array. Each artifact has: `type`, `target_subdir`,
-   `target_filename`, `content`, and optionally `base_path`.
-4. If the artifacts array is empty, warn and stop.
-
-### Step 2 — Scope picker
-
-Use the `scope_base` from the install-prep JSON (e.g. `.claude` for Claude, `.claude` for Codex rules).
-
-Present the user with a choice using AskUserQuestion:
+Ask the user where to install using AskUserQuestion:
 
 ```
 Where should this package be installed?
 
-1. Project — `{scope_base}/` in the current repo (governs this project, shared via source control)
-2. User — `~/{scope_base}/` in your home directory (governs all your projects)
+1. Project — into this repository (governs this project, shared via source control)
+2. User — into your home directory (governs all your projects)
 ```
 
-Map the response to a base path:
+Map the choice to a `--scope` flag:
 
-| Scope | Base path |
-|-------|-----------|
-| Project | `{CWD}/{scope_base}/` |
-| User | `~/{scope_base}/` |
+| Choice | Flag |
+|--------|------|
+| Project | `--scope project` |
+| User | `--scope user` |
+
+### Step 2 — Prepare install artifacts
+
+Run:
+
+```
+python3 "{skill-dir}/aegis-catalog.py" install-prep <name> --scope <project|user>
+```
+
+If the JSON contains `"error"`, print the error and stop.
+If `artifacts` is empty, warn and stop.
+
+The response contains:
+- `tool` — the detected active agent
+- `scope` — `project` or `user`
+- `scope_base` — absolute base path for rules and non-skill artifacts
+- `artifacts` — array of files to write; each entry has `install_path` (the complete absolute destination path), `content`, and `type`
 
 ### Step 3 — Batch write all files
 
-For each artifact from Step 1, compute the full target path:
-- If the artifact has a `base_path` field, use: `{base_path}/{target_subdir}/{target_filename}`
-- Otherwise use: `{scope-base}/{target_subdir}/{target_filename}`
+For each artifact, write `content` to `install_path`. Use `mkdir -p` to create parent directories. Issue all writes in a single Bash call:
 
-where `scope-base` comes from the scope picker (Step 2) or from the `scope_base` field in the JSON.
+```bash
+mkdir -p "$(dirname '{install_path_1}')" && cat > '{install_path_1}' << 'AEGIS_EOF'
+{content_1}
+AEGIS_EOF
+mkdir -p "$(dirname '{install_path_2}')" && cat > '{install_path_2}' << 'AEGIS_EOF'
+{content_2}
+AEGIS_EOF
+```
 
-Write all files using Bash with `mkdir -p` and `cat > file << 'AEGIS_EOF' ... AEGIS_EOF`.
-The Write tool cannot write to `.claude/` paths (hardcoded sensitive-path protection),
-so Bash is required. Create parent directories first, then write all files in a single
-Bash call to minimize tool invocations.
+**Do not recompute or adjust the paths.** Write exactly to the `install_path` values from the JSON — they already account for tool-specific layout (e.g. Codex skills go to `.agents/skills/`, not `.claude/skills/`).
 
-### Step 4 — Update AGENTS.md (Project scope only)
+### Step 4 — Update AGENTS.md (Claude Code, Project scope only)
 
-Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
+Skip for all tools except Claude Code. Skip for User scope. Skip if AGENTS.md does not exist in CWD.
 
 1. Read AGENTS.md.
 2. Look for the heading `## Installed Governance Rules`.
@@ -227,7 +231,7 @@ Skip this step for User scope. Skip if AGENTS.md does not exist in CWD.
    | {rule} | {package} | {version} | {tier} | `{relative-path}` |
    ```
 
-   Populate the table by scanning `{CWD}/.claude/rules/aegis--*`. Read each file's
+   Populate the table by scanning `{scope_base}/rules/aegis--*`. Read each file's
    frontmatter for package, rule, version, and tier.
 
 ### Step 5 — Confirm
@@ -237,15 +241,17 @@ Print a summary:
 ```
 ## Installed: {name} v{version} ({tier})
 
+Tool: {tool}
+
 | # | Type | Installed to |
 |---|------|-------------|
 | 1 | rule | .claude/rules/aegis--example--example-rule.md |
-| 2 | skill | .claude/skills/example/SKILL.md |
+| 2 | skill | .agents/skills/example/SKILL.md |
 ```
 
-If AGENTS.md was updated, add: "AGENTS.md updated with installed governance rules table."
+If AGENTS.md was updated (Claude Code only), add: "AGENTS.md updated with installed governance rules table."
 
-**Important**: After installing skills, remind the user: "Restart Claude Code to load newly installed skills."
+**Important**: After installing skills, remind the user: "Restart Claude Code (or your active tool) to load newly installed skills."
 
 ## uninstall
 

@@ -10,7 +10,7 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
-  │   ├── ○ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
+  │   ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
   │   ├── ○ coding-aegis-b5z.35 ● P1 Align Gemini test script with user journey contra…
   │   ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
@@ -20,7 +20,7 @@ Auto-generated from `bd graph --all --compact`.
   │   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
-  ├── ○ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
+  ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
   ├── ○ coding-aegis-b5z.35 ● P1 Align Gemini test script with user journey contra…
   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
   ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
@@ -151,6 +151,19 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
+
+  LAYER 1
+  ├── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
+  └── ○ coding-aegis-pnv ● P2 Research Windsurf and Copilot tool detection sign…
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-a0q (2 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -159,6 +172,15 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
   │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-c1d (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-c1d ● P2 Suppress tool detection output on implicit runs
 
 ────────────────────────────────────────────────────────────
 
@@ -265,8 +287,12 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-wpi.10`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-lw7`](standalone.md)
+- [`coding-aegis-ghv`](standalone.md)
+- [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
+- [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

@@ -3,14 +3,18 @@
 # Usage: tests/test-codex-skill-install.sh
 #
 # Follows the user journey per docs/test/testing-spec.md:
-#   T0  Prerequisites (installed + authenticated)
-#   T1  Register marketplace (validate .codex-plugin/ manifest)
-#   T2  Install coding-aegis skill via $skill-installer
-#   T3  Use skill: list packages
-#   T4  Use skill: show helloworld
-#   T5  Use skill: install helloworld
-#   T6  Verify installed files
-#   T7  Teardown (step-by-step with validation)
+#   T0   Prerequisites (installed + authenticated)
+#   T1   Register marketplace (validate .codex-plugin/ manifest)
+#   T2   Install coding-aegis skill via $skill-installer
+#   T3   Use skill: detect-tool
+#   T4   Use skill: list packages
+#   T5   Use skill: show helloworld
+#   T6   Use skill: install helloworld
+#   T7   Verify installed files
+#   T8   Invoke installed helloworld skill
+#   T9   Teardown: uninstall helloworld
+#   T10  Teardown: uninstall coding-aegis skill
+#   T11  Teardown: remove test directory
 #
 # The $skill-installer is a built-in Codex system skill that installs
 # skills from GitHub repos. T2 asks the Codex agent to use it — this
@@ -34,20 +38,18 @@ CODEX_SKILL_DIR="$HOME/.codex/skills/coding-aegis"
 SKILL_INSTALL_DIR="$TEST_DIR/.agents/skills/helloworld"
 
 cleanup() {
-  section "T7: Teardown"
-
-  test_header "T7.1 uninstall helloworld via skill"
+  section "T9: Teardown — uninstall helloworld"
   CLI_PROMPT="\$coding-aegis uninstall helloworld"
   CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
 
-  test_header "T7.2 uninstall coding-aegis skill"
+  section "T10: Teardown — uninstall coding-aegis skill"
   rm -rf "$CODEX_SKILL_DIR"
   assert_dir_not_exists "$CODEX_SKILL_DIR" "coding-aegis removed from ~/.codex/skills/"
 
-  test_header "T7.3 remove test directory"
+  section "T11: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
   assert_dir_not_exists "$TEST_DIR" "test directory removed"
 
@@ -106,23 +108,8 @@ assert_file_exists "$CODEX_SKILL_DIR/aegis-catalog.py" "aegis-catalog.py install
 # Make catalog accessible in test directory
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
-# ── T2b: Verify tool detection ───────────────────────────────
-section "T2b: Verify tool detection"
-
-# Direct invocation — no agent needed.
-# ~/.codex/skills/ is the $skill-installer install path; __file__ contains .codex → path:.codex fires.
-DETECT_SCRIPT="$HOME/.codex/skills/coding-aegis/detect_tool.py"
-
-test_header "detect_tool.py installed"
-assert_file_exists "$DETECT_SCRIPT" "detect_tool.py at ~/.codex/skills/coding-aegis/"
-
-test_header "detect_tool.py identifies codex"
-run_cli "detect tool" python3 "$DETECT_SCRIPT"
-assert_json_value "$LAST_OUTPUT" "tool" "codex" "detected tool: codex"
-assert_json_nonempty_array "$LAST_OUTPUT" "signals" "at least one signal fired"
-
-# ── T2c: Use skill — detect-tool command ─────────────────────
-section "T2c: Skill detect-tool command"
+# ── T3: Use skill — detect-tool ──────────────────────────────
+section "T3: Use skill — detect-tool"
 
 test_header "coding-aegis detect-tool"
 CLI_PROMPT="\$coding-aegis detect-tool"
@@ -130,16 +117,16 @@ RUN_DIR="$TEST_DIR" run_cli "skill detect-tool" codex exec --ephemeral -s read-o
 assert_contains "$LAST_OUTPUT" "codex" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
-# ── T3: Use skill — list ─────────────────────────────────────
-section "T3: Use skill — list packages"
+# ── T4: Use skill — list ─────────────────────────────────────
+section "T4: Use skill — list packages"
 
 test_header "coding-aegis list"
 CLI_PROMPT="\$coding-aegis list"
 RUN_DIR="$TEST_DIR" run_cli "skill list" codex exec --ephemeral -s read-only -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
-# ── T4: Use skill — show ─────────────────────────────────────
-section "T4: Use skill — show helloworld"
+# ── T5: Use skill — show ─────────────────────────────────────
+section "T5: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 CLI_PROMPT="\$coding-aegis show helloworld"
@@ -148,21 +135,19 @@ assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 
-# ── T5: Use skill — install ──────────────────────────────────
-section "T5: Use skill — install helloworld"
+# ── T6: Use skill — install ──────────────────────────────────
+section "T6: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
 # Scope must be specified in prompt — the skill's interactive scope picker
-# (AskUserQuestion) cannot be used in Codex headless mode.
-# Scope must be specified — the skill's interactive scope picker cannot
-# be used in Codex headless mode.
+# cannot be used in Codex headless mode.
 CLI_PROMPT="\$coding-aegis install helloworld to Project scope"
 CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s workspace-write -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 
-# ── T6: Verify installed files ────────────────────────────────
-section "T6: Verify installed files"
+# ── T7: Verify installed files ────────────────────────────────
+section "T7: Verify installed files"
 
 # Rule file verification skipped for Codex — Codex rules go in AGENTS.md,
 # not individual files. Tracked in 2sv.15.
@@ -173,12 +158,12 @@ echo -e "  ${DIM}$(find "$TEST_DIR" \( -name 'aegis--*' -o -name 'SKILL.md' -o -
 test_header "skill file exists"
 assert_file_exists "$SKILL_INSTALL_DIR/SKILL.md" "skill file: .agents/skills/helloworld/SKILL.md"
 
-# ── T6b: Invoke installed helloworld skill ────────────────────
-section "T6b: Invoke helloworld skill"
+# ── T8: Invoke installed helloworld skill ─────────────────────
+section "T8: Invoke helloworld skill"
 
 test_header "helloworld responds"
 CLI_PROMPT="\$helloworld"
 RUN_DIR="$TEST_DIR" run_cli "invoke helloworld" codex exec --ephemeral -s read-only -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "Hello, World" "helloworld skill responded"
 
-# T7 teardown happens in cleanup trap
+# T9–T11 teardown happens in cleanup trap

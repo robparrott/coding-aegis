@@ -31,7 +31,7 @@
 - [x] `coding-aegis-b5z.31` Implement proper T7 teardown in Codex test script
 - [x] `coding-aegis-b5z.32` Create .codex-plugin/plugin.json manifest
 - [x] `coding-aegis-b5z.33` Add assert_file_not_exists and assert_dir_not_exists to test harness
-- [ ] `coding-aegis-b5z.34` Fix Codex test: helloworld skill installs to .claude/ instead of .agents/
+- [~] `coding-aegis-b5z.34` Fix Codex test: helloworld skill installs to .claude/ instead of .agents/
 - [ ] `coding-aegis-b5z.35` Align Gemini test script with user journey contract
 - [ ] `coding-aegis-b5z.36` Support local git repo install in Codex test T2
 - [ ] `coding-aegis-b5z.37` Fix uninstall command for Codex: scan .agents/skills/ not .claude/skills/

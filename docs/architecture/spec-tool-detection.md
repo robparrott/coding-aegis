@@ -106,6 +106,31 @@ Env vars are checked first (process-intrinsic, unambiguous). `__file__` is fallb
 - Standalone: `python3 detect-tool.py` prints JSON and exits 0.
 - Importable: `from detect_tool import detect_tool`.
 
+### Testing strategy
+
+**Never assume install scope in tests.** Path-based signals (`.claude`, `.codex`, etc.) are
+only reliable when the script is actually installed at a known path, which depends on scope
+(user vs. project). Tests must not hardcode user-scope paths (`~/.claude/`, `~/.codex/`).
+
+**Unit-level detection tests use env var injection:**
+
+```bash
+# Claude
+env CLAUDECODE=1 python3 detect_tool.py   # → {"tool":"claude","signals":["env:CLAUDECODE=1"]}
+
+# Codex
+env CODEX_CI=1 python3 detect_tool.py    # → {"tool":"codex","signals":["env:CODEX_CI=1"]}
+
+# Gemini — agent-mediated only (GEMINI_CLI=1 is set by the Gemini runtime)
+```
+
+Run `detect_tool.py` from the repo source path (`pkgs/bootstrap/coding-aegis/skills/coding-aegis/`),
+not from an installed location. This makes the test scope-independent.
+
+**Integration detection (T2c) runs inside the actual agent** (`claude -p`, `codex exec`, etc.),
+which naturally injects the env var. Those tests validate end-to-end detection without
+any scope assumption.
+
 ### Explicitly excluded
 
 - **Filesystem markers** (`.cursor/`, `.windsurf/` in CWD) — excluded because they fail

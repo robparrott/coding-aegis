@@ -3,14 +3,18 @@
 # Usage: tests/test-gemini-skill-install.sh
 #
 # Follows the user journey per docs/test/testing-spec.md:
-#   T0  Prerequisites (installed + authenticated)
-#   T1  Register marketplace (N/A for Gemini — skipped)
-#   T2  Install coding-aegis skill (gemini skills link)
-#   T3  Use skill: list packages
-#   T4  Use skill: show helloworld
-#   T5  Use skill: install helloworld
-#   T6  Verify installed files
-#   T7  Teardown
+#   T0   Prerequisites (installed + authenticated)
+#   T1   Register marketplace (N/A for Gemini — skipped)
+#   T2   Install coding-aegis skill (gemini skills link)
+#   T3   Use skill: detect-tool
+#   T4   Use skill: list packages
+#   T5   Use skill: show helloworld
+#   T6   Use skill: install helloworld
+#   T7   Verify installed files
+#   T8   Invoke installed helloworld skill
+#   T9   Teardown: uninstall helloworld
+#   T10  Teardown: uninstall coding-aegis skill
+#   T11  Teardown: remove test directory
 #
 # Note: Gemini CLI on Homebrew emits keytar/keychain warnings.
 # We filter them via gemini_quiet wrapper.
@@ -28,9 +32,7 @@ gemini_quiet() {
 }
 
 cleanup() {
-  section "T7: Teardown"
-
-  test_header "T7.1 uninstall helloworld via skill"
+  section "T9: Teardown — uninstall helloworld"
   # Skip agent-mediated uninstall if quota is exhausted — fall back to manual
   # cleanup so teardown doesn't hang.
   CLI_PROMPT="/coding-aegis uninstall helloworld"
@@ -42,10 +44,10 @@ cleanup() {
     rm -rf "$TEST_DIR/.claude/skills/helloworld"
   fi
 
-  test_header "T7.2 uninstall coding-aegis skill"
+  section "T10: Teardown — uninstall coding-aegis skill"
   gemini_quiet skills uninstall coding-aegis --scope user > /dev/null 2>&1 || true
 
-  test_header "T7.3 remove test directory"
+  section "T11: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
 
   print_results
@@ -98,24 +100,8 @@ assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in skills list"
 git -C "$TEST_DIR" init -q
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
-# ── T2b: Verify tool detection ───────────────────────────────
-section "T2b: Verify tool detection"
-
-# Agent-mediated — Gemini skills link to the local repo path (not ~/.gemini/), so
-# __file__ has no tool-specific segment. Detection relies on GEMINI_CLI=1 in env,
-# which is only set when running inside the Gemini CLI agent.
-test_header "detect_tool.py installed"
-assert_file_exists "$SKILL_DIR/detect_tool.py" "detect_tool.py present in skill directory"
-
-test_header "detect_tool.py identifies gemini (agent-mediated)"
-CLI_PROMPT="Use shell to run: python3 $SKILL_DIR/detect_tool.py — output the result exactly as printed, do not paraphrase"
-RUN_DIR="$TEST_DIR" run_cli "detect tool" gemini_quiet -o text --yolo
-assert_no_quota_error "$LAST_OUTPUT" "Gemini"
-assert_json_value "$LAST_OUTPUT" "tool" "gemini" "detected tool: gemini"
-assert_json_nonempty_array "$LAST_OUTPUT" "signals" "at least one signal fired"
-
-# ── T2c: Use skill — detect-tool command ─────────────────────
-section "T2c: Skill detect-tool command"
+# ── T3: Use skill — detect-tool ──────────────────────────────
+section "T3: Use skill — detect-tool"
 
 test_header "coding-aegis detect-tool"
 CLI_PROMPT="/coding-aegis detect-tool"
@@ -124,8 +110,8 @@ assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "gemini" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
-# ── T3: Use skill — list ─────────────────────────────────────
-section "T3: Use skill — list packages"
+# ── T4: Use skill — list ─────────────────────────────────────
+section "T4: Use skill — list packages"
 
 test_header "coding-aegis list"
 CLI_PROMPT="/coding-aegis list"
@@ -133,8 +119,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill list" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
-# ── T4: Use skill — show ─────────────────────────────────────
-section "T4: Use skill — show helloworld"
+# ── T5: Use skill — show ─────────────────────────────────────
+section "T5: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 CLI_PROMPT="/coding-aegis show helloworld"
@@ -144,8 +130,8 @@ assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 
-# ── T5: Use skill — install ──────────────────────────────────
-section "T5: Use skill — install helloworld"
+# ── T6: Use skill — install ──────────────────────────────────
+section "T6: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
 # Scope specified in prompt — the skill's interactive scope picker cannot
@@ -156,8 +142,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill install" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 
-# ── T6: Verify installed files ────────────────────────────────
-section "T6: Verify installed files"
+# ── T7: Verify installed files ────────────────────────────────
+section "T7: Verify installed files"
 
 SCOPE_DIR="$TEST_DIR/.claude"
 RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
@@ -173,8 +159,8 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
 
-# ── T6b: Invoke installed helloworld skill ────────────────────
-section "T6b: Invoke helloworld skill"
+# ── T8: Invoke installed helloworld skill ─────────────────────
+section "T8: Invoke helloworld skill"
 
 test_header "helloworld responds"
 CLI_PROMPT="/helloworld"
@@ -182,4 +168,4 @@ RUN_DIR="$TEST_DIR" run_cli "invoke helloworld" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "Hello, World" "helloworld skill responded"
 
-# T7 teardown happens in cleanup trap
+# T9–T11 teardown happens in cleanup trap

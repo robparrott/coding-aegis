@@ -3,14 +3,19 @@
 # Usage: tests/test-claude-bootstrapped-skill-install.sh
 #
 # Follows the user journey per docs/test/testing-spec.md:
-#   T0  Prerequisites (installed + authenticated)
-#   T1  Register marketplace
-#   T2  Install coding-aegis plugin
-#   T3  Use skill: list packages
-#   T4  Use skill: show helloworld
-#   T5  Use skill: install helloworld
-#   T6  Verify installed files
-#   T7  Teardown
+#   T0   Prerequisites (installed + authenticated)
+#   T1   Register marketplace
+#   T2   Install coding-aegis plugin
+#   T3   Use skill: detect-tool
+#   T4   Use skill: list packages
+#   T5   Use skill: show helloworld
+#   T6   Use skill: install helloworld
+#   T7   Verify installed files
+#   T8   Invoke installed helloworld skill
+#   T9   Teardown: uninstall helloworld
+#   T10  Teardown: uninstall coding-aegis plugin
+#   T11  Teardown: remove marketplace
+#   T12  Teardown: remove test directory
 #
 # Prompts are piped via stdin to avoid shell quoting issues.
 # MCP servers are disabled via --strict-mcp-config to avoid startup hangs.
@@ -26,22 +31,20 @@ TEST_DIR="$(mktemp -d)"
 CLAUDE_COMMON="--strict-mcp-config --mcp-config {\"mcpServers\":{}}"
 
 cleanup() {
-  section "T7: Teardown"
-
-  test_header "T7.1 uninstall helloworld via skill"
+  section "T9: Teardown — uninstall helloworld"
   CLI_PROMPT="/coding-aegis uninstall helloworld"
   CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" claude -p \
     --allowedTools "Bash,Read,Glob,Skill" --dangerously-skip-permissions $CLAUDE_COMMON
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
 
-  test_header "T7.2 uninstall coding-aegis plugin"
+  section "T10: Teardown — uninstall coding-aegis plugin"
   run_cli "uninstall plugin" claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user || true
 
-  test_header "T7.3 remove marketplace"
+  section "T11: Teardown — remove marketplace"
   run_cli "remove marketplace" claude plugin marketplace remove "$MARKETPLACE_NAME" || true
 
-  test_header "T7.4 remove test directory"
+  section "T12: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
 
   print_results
@@ -102,23 +105,8 @@ assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in plugin list"
 # Set up test directory with catalog
 ln -s "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs" 2>/dev/null || cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
-# ── T2b: Verify tool detection ───────────────────────────────
-section "T2b: Verify tool detection"
-
-# Direct invocation — no agent needed.
-# ~/.claude/skills/ is the user-scope install path; __file__ contains .claude → path:.claude fires.
-DETECT_SCRIPT="$HOME/.claude/skills/coding-aegis/detect_tool.py"
-
-test_header "detect_tool.py installed"
-assert_file_exists "$DETECT_SCRIPT" "detect_tool.py at ~/.claude/skills/coding-aegis/"
-
-test_header "detect_tool.py identifies claude"
-run_cli "detect tool" python3 "$DETECT_SCRIPT"
-assert_json_value "$LAST_OUTPUT" "tool" "claude" "detected tool: claude"
-assert_json_nonempty_array "$LAST_OUTPUT" "signals" "at least one signal fired"
-
-# ── T2c: Use skill — detect-tool command ─────────────────────
-section "T2c: Skill detect-tool command"
+# ── T3: Use skill — detect-tool ──────────────────────────────
+section "T3: Use skill — detect-tool"
 
 test_header "coding-aegis detect-tool"
 CLI_PROMPT="/coding-aegis detect-tool"
@@ -127,8 +115,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill detect-tool" claude -p \
 assert_contains "$LAST_OUTPUT" "claude" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
-# ── T3: Use skill — list ─────────────────────────────────────
-section "T3: Use skill — list packages"
+# ── T4: Use skill — list ─────────────────────────────────────
+section "T4: Use skill — list packages"
 
 test_header "coding-aegis list"
 CLI_PROMPT="/coding-aegis list"
@@ -136,8 +124,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill list" claude -p \
   --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
-# ── T4: Use skill — show ─────────────────────────────────────
-section "T4: Use skill — show helloworld"
+# ── T5: Use skill — show ─────────────────────────────────────
+section "T5: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 CLI_PROMPT="/coding-aegis show helloworld"
@@ -147,8 +135,8 @@ assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 
-# ── T5: Use skill — install ──────────────────────────────────
-section "T5: Use skill — install helloworld"
+# ── T6: Use skill — install ──────────────────────────────────
+section "T6: Use skill — install helloworld"
 
 # Pre-create .claude/ directory structure so the agent doesn't balk at
 # writing to a "sensitive" path that doesn't exist yet.
@@ -165,8 +153,8 @@ RUN_DIR="$TEST_DIR" run_cli "skill install" claude -p \
 assert_contains "$LAST_OUTPUT" "aegis--helloworld\|Installed\|helloworld.*rule\|helloworld.*skill" "install — files written"
 assert_not_contains "$LAST_OUTPUT" "denied\|unable to write\|permission" "install — no permission errors"
 
-# ── T6: Verify installed files ────────────────────────────────
-section "T6: Verify installed files"
+# ── T7: Verify installed files ────────────────────────────────
+section "T7: Verify installed files"
 
 SCOPE_DIR="$TEST_DIR/.claude"
 RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
@@ -182,8 +170,8 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
 
-# ── T6b: Invoke installed helloworld skill ────────────────────
-section "T6b: Invoke helloworld skill"
+# ── T8: Invoke installed helloworld skill ─────────────────────
+section "T8: Invoke helloworld skill"
 
 test_header "helloworld responds"
 CLI_PROMPT="/helloworld"
@@ -191,4 +179,4 @@ RUN_DIR="$TEST_DIR" run_cli "invoke helloworld" claude -p \
   --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "Hello, World" "helloworld skill responded"
 
-# T7 teardown happens in cleanup trap
+# T9–T12 teardown happens in cleanup trap

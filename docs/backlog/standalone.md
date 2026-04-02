@@ -1,5 +1,10 @@
 # Standalone Issues
 
+- [ ] `coding-aegis-c1d` [bug] Suppress tool detection output on implicit runs
+- [x] `coding-aegis-gx0` [task] Add detect-tool command to coding-aegis skill
+- [ ] `coding-aegis-lw7` [task] Add tool detection assertion to every skill install test script
+- [ ] `coding-aegis-pnv` [task] Research Windsurf and Copilot tool detection signals
+- [ ] `coding-aegis-ghv` [task] Create robust coding-agent tool detection utility
 - [ ] `coding-aegis-z61` [task] Design coding-aegis skill UX
 - [x] `coding-aegis-m5w` [task] Create bootstrapping HOWTO by coding-agent tool
 - [x] `coding-aegis-6kd` [task] Trim fancy-beads SKILL.md — remove command reference redundant with bd prime/help

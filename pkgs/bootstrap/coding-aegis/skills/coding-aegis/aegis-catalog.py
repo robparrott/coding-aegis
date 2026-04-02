@@ -343,6 +343,13 @@ def cmd_install_prep(args):
     explicit_tool = getattr(args, "tool", None)
     tool = explicit_tool if explicit_tool else _detect_tool()
     tool_cfg = TOOL_PATHS.get(tool, TOOL_PATHS["claude"])
+    scope = getattr(args, "scope", "project") or "project"
+
+    # Compute absolute scope_base_path
+    if scope == "user":
+        scope_base_path = Path.home() / tool_cfg["scope_base"]
+    else:
+        scope_base_path = Path.cwd() / tool_cfg["scope_base"]
 
     # Find the package
     pkg_data = None
@@ -393,11 +400,13 @@ def cmd_install_prep(args):
             target_filename = compute_target_filename(name, artifact)
             target_subdir = a_type + "s"  # rules/ or agents/
 
+            install_path = str(scope_base_path / target_subdir / target_filename)
             artifacts_out.append({
                 "type": a_type,
                 "source_path": str(source_path),
                 "target_subdir": target_subdir,
                 "target_filename": target_filename,
+                "install_path": install_path,
                 "content": content,
             })
 
@@ -423,6 +432,13 @@ def cmd_install_prep(args):
                         }
                         if skill_base is not None:
                             entry["base_path"] = skill_base
+                            entry["install_path"] = str(
+                                Path(skill_base).resolve() / skill_target / str(rel)
+                            )
+                        else:
+                            entry["install_path"] = str(
+                                scope_base_path / skill_target / str(rel)
+                            )
                         artifacts_out.append(entry)
             else:
                 # Single file skill
@@ -435,15 +451,24 @@ def cmd_install_prep(args):
                 }
                 if skill_base is not None:
                     entry["base_path"] = skill_base
+                    entry["install_path"] = str(
+                        Path(skill_base).resolve() / skill_target / Path(a_path).name
+                    )
+                else:
+                    entry["install_path"] = str(
+                        scope_base_path / skill_target / Path(a_path).name
+                    )
                 artifacts_out.append(entry)
 
         else:
             # mcp, plugin, etc. — pass through as-is
+            install_path = str(scope_base_path / a_type / Path(a_path).name)
             artifacts_out.append({
                 "type": a_type,
                 "source_path": str(source_path),
                 "target_subdir": a_type,
                 "target_filename": Path(a_path).name,
+                "install_path": install_path,
                 "content": source_text,
             })
 
@@ -452,7 +477,8 @@ def cmd_install_prep(args):
         "version": pkg_data.get("version"),
         "tier": pkg_data["tier"],
         "tool": tool,
-        "scope_base": tool_cfg["scope_base"],
+        "scope": scope,
+        "scope_base": str(scope_base_path),
         "artifacts": artifacts_out,
     }, indent=2))
 
@@ -626,6 +652,8 @@ def main():
     p_prep.add_argument("--tool", default=None,
                         choices=["claude", "codex", "cursor", "windsurf", "copilot"],
                         help="Override auto-detected tool (default: auto-detect from environment)")
+    p_prep.add_argument("--scope", default="project", choices=["project", "user"],
+                        help="Install scope (default: project)")
 
     # status
     p_status = sub.add_parser("status", help="Show installed package status")
