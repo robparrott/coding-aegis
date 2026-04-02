@@ -31,12 +31,19 @@ cleanup() {
   section "T7: Teardown"
 
   test_header "T7.1 uninstall helloworld via skill"
+  # Skip agent-mediated uninstall if quota is exhausted — fall back to manual
+  # cleanup so teardown doesn't hang.
   CLI_PROMPT="/coding-aegis uninstall helloworld"
+  CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" gemini_quiet -o text --yolo
-  assert_no_quota_error "$LAST_OUTPUT" "Gemini"
+  if echo "$LAST_OUTPUT" | grep -qi "quota\|RESOURCE_EXHAUSTED\|429"; then
+    echo -e "  ${DIM}quota exhausted — falling back to manual cleanup${RESET}"
+    rm -rf "$TEST_DIR/.claude/rules/aegis--helloworld--helloworld.md"
+    rm -rf "$TEST_DIR/.claude/skills/helloworld"
+  fi
 
   test_header "T7.2 uninstall coding-aegis skill"
-  run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope user || true
+  gemini_quiet skills uninstall coding-aegis --scope user > /dev/null 2>&1 || true
 
   test_header "T7.3 remove test directory"
   rm -rf "$TEST_DIR"
@@ -118,6 +125,7 @@ test_header "coding-aegis install helloworld"
 # Scope specified in prompt — the skill's interactive scope picker cannot
 # be used in headless mode.
 CLI_PROMPT="/coding-aegis install helloworld to Project scope"
+CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"

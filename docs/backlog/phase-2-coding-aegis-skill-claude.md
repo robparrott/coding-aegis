@@ -33,6 +33,8 @@
 - [x] `coding-aegis-b5z.33` Add assert_file_not_exists and assert_dir_not_exists to test harness
 - [ ] `coding-aegis-b5z.34` Fix Codex test: helloworld skill installs to .claude/ instead of .agents/
 - [ ] `coding-aegis-b5z.35` Align Gemini test script with user journey contract
+- [ ] `coding-aegis-b5z.36` Support local git repo install in Codex test T2
+- [ ] `coding-aegis-b5z.37` Fix uninstall command for Codex: scan .agents/skills/ not .claude/skills/
 - [x] `coding-aegis-b5z.4` Implement package installation
 - [ ] `coding-aegis-b5z.5` Add install-required command to coding-aegis skill
 - [x] `coding-aegis-b5z.6` Fix automated skill testing — claude -p hangs with --plugin-dir
@@ -40,4 +42,4 @@
 - [x] `coding-aegis-b5z.8` Update install/testing docs for Claude, Codex, and Gemini CLI
 - [x] `coding-aegis-b5z.9` Add Codex skill lifecycle tests (file-based install/verify/remove)
 
-**Progress**: 30/35 tasks complete
+**Progress**: 30/37 tasks complete

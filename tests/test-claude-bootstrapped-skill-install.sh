@@ -30,6 +30,7 @@ cleanup() {
 
   test_header "T7.1 uninstall helloworld via skill"
   CLI_PROMPT="/coding-aegis uninstall helloworld"
+  CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" claude -p \
     --allowedTools "Bash,Read,Glob,Skill" --dangerously-skip-permissions $CLAUDE_COMMON
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
@@ -132,6 +133,7 @@ test_header "coding-aegis install helloworld"
 # Scope specified in prompt — the skill's interactive scope picker may not
 # resolve correctly in headless (-p) mode.
 CLI_PROMPT="/coding-aegis install helloworld to Project scope"
+CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" claude -p \
   --allowedTools "Bash,Read,Write,Glob,Skill,AskUserQuestion" \
   --dangerously-skip-permissions $CLAUDE_COMMON

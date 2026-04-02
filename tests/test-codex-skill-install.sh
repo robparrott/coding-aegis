@@ -38,6 +38,7 @@ cleanup() {
 
   test_header "T7.1 uninstall helloworld via skill"
   CLI_PROMPT="\$coding-aegis uninstall helloworld"
+  CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
@@ -94,6 +95,7 @@ rm -rf "$CODEX_SKILL_DIR"
 
 test_header "install via \$skill-installer"
 CLI_PROMPT="\$skill-installer install --repo ${GITHUB_REPO} --path ${SKILL_PATH}"
+CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s danger-full-access -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "install\|coding-aegis\|skill" "skill-installer ran"
 
@@ -131,6 +133,7 @@ test_header "coding-aegis install helloworld"
 # Scope must be specified — the skill's interactive scope picker cannot
 # be used in Codex headless mode.
 CLI_PROMPT="\$coding-aegis install helloworld to Project scope"
+CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s workspace-write -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 

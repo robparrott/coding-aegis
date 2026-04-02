@@ -59,8 +59,9 @@ Every tool follows the same stdin pattern. The only differences are the binary n
 | Tool | Agent invocation (receives prompt on stdin) | Non-agent invocation |
 |------|---------------------------------------------|---------------------|
 | Claude | `claude -p --allowedTools "..." $CLAUDE_FLAGS` | `claude plugin marketplace add ...` |
-| Codex | `codex exec --ephemeral -s <sandbox> -o /dev/stdout` | `cp` to `.agents/skills/` |
+| Codex | `codex exec --ephemeral -s <sandbox> -o /dev/stdout` | `$skill-installer` |
 | Gemini | `gemini_quiet -o text` | `gemini_quiet skills link ...` |
+| Cursor | `cursor-agent -p --output-format text` | TBD (plugin CLI not yet documented) |
 
 **Claude flags:**
 - `--strict-mcp-config --mcp-config '{"mcpServers":{}}'` — disables MCP servers (prevents startup hangs)
@@ -77,6 +78,13 @@ Every tool follows the same stdin pattern. The only differences are the binary n
 - `-o text` — plain text output
 - `--yolo` — auto-approve tool use for all agent-mediated steps (T3-T5); without this, Gemini prompts for approval which hangs in headless mode
 - `gemini_quiet` wrapper filters Homebrew keytar warnings
+
+**Cursor flags:**
+- Binary: `cursor-agent` (Homebrew install); vendor install uses `agent`
+- `-p` — headless/print mode (same pattern as Claude)
+- `--output-format text` — plain text output
+- `--force` or `--yolo` — auto-approve file modifications
+- Plugin install mechanism not yet documented for CLI (IDE-only currently)
 
 ### Non-prompt CLI calls
 
@@ -106,8 +114,10 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `TIMEOUT` | 90 | Seconds before kill |
+| `TIMEOUT` | 30 | Default seconds before kill |
+| `TIMEOUT_LONG` | 60 | Extended timeout for install/uninstall (multi-step agent work) |
 | `CLI_PROMPT` | empty | Stdin prompt; reset after `run_cli` |
+| `CLI_TIMEOUT` | empty | Per-call timeout override; reset after `run_cli` |
 | `RUN_DIR` | empty | Working directory; reset after `run_cli` |
 | `LAST_OUTPUT` | — | Captured output |
 | `LAST_EXIT` | — | Exit code |

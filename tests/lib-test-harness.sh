@@ -15,8 +15,9 @@
 PASS=0
 FAIL=0
 
-# Timeout (override with AEGIS_TEST_TIMEOUT env var)
-TIMEOUT=${AEGIS_TEST_TIMEOUT:-90}
+# Timeouts in seconds (override with env vars)
+TIMEOUT=${AEGIS_TEST_TIMEOUT:-30}            # default for most steps
+TIMEOUT_LONG=${AEGIS_TEST_TIMEOUT_LONG:-60}  # install/uninstall (multi-step agent work)
 
 # Colors
 GREEN='\033[0;32m'
@@ -81,11 +82,15 @@ print_results() {
 # Set CLI_PROMPT to pipe a prompt via stdin (avoids shell quoting issues).
 # When CLI_PROMPT is set, stdin is piped; otherwise stdin is /dev/null.
 # RUN_DIR and CLI_PROMPT reset after each call.
+# Set CLI_TIMEOUT before a call to override TIMEOUT for that call only.
 RUN_DIR=""
 CLI_PROMPT=""
+CLI_TIMEOUT=""
 
 run_cli() {
   local description="$1"; shift
+  local timeout_val="${CLI_TIMEOUT:-$TIMEOUT}"
+  CLI_TIMEOUT=""
 
   # Build display command: strip _quiet suffix from wrapper function names
   local display_cmd="$*"
@@ -124,13 +129,13 @@ run_cli() {
 
   LAST_EXIT=0
   if [ -n "$RUN_DIR" ] && [ -n "$CLI_PROMPT" ]; then
-    LAST_OUTPUT=$(cd "$RUN_DIR" && echo "$CLI_PROMPT" | timeout "$TIMEOUT" "$@" 2>&1) || LAST_EXIT=$?
+    LAST_OUTPUT=$(cd "$RUN_DIR" && echo "$CLI_PROMPT" | timeout "$timeout_val" "$@" 2>&1) || LAST_EXIT=$?
   elif [ -n "$RUN_DIR" ]; then
-    LAST_OUTPUT=$(cd "$RUN_DIR" && timeout "$TIMEOUT" "$@" < /dev/null 2>&1) || LAST_EXIT=$?
+    LAST_OUTPUT=$(cd "$RUN_DIR" && timeout "$timeout_val" "$@" < /dev/null 2>&1) || LAST_EXIT=$?
   elif [ -n "$CLI_PROMPT" ]; then
-    LAST_OUTPUT=$(echo "$CLI_PROMPT" | timeout "$TIMEOUT" "$@" 2>&1) || LAST_EXIT=$?
+    LAST_OUTPUT=$(echo "$CLI_PROMPT" | timeout "$timeout_val" "$@" 2>&1) || LAST_EXIT=$?
   else
-    LAST_OUTPUT=$(timeout "$TIMEOUT" "$@" < /dev/null 2>&1) || LAST_EXIT=$?
+    LAST_OUTPUT=$(timeout "$timeout_val" "$@" < /dev/null 2>&1) || LAST_EXIT=$?
   fi
   RUN_DIR=""
   CLI_PROMPT=""
@@ -143,7 +148,7 @@ run_cli() {
   # so set -e doesn't abort the script before subsequent assertions run.
   if [ "$LAST_EXIT" -eq 124 ] || [ "$LAST_EXIT" -eq 142 ] || [ "$LAST_EXIT" -eq 143 ]; then
     echo -e "  ${DIM}result: ${elapsed}s elapsed${RESET}"
-    fail "TIMEOUT after ${TIMEOUT}s: $description"
+    fail "TIMEOUT after ${timeout_val}s: $description"
     return 0
   fi
 
