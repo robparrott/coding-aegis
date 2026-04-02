@@ -9,6 +9,7 @@ Design and implement the user experience for the coding-aegis skill — catalog 
 - [ ] `coding-aegis-bg5.1` Add install-required and install-best-practices commands to coding-aegis skill
 - [ ] `coding-aegis-bg5.2` Add uninstall command to coding-aegis skill
 - [ ] `coding-aegis-bg5.3` Update test scripts T7.1 to use skill-mediated uninstall
+- [x] `coding-aegis-bg5.4` Write user-facing install and uninstall documentation
 - [ ] `coding-aegis-z61` Design coding-aegis skill UX
 
-**Progress**: 0/4 tasks complete
+**Progress**: 1/5 tasks complete

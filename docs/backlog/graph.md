@@ -4,7 +4,7 @@ Auto-generated from `bd graph --all --compact`.
 
 ```
 
-📊 Dependency graph for coding-aegis-b5z (33 issues, 5 layers)
+📊 Dependency graph for coding-aegis-b5z (34 issues, 5 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
@@ -16,6 +16,7 @@ Auto-generated from `bd graph --all --compact`.
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   │   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
+  │   ├── ○ coding-aegis-b5z.38 ● P2 Remove hardcoded 5-minute timeout from Gemini tes…
   │   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
@@ -23,6 +24,7 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-b5z.35 ● P1 Align Gemini test script with user journey contra…
   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
   ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
+  ├── ○ coding-aegis-b5z.38 ● P2 Remove hardcoded 5-minute timeout from Gemini tes…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
 
   LAYER 1
@@ -134,14 +136,16 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
+📊 Dependency graph for coding-aegis-wpi (4 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.10 ● P2 Create Cursor test script following user journey …
   │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
   │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.10 ● P2 Create Cursor test script following user journey …
   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
 
@@ -211,6 +215,7 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-b5z.10`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.11`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.36`](phase-2-coding-aegis-skill-claude.md)
+- [`coding-aegis-b5z.38`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.5`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-4d6`](phase-4-renderers---adaptation.md)
 - [`coding-aegis-4d6.1`](phase-4-renderers---adaptation.md)
@@ -257,6 +262,7 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
 - [`coding-aegis-z61`](standalone.md)
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.10`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
