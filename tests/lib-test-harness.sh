@@ -16,8 +16,8 @@ PASS=0
 FAIL=0
 
 # Timeouts in seconds (override with env vars)
-TIMEOUT=${AEGIS_TEST_TIMEOUT:-30}            # default for most steps
-TIMEOUT_LONG=${AEGIS_TEST_TIMEOUT_LONG:-60}  # install/uninstall (multi-step agent work)
+TIMEOUT=${AEGIS_TEST_TIMEOUT:-30}              # default for most steps
+TIMEOUT_LONG=${AEGIS_TEST_TIMEOUT_LONG:-30}    # install/uninstall — capped at 30s; timeouts are bugs not tuning knobs
 
 # Colors
 GREEN='\033[0;32m'
@@ -243,6 +243,42 @@ assert_dir_not_exists() {
     fail "$description — directory still exists: $path"
   else
     pass "$description"
+  fi
+}
+
+# assert_json_value <json_string> <field> <expected> <description>
+# Parse JSON output and assert a top-level field equals expected value.
+# Requires python3 (already a dependency of aegis-catalog.py).
+assert_json_value() {
+  local json="$1"
+  local field="$2"
+  local expected="$3"
+  local description="$4"
+
+  local actual
+  actual=$(echo "$json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('${field}',''))" 2>/dev/null)
+
+  if [ "$actual" = "$expected" ]; then
+    pass "$description"
+  else
+    fail "$description — expected '${expected}', got '${actual}'"
+  fi
+}
+
+# assert_json_nonempty_array <json_string> <field> <description>
+# Parse JSON and assert a top-level array field has at least one element.
+assert_json_nonempty_array() {
+  local json="$1"
+  local field="$2"
+  local description="$3"
+
+  local length
+  length=$(echo "$json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('${field}', [])))" 2>/dev/null)
+
+  if [ "${length:-0}" -gt 0 ] 2>/dev/null; then
+    pass "$description"
+  else
+    fail "$description — expected non-empty array for '${field}', got empty or missing"
   fi
 }
 

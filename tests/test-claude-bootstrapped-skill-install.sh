@@ -102,6 +102,31 @@ assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in plugin list"
 # Set up test directory with catalog
 ln -s "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs" 2>/dev/null || cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
+# ── T2b: Verify tool detection ───────────────────────────────
+section "T2b: Verify tool detection"
+
+# Direct invocation — no agent needed.
+# ~/.claude/skills/ is the user-scope install path; __file__ contains .claude → path:.claude fires.
+DETECT_SCRIPT="$HOME/.claude/skills/coding-aegis/detect_tool.py"
+
+test_header "detect_tool.py installed"
+assert_file_exists "$DETECT_SCRIPT" "detect_tool.py at ~/.claude/skills/coding-aegis/"
+
+test_header "detect_tool.py identifies claude"
+run_cli "detect tool" python3 "$DETECT_SCRIPT"
+assert_json_value "$LAST_OUTPUT" "tool" "claude" "detected tool: claude"
+assert_json_nonempty_array "$LAST_OUTPUT" "signals" "at least one signal fired"
+
+# ── T2c: Use skill — detect-tool command ─────────────────────
+section "T2c: Skill detect-tool command"
+
+test_header "coding-aegis detect-tool"
+CLI_PROMPT="/coding-aegis detect-tool"
+RUN_DIR="$TEST_DIR" run_cli "skill detect-tool" claude -p \
+  --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
+assert_contains "$LAST_OUTPUT" "claude" "detect-tool — tool name reported"
+assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
+
 # ── T3: Use skill — list ─────────────────────────────────────
 section "T3: Use skill — list packages"
 

@@ -98,6 +98,32 @@ assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in skills list"
 git -C "$TEST_DIR" init -q
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
+# ── T2b: Verify tool detection ───────────────────────────────
+section "T2b: Verify tool detection"
+
+# Agent-mediated — Gemini skills link to the local repo path (not ~/.gemini/), so
+# __file__ has no tool-specific segment. Detection relies on GEMINI_CLI=1 in env,
+# which is only set when running inside the Gemini CLI agent.
+test_header "detect_tool.py installed"
+assert_file_exists "$SKILL_DIR/detect_tool.py" "detect_tool.py present in skill directory"
+
+test_header "detect_tool.py identifies gemini (agent-mediated)"
+CLI_PROMPT="Use shell to run: python3 $SKILL_DIR/detect_tool.py — output the result exactly as printed, do not paraphrase"
+RUN_DIR="$TEST_DIR" run_cli "detect tool" gemini_quiet -o text --yolo
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
+assert_json_value "$LAST_OUTPUT" "tool" "gemini" "detected tool: gemini"
+assert_json_nonempty_array "$LAST_OUTPUT" "signals" "at least one signal fired"
+
+# ── T2c: Use skill — detect-tool command ─────────────────────
+section "T2c: Skill detect-tool command"
+
+test_header "coding-aegis detect-tool"
+CLI_PROMPT="/coding-aegis detect-tool"
+RUN_DIR="$TEST_DIR" run_cli "skill detect-tool" gemini_quiet -o text --yolo
+assert_no_quota_error "$LAST_OUTPUT" "Gemini"
+assert_contains "$LAST_OUTPUT" "gemini" "detect-tool — tool name reported"
+assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
+
 # ── T3: Use skill — list ─────────────────────────────────────
 section "T3: Use skill — list packages"
 

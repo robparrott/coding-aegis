@@ -108,14 +108,18 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 | `assert_file_not_exists <path> <desc>` | File absence (for teardown) |
 | `assert_dir_not_exists <path> <desc>` | Directory absence (for teardown) |
 | `assert_no_quota_error <output> [tool]` | Detect quota/rate-limit errors; FAIL + abort if found |
+| `assert_json_value <json> <field> <expected> <desc>` | Parse JSON, assert a top-level field equals expected string |
+| `assert_json_nonempty_array <json> <field> <desc>` | Parse JSON, assert a top-level array field has at least one element |
 | `pass <desc>` / `fail <desc>` | Counters + colored output |
 | `print_results` | Final summary, exit 0/1 |
 | `section <title>` / `test_header <title>` | Formatted headers |
 
+**Timeout policy: all timeouts are capped at 30 seconds. A timeout is always a bug, never a tuning knob. If a step times out, fix the root cause — wrong paths, missing files, bad tool detection — do not raise the timeout.**
+
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `TIMEOUT` | 30 | Default seconds before kill |
-| `TIMEOUT_LONG` | 60 | Extended timeout for install/uninstall (multi-step agent work) |
+| `TIMEOUT_LONG` | 30 | Extended timeout (kept at 30 — see policy above) |
 | `CLI_PROMPT` | empty | Stdin prompt; reset after `run_cli` |
 | `CLI_TIMEOUT` | empty | Per-call timeout override; reset after `run_cli` |
 | `RUN_DIR` | empty | Working directory; reset after `run_cli` |
@@ -160,6 +164,49 @@ Install the skill from the registered source (T1) or via the best available mech
 | Claude | `claude plugin install coding-aegis@<mp>` | `claude plugin list` |
 | Codex | Agent invokes `$skill-installer` to install from GitHub | `assert_file_exists` SKILL.md in `~/.codex/skills/` |
 | Gemini | `gemini skills link <path> --consent` | `gemini skills list` |
+
+### T2b — Verify Tool Detection
+
+Confirm `detect_tool.py` (installed alongside the skill in T2) correctly identifies the
+active agent. Run immediately after T2, before any skill commands.
+
+**How to invoke** depends on how the tool detects itself:
+
+- Tools where the install path contains a tool-specific directory segment (`.claude/`, `.codex/`)
+  use a **direct bash invocation** — no agent needed. The `__file__` path signal fires.
+- Tools where the skill is linked to a local path with no tool-specific segment (Gemini via
+  `skills link`) require an **agent-mediated invocation** so the tool's env var
+  (`GEMINI_CLI=1`) is present.
+
+| Step | Pass criteria |
+|------|---------------|
+| T2b.1 Script present | `detect_tool.py` exists at installed path |
+| T2b.2 Output is valid JSON with `tool` field | `"tool"` key present in output |
+| T2b.3 Correct tool detected | `"tool"` value equals expected tool name |
+| T2b.4 At least one signal fired | `"signals"` array is non-empty |
+
+| Tool | T2b method | Installed path | Expected `tool` | Expected signal |
+|------|-----------|----------------|-----------------|-----------------|
+| Claude | Direct bash | `~/.claude/skills/coding-aegis/detect_tool.py` | `claude` | `path:.claude` |
+| Codex | Direct bash | `~/.codex/skills/coding-aegis/detect_tool.py` | `codex` | `path:.codex` |
+| Gemini | Agent-mediated | `$SKILL_DIR/detect_tool.py` (linked repo path) | `gemini` | `env:GEMINI_CLI=1` |
+
+### T2c — Use Skill: detect-tool Command
+
+Invoke the skill's `detect-tool` command and confirm it reports the correct tool and
+signals. This is an agent-mediated test for all tools — it exercises the skill dispatch
+path, not just the underlying script.
+
+| Tool | Prompt (stdin) |
+|------|---------------|
+| Claude | `/coding-aegis detect-tool` |
+| Codex | `$coding-aegis detect-tool` |
+| Gemini | `/coding-aegis detect-tool` |
+
+| Step | Pass criteria |
+|------|---------------|
+| T2c.1 Skill responds | Output contains the detected tool name |
+| T2c.2 Signals reported | Output contains at least one signal name (e.g. `env:` or `path:`) |
 
 ### T3 — Use Skill: List Packages
 
@@ -262,6 +309,8 @@ Remove artifacts in reverse install order: target package first, then the coding
 | T0 Prerequisites | done | done | done | TBD |
 | T1 Register marketplace | done | N/A | N/A | TBD |
 | T2 Install skill | done | done | done | TBD |
+| T2b Verify tool detection | done | done | done | TBD |
+| T2c Skill: detect-tool | done | done | done | TBD |
 | T3 Skill: list | done | done | done | TBD |
 | T4 Skill: show | done | done | done | TBD |
 | T5 Skill: install | done | done | done | TBD |

@@ -15,6 +15,15 @@ import re
 import sys
 from pathlib import Path
 
+# Import detect_tool from the same skill directory
+sys.path.insert(0, str(Path(__file__).parent))
+from detect_tool import detect_tool as _detect_tool_fn
+
+
+def _detect_tool():
+    """Return the active tool name using detect_tool.py."""
+    return _detect_tool_fn()["tool"]
+
 # Tier scan order (bootstrap excluded from listings)
 TIERS = ["required", "best-practices", "optional", "goodies"]
 
@@ -32,27 +41,6 @@ TOOL_PATHS = {
 }
 
 
-def _detect_tool():
-    """Auto-detect the active coding agent tool from environment signals.
-
-    Detection order (first match wins):
-      - CODEX_HOME env var → codex
-      - .cursor/ directory in CWD or repo root → cursor
-      - .windsurf/ directory in CWD or repo root → windsurf
-      - .github/copilot-instructions.md → copilot
-      - Default → claude
-    """
-    # Codex sets CODEX_SANDBOX, CODEX_CI, CODEX_THREAD_ID in its sandbox
-    if any(k.startswith("CODEX_") for k in os.environ):
-        return "codex"
-    cwd = Path.cwd()
-    if (cwd / ".cursor").is_dir():
-        return "cursor"
-    if (cwd / ".windsurf").is_dir():
-        return "windsurf"
-    if (cwd / ".github" / "copilot-instructions.md").is_file():
-        return "copilot"
-    return "claude"
 
 
 # ---------------------------------------------------------------------------
@@ -584,16 +572,17 @@ def cmd_uninstall_prep(args):
             if f.is_file():
                 files_to_remove.append(str(f))
 
-    # Scan skills under scope_base (Claude, Cursor, Windsurf)
-    skills_dir = scope_base / "skills" / name
-    if skills_dir.is_dir():
-        dirs_to_remove.append(str(skills_dir))
+    # Compute skill dir using TOOL_PATHS config — mirrors install-prep logic
+    skills_base = tool_cfg.get("skills_base")
+    if skills_base is not None:
+        # Tool installs skills relative to CWD (e.g. Codex: .agents/skills/)
+        skill_dir = (Path.cwd() / skills_base / tool_cfg["skills_dir"] / name).resolve()
+    else:
+        # Tool installs skills under scope_base (e.g. Claude: .claude/skills/)
+        skill_dir = scope_base / tool_cfg.get("skills_dir", "skills") / name
 
-    # Scan skills under .agents/skills/ (Codex)
-    if tool == "codex":
-        agents_skills = Path.cwd() / ".agents" / "skills" / name
-        if agents_skills.is_dir():
-            dirs_to_remove.append(str(agents_skills))
+    if skill_dir.is_dir():
+        dirs_to_remove.append(str(skill_dir))
 
     if not files_to_remove and not dirs_to_remove:
         _error(f"Package '{name}' is not installed in {scope_base}")

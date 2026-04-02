@@ -8,6 +8,31 @@ description: Browse, install, and manage coding agent governance packages from t
 Browse, install, and manage governance packages for coding agents. This skill provides
 four commands: `list`, `show`, `install`, and `status`.
 
+## Before You Begin: Detect the Active Tool
+
+**Always run tool detection first**, before any other step. This determines install paths,
+scope defaults, and which tool-specific logic to apply.
+
+```bash
+python3 "{skill-dir}/detect_tool.py"
+```
+
+Output:
+
+```json
+{
+  "tool": "claude",
+  "signals": ["env:CLAUDECODE=1"]
+}
+```
+
+The `tool` field is the active agent: `claude` | `codex` | `cursor` | `gemini` | `windsurf` | `copilot`.
+The `signals` list records what fired — include it in any error reports or debug output.
+
+Use the detected tool for all subsequent path and scope decisions. Do not guess or
+hardcode a tool name. If detection returns an unexpected tool, report it to the user
+before proceeding.
+
 ## CLI Helper
 
 This skill includes a Python CLI helper (`aegis-catalog.py`) in the same directory as
@@ -47,6 +72,7 @@ Parse the user input after `/coding-aegis`. Route to the matching section below.
 | `install <name>` | Run **install** for `<name>` |
 | `uninstall <name>` | Run **uninstall** for `<name>` |
 | `status` | Run **status** |
+| `detect-tool` | Run **detect-tool** |
 | anything else | Print help text |
 
 ### Help text
@@ -58,6 +84,7 @@ Usage:
   /coding-aegis install <package> Install a package into the current project
   /coding-aegis uninstall <package> Remove an installed package
   /coding-aegis status            Show installed packages and versions
+  /coding-aegis detect-tool       Show which coding agent is active and why
 ```
 
 ## list
@@ -291,6 +318,36 @@ If no governance-managed files found in any scope:
 
 ```
 No coding-aegis packages installed. Run `/coding-aegis list` to browse the catalog.
+```
+
+## detect-tool
+
+Report which coding agent is active and which signals triggered the detection. Useful
+as a diagnostic when installs or path resolution behave unexpectedly.
+
+### Steps
+
+1. Run: `python3 "{skill-dir}/detect_tool.py"`
+2. Parse the JSON response. It contains `tool` (string) and `signals` (array of strings).
+3. Format the output using the template below.
+
+### Output format
+
+```
+## Active tool: {tool}
+
+Signals that fired:
+- {signal_1}
+- {signal_2}
+```
+
+If `signals` is empty, print:
+
+```
+## Active tool: {tool}
+
+No signals fired — defaulted to claude. If this is unexpected, check that the skill
+is installed to the correct tool's skill directory.
 ```
 
 ## Constants and Naming
