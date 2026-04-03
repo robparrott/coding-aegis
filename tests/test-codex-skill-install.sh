@@ -47,12 +47,16 @@ cleanup() {
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
+  # uninstall-prep rewrites AGENTS.md directly; verify the section is gone
+  test_header "AGENTS.md rule section removed"
   if [ -f "$TEST_DIR/AGENTS.md" ]; then
     if grep -q "aegis:begin package=helloworld" "$TEST_DIR/AGENTS.md" 2>/dev/null; then
       fail "AGENTS.md: helloworld rule section still present after uninstall"
     else
       pass "AGENTS.md: helloworld rule section removed"
     fi
+  else
+    pass "AGENTS.md: not present (no sections to remove)"
   fi
 
   section "Phase 7: Full Cleanup"

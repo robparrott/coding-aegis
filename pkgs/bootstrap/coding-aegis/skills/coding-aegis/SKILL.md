@@ -284,24 +284,22 @@ Remove an installed package's artifacts from the target project or user configur
 
 ### Step 2 — Remove artifacts
 
-Use Bash to delete all files and directories listed in the JSON:
+Use Bash to delete all files and directories listed in the JSON. Issue all
+removals in a single Bash call:
 
 ```bash
 rm -f <file1> <file2> ...
 rm -rf <dir1> <dir2> ...
 ```
 
-If `agents_md_rewrites` is non-empty, write the rewritten content back to each file listed:
+`agents_md_files_rewritten` lists AGENTS.md files already updated by the script —
+no further action needed for those. Include them in the confirmation summary.
 
-```bash
-cat > '{file}' << 'AEGIS_EOF'
-{content}
-AEGIS_EOF
-```
+### Step 3 — Update AGENTS.md (Claude Code, Project scope only)
 
-Issue all removals and rewrites in a single Bash call.
-
-### Step 3 — Update AGENTS.md (Project scope only)
+Skip for all tools except Claude Code. For Codex, AGENTS.md section removal is
+handled by `agents_md_rewrites` in Step 2 — do not perform additional AGENTS.md
+scanning here.
 
 If AGENTS.md exists and contains `## Installed Governance Rules`, rebuild the table
 by scanning remaining `aegis--*` files (same as install Step 4). If no governance

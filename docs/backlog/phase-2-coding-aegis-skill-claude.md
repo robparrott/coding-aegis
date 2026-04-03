@@ -34,7 +34,7 @@
 - [~] `coding-aegis-b5z.34` Fix Codex test: helloworld skill installs to .claude/ instead of .agents/
 - [x] `coding-aegis-b5z.35` Align Gemini test script with user journey contract @Rob Parrott
 - [ ] `coding-aegis-b5z.36` Support local git repo install in Codex test T2
-- [ ] `coding-aegis-b5z.37` Fix uninstall command for Codex: scan .agents/skills/ not .claude/skills/
+- [~] `coding-aegis-b5z.37` Fix uninstall command for Codex: scan .agents/skills/ not .claude/skills/ @Rob Parrott
 - [x] `coding-aegis-b5z.39` Fix test scripts: change --scope user to --scope project for plugin/skill bootstrap
 - [x] `coding-aegis-b5z.4` Implement package installation
 - [x] `coding-aegis-b5z.40` Fix all --scope user violations in test scripts per testing-spec.md

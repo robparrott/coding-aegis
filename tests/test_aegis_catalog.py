@@ -286,7 +286,7 @@ class TestUninstallPrep(unittest.TestCase):
             self.assertIn("error", data)
 
     def test_codex_agents_md_section_removal(self):
-        """Codex: managed AGENTS.md sections returned in agents_md_rewrites."""
+        """Codex: managed AGENTS.md sections removed in-place; file path reported."""
         with tempfile.TemporaryDirectory() as d:
             base = Path(d).resolve()
             agents_md = base / "AGENTS.md"
@@ -300,13 +300,15 @@ class TestUninstallPrep(unittest.TestCase):
             skill_dir = base / ".agents" / "skills" / "helloworld"
             skill_dir.mkdir(parents=True)
             data = run_cmd("uninstall-prep", "helloworld", "--tool", "codex", cwd=d)
-            self.assertIn("agents_md_rewrites", data)
-            self.assertEqual(len(data["agents_md_rewrites"]), 1)
-            rewrite = data["agents_md_rewrites"][0]
-            self.assertEqual(rewrite["file"], str(agents_md))
-            self.assertNotIn("aegis:begin", rewrite["content"])
-            self.assertNotIn("Some rule content", rewrite["content"])
-            self.assertIn("Other content", rewrite["content"])
+            # Script directly rewrites AGENTS.md and reports file path
+            self.assertIn("agents_md_files_rewritten", data)
+            self.assertEqual(len(data["agents_md_files_rewritten"]), 1)
+            self.assertEqual(data["agents_md_files_rewritten"][0], str(agents_md))
+            # Verify the file was actually rewritten
+            rewritten = agents_md.read_text()
+            self.assertNotIn("aegis:begin", rewritten)
+            self.assertNotIn("Some rule content", rewritten)
+            self.assertIn("Other content", rewritten)
 
 
 class TestYamlParser(unittest.TestCase):

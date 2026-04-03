@@ -11,7 +11,7 @@ Auto-generated from `bd graph --all --compact`.
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
   │   ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
-  │   ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
+  │   ├── ◐ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   │   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
@@ -21,7 +21,7 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
-  ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
+  ├── ◐ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
   ├── ○ coding-aegis-b5z.42 ● P2 Add local install fallback for Claude test: insta…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
 
@@ -86,7 +86,7 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-2sv ● P1 Cross-tool artifact model refactor
-  │   ├── ○ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
+  │   ├── ◐ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
   │   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
   │   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   │   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
@@ -103,7 +103,7 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   ├── ○ coding-aegis-2sv.11 ● P3 Add MCP server stub to pirate-speak package
   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
-  ├── ○ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
+  ├── ◐ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   ├── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
@@ -149,6 +149,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-eju (3 issues, 3 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-rge ● P2 Add validate-install skill command to coding-aegis
+
+  LAYER 1
+  └── ○ coding-aegis-2l5 ● P2 Update testing plan to use validate-install inste…
+
+  LAYER 2
+  └── ○ coding-aegis-eju ● P2 Implement validate-install in all integration tes…
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -173,12 +188,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-1rg (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
+  └── ○ coding-aegis-1rg ● P1 Codex test: push changes to GitHub so -installer …
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-lf6 (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-lf6 ● P1 Investigate and fix Codex uninstall timeout (60s)…
 
 ────────────────────────────────────────────────────────────
 
@@ -197,6 +221,24 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-yjy (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-yjy ● P2 Add OpenCode support
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -302,14 +344,20 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-wpi.10`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-eju`](standalone.md)
+- [`coding-aegis-rge`](standalone.md)
+- [`coding-aegis-2l5`](standalone.md)
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-gua`](standalone.md)
+- [`coding-aegis-1rg`](standalone.md)
+- [`coding-aegis-lf6`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-yjy`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

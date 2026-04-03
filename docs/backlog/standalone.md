@@ -1,5 +1,11 @@
 # Standalone Issues
 
+- [ ] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
+- [ ] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
+- [ ] `coding-aegis-eju` [task] Implement validate-install in all integration test scripts
+- [ ] `coding-aegis-2l5` [task] Update testing plan to use validate-install instead of direct file analysis
+- [ ] `coding-aegis-rge` [feature] Add validate-install skill command to coding-aegis
+- [ ] `coding-aegis-yjy` [task] Add OpenCode support
 - [x] `coding-aegis-ffu` [task] Update docs/test/TEST.md to reflect current test structure and phase numbering
 - [x] `coding-aegis-a84` [task] Add back-reference to testing-spec.md at top of each tool detail file
 - [x] `coding-aegis-d07` [task] Align test scripts and tool detail files with canonical phase numbering

@@ -12,7 +12,7 @@ Canonical cross-tool concept mapping and downstream spec/artifact table fixes. S
 - [ ] `coding-aegis-2sv.12` Design AGENTS.md management strategy for installed packages
 - [ ] `coding-aegis-2sv.13` Add AGENTS.md integration to pirate-speak package
 - [x] `coding-aegis-2sv.14` Detect active tool and install to correct skill path
-- [ ] `coding-aegis-2sv.15` Deliver Codex governance rules via AGENTS.md instead of .claude/rules/
+- [~] `coding-aegis-2sv.15` Deliver Codex governance rules via AGENTS.md instead of .claude/rules/ @Rob Parrott
 - [ ] `coding-aegis-2sv.2` Spike: Research GitHub Copilot agent mode and sub-agent capabilities
 - [ ] `coding-aegis-2sv.3` Add Codex tool support
 - [ ] `coding-aegis-2sv.4` Add Gemini Code Assist support

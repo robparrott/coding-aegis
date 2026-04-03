@@ -603,7 +603,12 @@ def cmd_status(args):
 
 
 def cmd_uninstall_prep(args):
-    """Find all installed artifacts for a package and return paths to remove."""
+    """Find and remove all installed artifacts for a package.
+
+    Directly removes AGENTS.md managed sections (Codex) rather than returning
+    them for the skill to rewrite — this keeps Step 2 a single rm -f / rm -rf
+    call and avoids agent timeout from large heredoc writes.
+    """
     name = args.package
     tool = args.tool if args.tool else _detect_tool()
     tool_cfg = TOOL_PATHS.get(tool, TOOL_PATHS["claude"])
@@ -612,7 +617,7 @@ def cmd_uninstall_prep(args):
 
     files_to_remove = []
     dirs_to_remove = []
-    agents_md_rewrites = []
+    agents_md_files_rewritten = []
 
     # Scan rules: aegis--{name}--*.md
     rules_dir = scope_base / "rules"
@@ -633,11 +638,12 @@ def cmd_uninstall_prep(args):
     if skill_dir.is_dir():
         dirs_to_remove.append(str(skill_dir))
 
-    # For Codex: scan AGENTS.md for managed sections and compute rewritten content.
+    # For Codex: strip managed sections directly from AGENTS.md.
+    # We do this here (not in the skill) to keep Step 2 a simple rm-only call.
     if tool == "codex":
+        import re as _re
         agents_md_path = Path.cwd() / "AGENTS.md"
         if agents_md_path.is_file():
-            import re as _re
             text = agents_md_path.read_text()
             pattern = (
                 r"<!-- aegis:begin package=" + _re.escape(name) + r"[^\n]*-->\n"
@@ -646,12 +652,10 @@ def cmd_uninstall_prep(args):
             )
             if _re.search(pattern, text, _re.DOTALL):
                 new_text = _re.sub(pattern, "", text, flags=_re.DOTALL)
-                agents_md_rewrites.append({
-                    "file": str(agents_md_path),
-                    "content": new_text,
-                })
+                agents_md_path.write_text(new_text)
+                agents_md_files_rewritten.append(str(agents_md_path))
 
-    if not files_to_remove and not dirs_to_remove and not agents_md_rewrites:
+    if not files_to_remove and not dirs_to_remove and not agents_md_files_rewritten:
         _error(f"Package '{name}' is not installed in {scope_base}")
 
     print(json.dumps({
@@ -660,7 +664,7 @@ def cmd_uninstall_prep(args):
         "scope_base": str(scope_base),
         "files_to_remove": files_to_remove,
         "dirs_to_remove": dirs_to_remove,
-        "agents_md_rewrites": agents_md_rewrites,
+        "agents_md_files_rewritten": agents_md_files_rewritten,
     }, indent=2))
 
 

@@ -1,1 +1,9 @@
 @AGENTS.md
+
+No, really read AGENTS.md. Don't proceed until you have sone that.
+
+Next:
+
+* Always use Serena if available.
+* Always use beads for task tracking.
+ 
