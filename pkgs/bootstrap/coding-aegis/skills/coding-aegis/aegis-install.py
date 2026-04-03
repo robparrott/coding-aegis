@@ -99,7 +99,7 @@ def main():
                     managed_keys["description"] = f"{name} governance — {rule_stem}"
                 merged_fm = merge_frontmatter(fm, managed_keys)
                 content = render_frontmatter(merged_fm, body)
-                target_filename = compute_target_filename(name, artifact)
+                target_filename = compute_target_filename(name, artifact, tool)
                 install_path = scope_base / "rules" / target_filename
                 os.makedirs(install_path.parent, exist_ok=True)
                 install_path.write_text(content)

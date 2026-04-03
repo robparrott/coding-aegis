@@ -9,7 +9,7 @@ fixture. Key Gemini differences from the Claude and Codex tests:
   - No marketplace (Phase 2 N/A) — Gemini uses ``gemini skills link`` directly.
   - Skill install via ``gemini skills link <path> --scope user --consent``.
   - Skill discovery via ``gemini skills list``.
-  - Agent prompts via ``gemini -m gemini-2.5-flash -o text --yolo`` with prompt
+  - Agent prompts via ``gemini -m gemini-3-flash-preview -o text --yolo`` with prompt
     passed via stdin.
   - CLAUDECODE / CLAUDE_CODE_ENTRYPOINT are unset (clean_env built inline) so
     detect_tool.py returns "gemini" when invoked through the agent.
@@ -53,7 +53,7 @@ pytestmark = pytest.mark.skipif(
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3-flash-preview"
 SKILL_PATH = "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 TIMEOUT_LONG = 120  # Gemini retries internally; each step can take 60-90s
 

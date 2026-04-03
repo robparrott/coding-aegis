@@ -26,7 +26,7 @@ SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 TEST_DIR="$(mktemp -d)"
 
 # Model to use for all agent invocations — flash keeps latency low and avoids quota burn
-GEMINI_MODEL="gemini-2.5-flash"
+GEMINI_MODEL="gemini-3-flash-preview"
 
 # Filter noisy keytar warnings from gemini chat commands; pin model via -m
 gemini_quiet() {

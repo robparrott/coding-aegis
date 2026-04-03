@@ -39,7 +39,7 @@ TOOL_PATHS = {
     "gemini":    {"scope_base": ".claude",   "skills_dir": "skills"},  # Gemini uses Claude-compat paths
     "codex":     {"scope_base": ".agents",   "skills_dir": ".agents/skills",
                   "skills_base": "."},  # skills install relative to CWD, not scope_base
-    "cursor":    {"scope_base": ".cursor",   "skills_dir": "skills"},
+    "cursor":    {"scope_base": ".cursor",   "skills_dir": "skills", "rule_ext": ".mdc"},
     "windsurf":  {"scope_base": ".windsurf", "skills_dir": "skills"},
     "copilot":   {"scope_base": ".github",   "skills_dir": "skills"},
     "opencode":  {"scope_base": ".opencode", "skills_dir": "skills",
@@ -285,10 +285,15 @@ def compute_artifact_summary(artifacts):
     return ", ".join(parts) if parts else "none"
 
 
-def compute_target_filename(pkg_name, artifact):
-    """Compute the installed filename for a rule/agent artifact."""
+def compute_target_filename(pkg_name, artifact, tool=None):
+    """Compute the installed filename for a rule/agent artifact.
+
+    Uses the tool's configured rule_ext (e.g. '.mdc' for Cursor) if provided,
+    otherwise defaults to '.md'.
+    """
     basename = Path(artifact["path"]).stem
-    return f"aegis--{pkg_name}--{basename}.md"
+    ext = TOOL_PATHS.get(tool, {}).get("rule_ext", ".md")
+    return f"aegis--{pkg_name}--{basename}{ext}"
 
 
 def find_package(catalog, name):

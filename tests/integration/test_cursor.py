@@ -325,7 +325,7 @@ class TestCursorJourney:
             journey["test_dir"]
             / ".cursor"
             / "rules"
-            / "aegis--helloworld--helloworld.md"
+            / "aegis--helloworld--helloworld.mdc"
         )
         assert rule_file.exists(), (
             f"Rule file not found: {rule_file}\n"
@@ -392,7 +392,7 @@ class TestCursorJourney:
             journey["test_dir"]
             / ".cursor"
             / "rules"
-            / "aegis--helloworld--helloworld.md"
+            / "aegis--helloworld--helloworld.mdc"
         )
         skill_dir = journey["test_dir"] / ".cursor" / "skills" / "helloworld"
         assert not rule_file.exists(), (

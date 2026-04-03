@@ -130,23 +130,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-wpi (5 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
-  │   ├── ○ coding-aegis-wpi.11 ● P1 cursor-agent CLI investigation: verify flags and …
-  │   ├── ○ coding-aegis-wpi.12 ● P1 Fix Cursor rule file extension: .mdc not .md
-  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-  ├── ○ coding-aegis-wpi.11 ● P1 cursor-agent CLI investigation: verify flags and …
-  ├── ○ coding-aegis-wpi.12 ● P1 Fix Cursor rule file extension: .mdc not .md
-  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-bg5 (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -179,16 +162,18 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-rkq.8 (3 issues, 1 layers)
+📊 Dependency graph for coding-aegis-wpi (4 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  ├── ◐ coding-aegis-rkq ● P1 Fix Gemini test script to pass all 7 phases
-  │   ├── ○ coding-aegis-rkq.8 ● P1 Gemini test Phase 6: uninstall helloworld, no err…
-  │   └── ○ coding-aegis-rkq.9 ● P1 Gemini test Phase 7: full cleanup, skill uninstal…
-  ├── ○ coding-aegis-rkq.8 ● P1 Gemini test Phase 6: uninstall helloworld, no err…
-  └── ○ coding-aegis-rkq.9 ● P1 Gemini test Phase 7: full cleanup, skill uninstal…
+  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.11 ● P1 cursor-agent CLI investigation: verify flags and …
+  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.11 ● P1 cursor-agent CLI investigation: verify flags and …
+  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
 
 ────────────────────────────────────────────────────────────
 
@@ -372,11 +357,6 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-97z.7`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.8`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.6`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.11`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.12`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
@@ -386,7 +366,10 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-yjy.4`](add-opencode-support.md)
 - [`coding-aegis-yjy.5`](add-opencode-support.md)
 - [`coding-aegis-yjy.6`](add-opencode-support.md)
-- [`coding-aegis-rkq`](standalone.md)
+- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.11`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-eju`](standalone.md)
 - [`coding-aegis-rge`](standalone.md)
 - [`coding-aegis-2l5`](standalone.md)
