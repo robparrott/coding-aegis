@@ -4,6 +4,21 @@
 
 Validate the coding-aegis skill install lifecycle across agentic coding tools. Tests exercise the **actual user journey** — install the coding-aegis skill, then use it through the tool's agent to manage packages. No test bypasses the skill.
 
+## Coding Tools
+
+Each tool has a detail file covering CLI invocation, install mechanisms, tool detection, teardown, and caveats.
+
+| Tool | Detail file | Test script | Status |
+|------|------------|-------------|--------|
+| Claude Code | [test-claude.md](test-claude.md) | `tests/test-claude-bootstrapped-skill-install.sh` | done |
+| Codex | [test-codex.md](test-codex.md) | `tests/test-codex-skill-install.sh` | done |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/test-gemini-skill-install.sh` | done |
+| Cursor | [test-cursor.md](test-cursor.md) | `tests/test-cursor-skill-install.sh` | TBD |
+| OpenCode | TBD | TBD | TBD |
+| Windsurf | TBD | TBD | TBD |
+
+Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
+
 ## User Journey
 
 This is the flow every test script validates, in order:
@@ -13,8 +28,9 @@ This is the flow every test script validates, in order:
 3. **Use the skill to list** packages in the catalog
 4. **Use the skill to show** the helloworld package details
 5. **Use the skill to install** the helloworld package into a test directory
-6. **Verify** the installed files exist with correct naming and frontmatter
-7. **Teardown** — remove helloworld, uninstall coding-aegis, remove marketplace, clean up
+6. **Use the helloworld skill** to verify it is properly installed
+7. **Verify** the installed files exist with correct naming and frontmatter
+8. **Teardown** — remove helloworld, uninstall coding-aegis, remove marketplace, at each step validating that the uninstall was clean. Only then clean up
 
 The skill is the product. Every agent-mediated test goes through it.
 
@@ -22,9 +38,9 @@ The skill is the product. Every agent-mediated test goes through it.
 
 Prompts must invoke the tool's **built-in mechanisms** — never instruct the agent to bypass them. For example, Codex has a built-in `$skill-installer` skill for installing skills from GitHub. The test prompt says "Use the skill-installer to install a skill from GitHub repo X, path Y" and lets the agent invoke `$skill-installer` naturally. It does NOT call `install-skill-from-github.py` directly or copy files manually.
 
-Similarly, T3-T5 prompts should reference the skill by name ("Use the coding-aegis skill to list packages") rather than providing implementation details about internal scripts or directory paths.
+Similarly, phases 4–5 prompts should reference the skill by name ("Use the coding-aegis skill to list packages") rather than providing implementation details about internal scripts or directory paths.
 
-### Install mechanism preference (T2)
+### Install mechanism preference (phase 3)
 
 | Preference | Mechanism | When to use |
 |-----------|-----------|-------------|
@@ -33,11 +49,41 @@ Similarly, T3-T5 prompts should reference the skill by name ("Use the coding-aeg
 | **3rd** | CLI skill management | Tool has a skills CLI (Gemini `skills link`) |
 | **4th** | Local file copy | Tool has NO install mechanism — last resort |
 
-| Tool | T2 mechanism |
-|------|-------------|
-| Claude | `claude plugin install` (marketplace CLI) |
-| Codex | Agent-mediated via `$skill-installer` (installs from GitHub to `~/.codex/skills/`) |
-| Gemini | `gemini skills link` (local path) or `gemini skills install` (remote) |
+## Test Plan
+
+| Phase | Step | Description | Pass criteria |
+|-------|------|-------------|---------------|
+| **1. Environment & Tool Validation** | 1.1 | Tool installed | `command -v <tool>` succeeds; version printed |
+| | 1.2 | Tool authenticated | Prompt `Reply with exactly: AUTH_OK` returns `AUTH_OK` |
+| | 1.3 | Working directory initialized | `git init` (or equivalent) succeeds in `$TEST_DIR` |
+| **2. Marketplace / Registry Setup** | 2.1 | Register coding-aegis source | CLI reports success |
+| | 2.2 | Source visible | Marketplace/registry name appears in tool's list |
+| **3. Install coding-aegis Skill** | 3.1 | Install skill via native mechanism | CLI reports success or expected files present |
+| | 3.2 | Skill discoverable | Name visible in tool's skill/plugin list |
+| | 3.3 | `detect_tool.py` present | File exists at installed path |
+| **4. Validate coding-aegis Skill** | 4.1 | Tool detected correctly | `detect_tool.py` returns correct `tool` value and non-empty `signals` |
+| | 4.2 | `detect-tool` skill command | Skill output contains tool name and at least one signal |
+| | 4.3 | `list` skill command | Output contains `helloworld` |
+| | 4.4 | `show` skill command | Output contains name, tier `optional`, version `1.0.0` |
+| **5. Install helloworld Package** | 5.1 | `install helloworld` skill command | Agent reports install activity |
+| | 5.2 | Rule file present | `aegis--helloworld--helloworld.md` exists at expected path |
+| | 5.3 | Rule frontmatter correct | Contains `managed-by: coding-aegis`, `package: helloworld`, `tier: optional` |
+| | 5.4 | Skill file present | `skills/helloworld/SKILL.md` exists |
+| | 5.5 | helloworld skill responds | Invoking `$helloworld` / `/helloworld` returns `Hello, World` |
+| **6. Uninstall helloworld Package** | 6.1 | `uninstall helloworld` skill command | No errors in output |
+| | 6.2 | Installed files removed | Rule file and skill directory absent |
+| **7. Full Cleanup** | 7.1 | Uninstall coding-aegis skill | CLI or file removal succeeds |
+| | 7.2 | Skill no longer discoverable | Name absent from tool's skill/plugin list |
+| | 7.3 | Remove marketplace/registry | CLI or file removal succeeds |
+| | 7.4 | Marketplace no longer registered | Name absent from tool's marketplace list (or manifest directory absent) |
+| | 7.5 | Remove test directory | `rm -rf $TEST_DIR` |
+| | 7.6 | Test directory gone | `assert_dir_not_exists $TEST_DIR` |
+
+**Phase 3.1 — detection invocation method**: Tools whose skill is installed under a tool-specific path segment (`.claude/`, `.codex/`) use a direct bash invocation of `detect_tool.py` — no agent needed, the `path:` signal fires from `__file__`. Tools where the skill is linked to a local path with no tool-specific segment (Gemini via `skills link`) require an agent-mediated invocation so the tool's env var (`GEMINI_CLI=1`) is present. See the tool's detail file for the specific path and expected signal.
+
+**Phase 5.1 — headless install**: The install command's interactive scope picker (`AskUserQuestion`) cannot be used in headless mode. Include "to Project scope" in the prompt so the agent can complete the install without waiting for input.
+
+**Phase 7 — teardown ordering**: Run all assertions (7.2, 7.4, 7.6) before the corresponding removal steps. Never remove the test directory before asserting that earlier cleanup steps succeeded — a failing assertion inside a deleted directory produces no output.
 
 ## CLI Invocation Standard
 
@@ -52,40 +98,6 @@ CLI_PROMPT="You have the coding-aegis skill loaded. Execute its list command."
 RUN_DIR="$TEST_DIR" run_cli "skill list" <tool> <flags-only>
 ```
 
-### Tool invocation patterns
-
-Every tool follows the same stdin pattern. The only differences are the binary name and flags.
-
-| Tool | Agent invocation (receives prompt on stdin) | Non-agent invocation |
-|------|---------------------------------------------|---------------------|
-| Claude | `claude -p --allowedTools "..." $CLAUDE_FLAGS` | `claude plugin marketplace add ...` |
-| Codex | `codex exec --ephemeral -s <sandbox> -o /dev/stdout` | `$skill-installer` |
-| Gemini | `gemini_quiet -o text` | `gemini_quiet skills link ...` |
-| Cursor | `cursor-agent -p --output-format text` | TBD (plugin CLI not yet documented) |
-
-**Claude flags:**
-- `--strict-mcp-config --mcp-config '{"mcpServers":{}}'` — disables MCP servers (prevents startup hangs)
-- `--allowedTools "Bash,Read,Glob,Skill"` — read-only commands (list, show); Skill tool required for `/coding-aegis` invocation
-- `--allowedTools "Bash,Read,Write,Glob,Skill,AskUserQuestion" --dangerously-skip-permissions` — install (needs Write + Skill + AskUserQuestion; `--dangerously-skip-permissions` required because `.claude/` is a protected path that even `--permission-mode bypassPermissions` won't override)
-
-**Codex flags:**
-- `--ephemeral` — no session persistence
-- `-s read-only` — read-only commands (list, show); `-s workspace-write` — local writes (install helloworld); `-s danger-full-access` — network + writes (skill-installer needs GitHub access)
-- `-o /dev/stdout` — captures output
-- Requires `git init` in working directory
-
-**Gemini flags:**
-- `-o text` — plain text output
-- `--yolo` — auto-approve tool use for all agent-mediated steps (T3-T5); without this, Gemini prompts for approval which hangs in headless mode
-- `gemini_quiet` wrapper filters Homebrew keytar warnings
-
-**Cursor flags:**
-- Binary: `cursor-agent` (Homebrew install); vendor install uses `agent`
-- `-p` — headless/print mode (same pattern as Claude)
-- `--output-format text` — plain text output
-- `--force` or `--yolo` — auto-approve file modifications
-- Plugin install mechanism not yet documented for CLI (IDE-only currently)
-
 ### Non-prompt CLI calls
 
 Tool management commands (marketplace add, plugin install, skills link) do NOT use `CLI_PROMPT`. Arguments go directly to `run_cli`:
@@ -93,6 +105,8 @@ Tool management commands (marketplace add, plugin install, skills link) do NOT u
 ```bash
 run_cli "marketplace add" claude plugin marketplace add "$REPO_ROOT"
 ```
+
+For tool-specific flags, sandbox modes, and invocation patterns see each tool's detail file.
 
 ## Test Harness (`tests/lib-test-harness.sh`)
 
@@ -126,163 +140,6 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 | `LAST_OUTPUT` | — | Captured output |
 | `LAST_EXIT` | — | Exit code |
 
-## Test Sequence
-
-### T0 — Prerequisites
-
-| Step | Pass criteria |
-|------|---------------|
-| T0.1 Tool installed | `command -v <tool>` succeeds, version printed |
-| T0.2 Tool authenticated | `CLI_PROMPT="Reply with exactly: AUTH_OK"` returns AUTH_OK |
-
-### T1 — Register Marketplace / Registry
-
-Add the coding-aegis catalog as a source the tool can install from.
-
-| Step | Pass criteria |
-|------|---------------|
-| T1.1 Register source | CLI reports success |
-| T1.2 Source visible in list | Marketplace/registry name visible |
-
-| Tool | T1.1 | T1.2 |
-|------|------|------|
-| Claude | `claude plugin marketplace add <path>` | `claude plugin marketplace list` |
-| Codex | Validate `.codex-plugin/plugin.json` exists with required fields | Plugin manifest present |
-| Gemini | N/A (uses `skills link` directly — skip to T2) | N/A |
-
-### T2 — Install coding-aegis Skill
-
-Install the skill from the registered source (T1) or via the best available mechanism.
-
-| Step | Pass criteria |
-|------|---------------|
-| T2.1 Install skill | CLI reports success or files present |
-| T2.2 Skill discoverable | Name visible in tool's list/discovery |
-
-| Tool | T2.1 | T2.2 |
-|------|------|------|
-| Claude | `claude plugin install coding-aegis@<mp>` | `claude plugin list` |
-| Codex | Agent invokes `$skill-installer` to install from GitHub | `assert_file_exists` SKILL.md in `~/.codex/skills/` |
-| Gemini | `gemini skills link <path> --consent` | `gemini skills list` |
-
-### T2b — Verify Tool Detection
-
-Confirm `detect_tool.py` (installed alongside the skill in T2) correctly identifies the
-active agent. Run immediately after T2, before any skill commands.
-
-**How to invoke** depends on how the tool detects itself:
-
-- Tools where the install path contains a tool-specific directory segment (`.claude/`, `.codex/`)
-  use a **direct bash invocation** — no agent needed. The `__file__` path signal fires.
-- Tools where the skill is linked to a local path with no tool-specific segment (Gemini via
-  `skills link`) require an **agent-mediated invocation** so the tool's env var
-  (`GEMINI_CLI=1`) is present.
-
-| Step | Pass criteria |
-|------|---------------|
-| T2b.1 Script present | `detect_tool.py` exists at installed path |
-| T2b.2 Output is valid JSON with `tool` field | `"tool"` key present in output |
-| T2b.3 Correct tool detected | `"tool"` value equals expected tool name |
-| T2b.4 At least one signal fired | `"signals"` array is non-empty |
-
-| Tool | T2b method | Installed path | Expected `tool` | Expected signal |
-|------|-----------|----------------|-----------------|-----------------|
-| Claude | Direct bash | `~/.claude/skills/coding-aegis/detect_tool.py` | `claude` | `path:.claude` |
-| Codex | Direct bash | `~/.codex/skills/coding-aegis/detect_tool.py` | `codex` | `path:.codex` |
-| Gemini | Agent-mediated | `$SKILL_DIR/detect_tool.py` (linked repo path) | `gemini` | `env:GEMINI_CLI=1` |
-
-### T2c — Use Skill: detect-tool Command
-
-Invoke the skill's `detect-tool` command and confirm it reports the correct tool and
-signals. This is an agent-mediated test for all tools — it exercises the skill dispatch
-path, not just the underlying script.
-
-| Tool | Prompt (stdin) |
-|------|---------------|
-| Claude | `/coding-aegis detect-tool` |
-| Codex | `$coding-aegis detect-tool` |
-| Gemini | `/coding-aegis detect-tool` |
-
-| Step | Pass criteria |
-|------|---------------|
-| T2c.1 Skill responds | Output contains the detected tool name |
-| T2c.2 Signals reported | Output contains at least one signal name (e.g. `env:` or `path:`) |
-
-### T3 — Use Skill: List Packages
-
-Invoke the skill using the tool's native syntax — not natural language descriptions.
-
-| Tool | Prompt (stdin) |
-|------|---------------|
-| Claude | `/coding-aegis list` |
-| Codex | `$coding-aegis list` |
-| Gemini | `/coding-aegis list` |
-
-| Step | Pass criteria |
-|------|---------------|
-| T3.1 Agent lists packages | Output contains "helloworld" |
-
-### T4 — Use Skill: Show Package
-
-| Tool | Prompt (stdin) |
-|------|---------------|
-| Claude | `/coding-aegis show helloworld` |
-| Codex | `$coding-aegis show helloworld` |
-| Gemini | `/coding-aegis show helloworld` |
-
-| Step | Pass criteria |
-|------|---------------|
-| T4.1 Agent shows helloworld | Output contains name, tier "optional", version "1.0.0" |
-
-### T5 — Use Skill: Install Package
-
-The install command's interactive scope picker (`AskUserQuestion`) cannot be used in headless mode. The prompt includes "to Project scope" so the agent can complete the install without interactive input.
-
-| Tool | Prompt (stdin) |
-|------|---------------|
-| Claude | `/coding-aegis install helloworld to Project scope` |
-| Codex | `$coding-aegis install helloworld to Project scope (.claude/ in the current directory)` |
-| Gemini | `/coding-aegis install helloworld to Project scope` |
-
-| Step | Pass criteria |
-|------|---------------|
-| T5.1 Agent installs helloworld | Agent reports install activity |
-
-### T6 — Verify Installed Files
-
-Filesystem checks, no agent.
-
-| Step | Pass criteria |
-|------|---------------|
-| T6.1 Rule file exists | `aegis--helloworld--helloworld.md` present |
-| T6.2 Rule frontmatter | `managed-by: coding-aegis`, `package: helloworld`, `tier: optional` |
-| T6.3 Skill file exists | `skills/helloworld/SKILL.md` present |
-
-### T6b — Invoke Installed Skill
-
-Exercise the installed helloworld skill to confirm it is functional, not just present on disk.
-
-| Tool | Prompt (stdin) |
-|------|---------------|
-| Claude | `/helloworld` |
-| Codex | `$helloworld` |
-| Gemini | `/helloworld` |
-
-| Step | Pass criteria |
-|------|---------------|
-| T6b.1 Skill responds | Output contains "Hello, World" |
-
-### T7 — Teardown
-
-Remove artifacts in reverse install order: target package first, then the coding-aegis skill, then the marketplace/registry, then the test directory.
-
-| Step | Pass criteria |
-|------|---------------|
-| T7.1 Uninstall helloworld via skill | `/coding-aegis uninstall helloworld` — no errors, installed files removed |
-| T7.2 Uninstall coding-aegis skill | CLI success or files removed |
-| T7.3 Remove marketplace/registry | CLI success (skip for tools without marketplace) |
-| T7.4 Remove test directory | Deleted |
-
 ## Test Package
 
 `helloworld` from `pkgs/optional/helloworld/`:
@@ -304,36 +161,23 @@ Remove artifacts in reverse install order: target package first, then the coding
 
 **All scripts must be run before closing any task.** Do not limit testing to scripts directly touched by a change — a regression anywhere in the suite is a failure. If a script cannot be run (e.g. tool not installed), note it explicitly and get user agreement before closing.
 
-### Codex: two-phase testing requirement
-
-The Codex `$skill-installer` only supports GitHub sources — it cannot install from local filesystem paths. This means the Codex test script (`test-codex-skill-install.sh`) cannot validate uncommitted local changes directly. Testing Codex changes requires two phases:
-
-1. **Push to GitHub** — commit and push all skill changes to the remote repository.
-2. **Run the Codex test** — the test then installs from GitHub, reflecting the pushed changes.
-
-Do not run the Codex test against a local working copy. If changes have not been pushed, note that the Codex test is blocked and get user agreement before closing the task.
-
 ### The user journey contract is inviolable
 
 **NEVER substitute a direct file copy, manual script execution, or any other shortcut for the tool's proper install mechanism.** A test that bypasses the install mechanism does not validate the user journey — it validates nothing useful and creates false confidence. Worse, it hides real failures that will surface in production.
 
-If a tool's install mechanism cannot be exercised (e.g. network unavailable, tool not installed), the correct action is to **skip the test and note it explicitly** — not to substitute a workaround. A skipped test with a clear explanation is always preferable to a test that breaks the user journey contract. A test that does not follow the real install path is worse than no test at all.
+If a tool's install mechanism cannot be exercised (e.g. network unavailable, tool not installed), the correct action is to **skip the test and note it explicitly** — not to substitute a workaround. A skipped test with a clear explanation is always preferable to a test that breaks the user journey contract.
 
 ## Coverage Matrix
 
-| Test | Claude | Codex | Gemini | Cursor |
-|------|--------|-------|--------|--------|
-| T0 Prerequisites | done | done | done | TBD |
-| T1 Register marketplace | done | N/A | N/A | TBD |
-| T2 Install skill | done | done | done | TBD |
-| T2b Verify tool detection | done | done | done | TBD |
-| T2c Skill: detect-tool | done | done | done | TBD |
-| T3 Skill: list | done | done | done | TBD |
-| T4 Skill: show | done | done | done | TBD |
-| T5 Skill: install | done | done | done | TBD |
-| T6 Verify files | done | done | done | TBD |
-| T6b Invoke helloworld | done | done | done | TBD |
-| T7 Teardown | done | done | done | TBD |
+| Phase | Claude | Codex | Gemini | Cursor |
+|-------|--------|-------|--------|--------|
+| 1 Environment & Tool Validation | done | done | done | TBD |
+| 2 Marketplace / Registry Setup | done | N/A | N/A | TBD |
+| 3 Install coding-aegis Skill | done | done | done | TBD |
+| 4 Validate coding-aegis Skill | done | done | done | TBD |
+| 5 Install helloworld Package | done | done | done | TBD |
+| 6 Uninstall helloworld Package | done | done | done | TBD |
+| 7 Full Cleanup | done | done | done | TBD |
 | Unit tests | done (31) | — | — | — |
 
-All test scripts conform to the T0-T7 sequence defined above.
+All test scripts conform to the 7-phase test plan defined above.

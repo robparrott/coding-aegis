@@ -1,5 +1,9 @@
 # Standalone Issues
 
+- [x] `coding-aegis-a84` [task] Add back-reference to testing-spec.md at top of each tool detail file
+- [ ] `coding-aegis-d07` [task] Align test scripts and tool detail files with canonical phase numbering
+- [x] `coding-aegis-jdj` [task] Reconcile Test Plan and Test Sequence in testing-spec.md
+- [ ] `coding-aegis-gua` [task] Codex T1: actively register marketplace in test dir, unregister in teardown
 - [ ] `coding-aegis-6pp` [task] Codex T6/T9: replace local pkgs/ catalog with remote-based install
 - [ ] `coding-aegis-c1d` [bug] Suppress tool detection output on implicit runs
 - [x] `coding-aegis-gx0` [task] Add detect-tool command to coding-aegis skill

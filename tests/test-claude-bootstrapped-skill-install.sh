@@ -43,9 +43,12 @@ cleanup() {
 
   section "T11: Teardown — remove marketplace"
   run_cli "remove marketplace" claude plugin marketplace remove "$MARKETPLACE_NAME" || true
+  run_cli "marketplace list" claude plugin marketplace list || true
+  assert_not_contains "$LAST_OUTPUT" "$MARKETPLACE_NAME" "marketplace no longer in list"
 
   section "T12: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
+  assert_dir_not_exists "$TEST_DIR" "test directory removed"
 
   print_results
 }

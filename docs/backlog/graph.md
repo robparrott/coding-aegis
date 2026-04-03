@@ -177,12 +177,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-d07 (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+  └── ○ coding-aegis-d07 ● P2 Align test scripts and tool detail files with can…
 
 ────────────────────────────────────────────────────────────
 
@@ -192,6 +192,24 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-c1d ● P2 Suppress tool detection output on implicit runs
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -304,8 +322,10 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-d07`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
+- [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

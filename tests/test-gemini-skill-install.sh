@@ -45,10 +45,13 @@ cleanup() {
   fi
 
   section "T10: Teardown — uninstall coding-aegis skill"
-  timeout "$TIMEOUT" gemini skills uninstall coding-aegis --scope workspace > /dev/null 2>&1 || true
+  timeout "$TIMEOUT" gemini_quiet skills uninstall coding-aegis --scope workspace || true
+  run_cli "skills list" gemini_quiet skills list || true
+  assert_not_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis no longer in skills list"
 
   section "T11: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
+  assert_dir_not_exists "$TEST_DIR" "test directory removed"
 
   print_results
 }

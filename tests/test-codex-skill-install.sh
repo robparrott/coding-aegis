@@ -13,8 +13,9 @@
 #   T7   Verify installed files
 #   T8   Invoke installed helloworld skill
 #   T9   Teardown: uninstall helloworld
-#   T10  Teardown: uninstall coding-aegis skill
-#   T11  Teardown: remove test directory
+#   T10  Teardown: remove marketplace registration (.codex-plugin/)
+#   T11  Teardown: uninstall coding-aegis skill
+#   T12  Teardown: remove test directory
 #
 # The $skill-installer is a built-in Codex system skill that installs
 # skills from GitHub repos. T2 asks the Codex agent to use it — this
@@ -53,11 +54,19 @@ cleanup() {
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
 
-  section "T10: Teardown — uninstall coding-aegis skill"
+  section "T10: Teardown — remove marketplace registration"
+  # TODO (coding-aegis-gua): when T1 fetches .codex-plugin/ from GitHub into
+  # $TEST_DIR, remove it here. For now assert it was never left behind.
+  rm -rf "$TEST_DIR/.codex-plugin"
+
+  test_header "marketplace no longer registered"
+  assert_dir_not_exists "$TEST_DIR/.codex-plugin" "marketplace (.codex-plugin/) removed from test dir"
+
+  section "T11: Teardown — uninstall coding-aegis skill"
   rm -rf "$CODEX_SKILL_DIR"
   assert_dir_not_exists "$CODEX_SKILL_DIR" "coding-aegis removed from ~/.codex/skills/"
 
-  section "T11: Teardown — remove test directory"
+  section "T12: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
   assert_dir_not_exists "$TEST_DIR" "test directory removed"
 
