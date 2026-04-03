@@ -57,8 +57,17 @@ def main():
         skill_dir = scope_base / tool_cfg.get("skills_dir", "skills") / name
 
     if skill_dir.is_dir():
-        shutil.rmtree(str(skill_dir))
-        dirs_removed.append(str(skill_dir))
+        try:
+            shutil.rmtree(str(skill_dir))
+            dirs_removed.append(str(skill_dir))
+        except (PermissionError, OSError) as e:
+            # Codex workspace-write sandbox blocks rmtree at the syscall level.
+            # Note the failure but continue — AGENTS.md stripping still needs to run.
+            print(
+                f"Warning: could not remove {skill_dir}: {e}\n"
+                f"  The directory may need manual removal or danger-full-access sandbox mode.",
+                file=sys.stderr,
+            )
 
     # Codex: strip aegis:begin/end sections from AGENTS.md
     if tool == "codex":
