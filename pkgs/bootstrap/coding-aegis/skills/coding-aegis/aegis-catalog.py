@@ -33,7 +33,7 @@ ARTIFACT_TYPE_ORDER = ["rule", "skill", "agent", "mcp", "plugin"]
 # See references/install-rules.md for the full cross-tool mapping.
 TOOL_PATHS = {
     "claude":   {"scope_base": ".claude",   "skills_dir": "skills"},
-    "codex":    {"scope_base": ".claude",   "skills_dir": ".agents/skills",
+    "codex":    {"scope_base": ".agents",   "skills_dir": ".agents/skills",
                  "skills_base": "."},  # skills install relative to CWD, not scope_base
     "cursor":   {"scope_base": ".cursor",   "skills_dir": "skills"},
     "windsurf": {"scope_base": ".windsurf", "skills_dir": "skills"},

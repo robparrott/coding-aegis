@@ -188,22 +188,14 @@ Map the choice to a `--scope` flag:
 
 Run:
 
-First resolve the catalog path:
-
 ```
-python3 "{skill-dir}/aegis-catalog.py" resolve-catalog --from "{cwd}"
-```
-
-Where `{cwd}` is the current working directory. If this exits non-zero, stop immediately.
-Use the returned `catalog` path in the next call:
-
-```
-python3 "{skill-dir}/aegis-catalog.py" install-prep <name> --scope <project|user> --catalog "{catalog}"
+python3 "{skill-dir}/aegis-catalog.py" install-prep <name> --scope <project|user>
 ```
 
 **If the command exits non-zero or the JSON contains `"error"`: print the exact error
 output verbatim, stop immediately, and do not attempt any further steps.** Do not
 improvise, infer paths, or construct artifacts manually.
+If `artifacts` is empty, warn and stop.
 
 The response contains:
 - `tool` — the detected active agent
