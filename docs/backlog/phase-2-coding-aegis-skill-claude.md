@@ -6,7 +6,7 @@
 
 - [x] `coding-aegis-b5z.1` Create stub coding-aegis SKILL.md @Rob Parrott
 - [ ] `coding-aegis-b5z.10` Add Gemini remote skill install test (git URL)
-- [ ] `coding-aegis-b5z.11` Update install/testing docs for Claude, Codex, and Gemini CLI
+- [ ] `coding-aegis-b5z.11` Create integration test HOWTOs for all supported tools
 - [x] `coding-aegis-b5z.12` Cross-tool testing specification for skill setup pipeline
 - [x] `coding-aegis-b5z.13` Restructure test scripts to follow install-then-use user journey
 - [x] `coding-aegis-b5z.14` Claude test: install coding-aegis plugin then use skill to install helloworld

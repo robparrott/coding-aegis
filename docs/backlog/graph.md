@@ -11,12 +11,12 @@ Auto-generated from `bd graph --all --compact`.
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
-  │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
+  │   ├── ○ coding-aegis-b5z.11 ● P2 Create integration test HOWTOs for all supported …
   │   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
   │   ├── ○ coding-aegis-b5z.42 ● P2 Add local install fallback for Claude test: insta…
   │   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
-  ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
+  ├── ○ coding-aegis-b5z.11 ● P2 Create integration test HOWTOs for all supported …
   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
   ├── ○ coding-aegis-b5z.42 ● P2 Add local install fallback for Claude test: insta…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
@@ -130,6 +130,23 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-wpi (5 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.11 ● P1 cursor-agent CLI investigation: verify flags and …
+  │   ├── ○ coding-aegis-wpi.12 ● P1 Fix Cursor rule file extension: .mdc not .md
+  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.11 ● P1 cursor-agent CLI investigation: verify flags and …
+  ├── ○ coding-aegis-wpi.12 ● P1 Fix Cursor rule file extension: .mdc not .md
+  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-bg5 (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -159,21 +176,6 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-yjy.4 ● P1 OpenCode bootstrap: install coding-aegis skill to…
   ├── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
   └── ○ coding-aegis-yjy.6 ● P2 Document OpenCode support: docs/test/test-opencod…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-wpi (4 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
-  │   ├── ○ coding-aegis-wpi.10 ● P2 Create Cursor test script following user journey …
-  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-  ├── ○ coding-aegis-wpi.10 ● P2 Create Cursor test script following user journey …
-  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
 
 ────────────────────────────────────────────────────────────
 
@@ -256,21 +258,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -370,6 +372,11 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-97z.7`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.8`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.6`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.11`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.12`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
@@ -379,10 +386,6 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-yjy.4`](add-opencode-support.md)
 - [`coding-aegis-yjy.5`](add-opencode-support.md)
 - [`coding-aegis-yjy.6`](add-opencode-support.md)
-- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.10`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-rkq`](standalone.md)
 - [`coding-aegis-eju`](standalone.md)
 - [`coding-aegis-rge`](standalone.md)
@@ -395,8 +398,8 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-lf6`](standalone.md)
 - [`coding-aegis-7b7`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
-- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)
