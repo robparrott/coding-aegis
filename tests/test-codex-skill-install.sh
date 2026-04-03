@@ -25,6 +25,10 @@ set -euo pipefail
 # test is run from within Claude Code's Bash tool.
 unset CLAUDECODE CLAUDE_CODE_ENTRYPOINT 2>/dev/null || true
 
+# Codex workspace-write sandbox steps (install/uninstall) are slower than read-only.
+# Override TIMEOUT_LONG to 60s for this test only.
+export AEGIS_TEST_TIMEOUT_LONG=60
+
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$(dirname "$0")/lib-test-harness.sh"
 

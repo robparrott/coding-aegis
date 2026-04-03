@@ -10,8 +10,9 @@ four commands: `list`, `show`, `install`, and `status`.
 
 ## Before You Begin: Detect the Active Tool
 
-**Always run tool detection first**, before any other step. This determines install paths,
-scope defaults, and which tool-specific logic to apply.
+Run tool detection first for **list**, **show**, **status**, and **detect-tool** commands.
+For **install** and **uninstall**, skip this step — `install-prep` and `uninstall-prep`
+run detection internally, and the extra exec call consumes budget in sandboxed environments.
 
 ```bash
 python3 "{skill-dir}/detect_tool.py"
