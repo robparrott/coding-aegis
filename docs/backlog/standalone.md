@@ -1,5 +1,9 @@
 # Standalone Issues
 
+- [ ] `coding-aegis-7b7` [bug] Fix Codex uninstall: rm -rf blocked by workspace-write sandbox
+- [ ] `coding-aegis-bc3` [task] Make coding-aegis uninstall lightning fast (currently ~16s)
+- [ ] `coding-aegis-jrc` [task] Make coding-aegis install lightning fast (currently ~24s)
+- [ ] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
 - [ ] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
 - [ ] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
 - [ ] `coding-aegis-eju` [task] Implement validate-install in all integration test scripts
