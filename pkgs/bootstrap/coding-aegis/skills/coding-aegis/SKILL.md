@@ -206,7 +206,9 @@ The response contains:
 
 ### Step 3 — Batch write all files
 
-For each artifact, write `content` to `install_path`. Use `mkdir -p` to create parent directories. Issue all writes in a single Bash call:
+Artifacts fall into two categories based on the presence of `target_mode`.
+
+**Standard artifacts** (no `target_mode` field): write `content` to `install_path`. Use `mkdir -p` to create parent directories. Issue all writes in a single Bash call:
 
 ```bash
 mkdir -p "$(dirname '{install_path_1}')" && cat > '{install_path_1}' << 'AEGIS_EOF'
@@ -214,6 +216,14 @@ mkdir -p "$(dirname '{install_path_1}')" && cat > '{install_path_1}' << 'AEGIS_E
 AEGIS_EOF
 mkdir -p "$(dirname '{install_path_2}')" && cat > '{install_path_2}' << 'AEGIS_EOF'
 {content_2}
+AEGIS_EOF
+```
+
+**`target_mode: "agents-md"` artifacts** (Codex rules): append `content` to `install_path` (which is the absolute path to `AGENTS.md`). Create the file if it does not exist. Use a single Bash call:
+
+```bash
+cat >> '{install_path}' << 'AEGIS_EOF'
+{content}
 AEGIS_EOF
 ```
 
@@ -281,7 +291,15 @@ rm -f <file1> <file2> ...
 rm -rf <dir1> <dir2> ...
 ```
 
-Issue all removals in a single Bash call.
+If `agents_md_rewrites` is non-empty, write the rewritten content back to each file listed:
+
+```bash
+cat > '{file}' << 'AEGIS_EOF'
+{content}
+AEGIS_EOF
+```
+
+Issue all removals and rewrites in a single Bash call.
 
 ### Step 3 — Update AGENTS.md (Project scope only)
 

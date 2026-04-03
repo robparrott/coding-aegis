@@ -32,9 +32,22 @@ Source rules are authored as `.md`. Adapt extension per target tool:
 | Tool | Target directory |
 |------|-----------------|
 | Claude Code | `.claude/rules/` |
+| Codex | `AGENTS.md` (appended as marked sections — see below) |
 | Cursor | `.cursor/rules/` |
 | Windsurf | `.windsurf/rules/` |
 | Copilot | `.github/instructions/` |
+
+#### Codex rule delivery
+
+Codex has no equivalent of `.claude/rules/` for markdown instruction files. Rules are delivered as marked sections appended to `AGENTS.md`. Each section uses HTML comment markers for machine-readable ownership:
+
+```
+<!-- aegis:begin package={pkg} rule={rule} version={version} tier={tier} -->
+{rule body — frontmatter stripped}
+<!-- aegis:end package={pkg} rule={rule} -->
+```
+
+`install-prep --tool codex` emits rule artifacts with `target_mode: "agents-md"` and `install_path` pointing to `AGENTS.md`. The skill appends the section during install and uses the `agents_md_rewrites` field from `uninstall-prep` to remove it on uninstall.
 
 ### Skills
 

@@ -17,12 +17,12 @@ SCRIPT = REPO_ROOT / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-
 CATALOG = REPO_ROOT / "pkgs"
 
 
-def run_cmd(*args, catalog=None):
+def run_cmd(*args, catalog=None, cwd=None):
     """Run aegis-catalog.py with args, return parsed JSON."""
     cmd = [sys.executable, str(SCRIPT)] + list(args)
     if catalog:
         cmd.extend(["--catalog", str(catalog)])
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
     if result.returncode != 0 and not result.stdout:
         raise RuntimeError(f"exit {result.returncode}: {result.stderr}")
     return json.loads(result.stdout)
@@ -140,6 +140,46 @@ class TestInstallPrep(unittest.TestCase):
         self.assertIn("error", data)
 
 
+class TestInstallPrepCodex(unittest.TestCase):
+
+    def test_codex_rule_targets_agents_md(self):
+        """Codex: rule artifact targets AGENTS.md, not a standalone file."""
+        with tempfile.TemporaryDirectory() as d:
+            data = run_cmd("install-prep", "helloworld", "--tool", "codex", catalog=CATALOG, cwd=d)
+            rules = [a for a in data["artifacts"] if a["type"] == "rule"]
+            self.assertEqual(len(rules), 1)
+            rule = rules[0]
+            self.assertEqual(rule.get("target_mode"), "agents-md")
+            self.assertTrue(rule["install_path"].endswith("AGENTS.md"))
+
+    def test_codex_rule_content_has_markers(self):
+        """Codex: rule content wrapped in aegis:begin/end markers."""
+        with tempfile.TemporaryDirectory() as d:
+            data = run_cmd("install-prep", "helloworld", "--tool", "codex", catalog=CATALOG, cwd=d)
+            rules = [a for a in data["artifacts"] if a["type"] == "rule"]
+            rule = rules[0]
+            self.assertIn("<!-- aegis:begin package=helloworld rule=helloworld", rule["content"])
+            self.assertIn("<!-- aegis:end package=helloworld rule=helloworld -->", rule["content"])
+
+    def test_codex_rule_content_no_frontmatter(self):
+        """Codex: rule section content strips YAML frontmatter."""
+        with tempfile.TemporaryDirectory() as d:
+            data = run_cmd("install-prep", "helloworld", "--tool", "codex", catalog=CATALOG, cwd=d)
+            rules = [a for a in data["artifacts"] if a["type"] == "rule"]
+            rule = rules[0]
+            self.assertNotIn("managed-by: coding-aegis", rule["content"])
+
+    def test_codex_skill_path_unchanged(self):
+        """Codex: skill artifacts still go to .agents/skills/, not .claude/skills/."""
+        with tempfile.TemporaryDirectory() as d:
+            data = run_cmd("install-prep", "helloworld", "--tool", "codex", catalog=CATALOG, cwd=d)
+            skills = [a for a in data["artifacts"] if a["type"] == "skill"]
+            self.assertGreaterEqual(len(skills), 1)
+            for s in skills:
+                self.assertIn(".agents/skills", s["install_path"])
+                self.assertNotIn(".claude", s["install_path"])
+
+
 class TestStatus(unittest.TestCase):
 
     def test_status_empty_scope(self):
@@ -197,6 +237,76 @@ class TestStatus(unittest.TestCase):
             self.assertEqual(pkgs[0]["status"], "outdated")
             self.assertEqual(pkgs[0]["installed_version"], "0.5.0")
             self.assertEqual(pkgs[0]["catalog_version"], "1.0.0")
+
+
+class TestUninstallPrep(unittest.TestCase):
+
+    def test_claude_skill_path(self):
+        """Claude: skill dir found in .claude/skills/{name}/."""
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d).resolve()
+            skill_dir = base / ".claude" / "skills" / "helloworld"
+            skill_dir.mkdir(parents=True)
+            (skill_dir / "SKILL.md").write_text("# helloworld\n")
+            data = run_cmd("uninstall-prep", "helloworld", "--tool", "claude", cwd=d)
+            self.assertEqual(data["tool"], "claude")
+            self.assertIn(str(skill_dir), data["dirs_to_remove"])
+            self.assertEqual(data["files_to_remove"], [])
+
+    def test_codex_skill_path(self):
+        """Codex: skill dir found in .agents/skills/{name}/, not .claude/skills/."""
+        with tempfile.TemporaryDirectory() as d:
+            skill_dir = Path(d) / ".agents" / "skills" / "helloworld"
+            skill_dir.mkdir(parents=True)
+            (skill_dir / "SKILL.md").write_text("# helloworld\n")
+            data = run_cmd("uninstall-prep", "helloworld", "--tool", "codex", cwd=d)
+            self.assertEqual(data["tool"], "codex")
+            self.assertEqual(len(data["dirs_to_remove"]), 1)
+            self.assertIn(".agents/skills/helloworld", data["dirs_to_remove"][0])
+            for p in data["dirs_to_remove"]:
+                self.assertNotIn(".claude", p)
+
+    def test_codex_rule_files_in_agents_rules(self):
+        """Codex: rule files in .agents/rules/ are found."""
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d).resolve()
+            rules_dir = base / ".agents" / "rules"
+            rules_dir.mkdir(parents=True)
+            rule_file = rules_dir / "aegis--helloworld--helloworld.md"
+            rule_file.write_text("---\npackage: helloworld\nmanaged-by: coding-aegis\n---\n")
+            skill_dir = base / ".agents" / "skills" / "helloworld"
+            skill_dir.mkdir(parents=True)
+            data = run_cmd("uninstall-prep", "helloworld", "--tool", "codex", cwd=d)
+            self.assertIn(str(rule_file), data["files_to_remove"])
+
+    def test_not_installed_errors(self):
+        """Error JSON returned when nothing found."""
+        with tempfile.TemporaryDirectory() as d:
+            data = run_cmd("uninstall-prep", "helloworld", "--tool", "claude", cwd=d)
+            self.assertIn("error", data)
+
+    def test_codex_agents_md_section_removal(self):
+        """Codex: managed AGENTS.md sections returned in agents_md_rewrites."""
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d).resolve()
+            agents_md = base / "AGENTS.md"
+            agents_md.write_text(
+                "# My Project\n\n"
+                "<!-- aegis:begin package=helloworld rule=helloworld version=1.0.0 tier=optional -->\n"
+                "Some rule content.\n"
+                "<!-- aegis:end package=helloworld rule=helloworld -->\n\n"
+                "Other content.\n"
+            )
+            skill_dir = base / ".agents" / "skills" / "helloworld"
+            skill_dir.mkdir(parents=True)
+            data = run_cmd("uninstall-prep", "helloworld", "--tool", "codex", cwd=d)
+            self.assertIn("agents_md_rewrites", data)
+            self.assertEqual(len(data["agents_md_rewrites"]), 1)
+            rewrite = data["agents_md_rewrites"][0]
+            self.assertEqual(rewrite["file"], str(agents_md))
+            self.assertNotIn("aegis:begin", rewrite["content"])
+            self.assertNotIn("Some rule content", rewrite["content"])
+            self.assertIn("Other content", rewrite["content"])
 
 
 class TestYamlParser(unittest.TestCase):

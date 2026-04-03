@@ -47,6 +47,13 @@ cleanup() {
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
   assert_dir_not_exists "$SKILL_INSTALL_DIR" "helloworld skill dir removed"
+  if [ -f "$TEST_DIR/AGENTS.md" ]; then
+    if grep -q "aegis:begin package=helloworld" "$TEST_DIR/AGENTS.md" 2>/dev/null; then
+      fail "AGENTS.md: helloworld rule section still present after uninstall"
+    else
+      pass "AGENTS.md: helloworld rule section removed"
+    fi
+  fi
 
   section "Phase 7: Full Cleanup"
   # TODO (coding-aegis-gua): when Phase 2 fetches .codex-plugin/ from GitHub into
@@ -159,13 +166,16 @@ CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s workspace-write -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 
-# Rule file verification skipped for Codex — Codex rules go in AGENTS.md,
-# not individual files. Tracked in 2sv.15.
 test_header "files written by install"
 echo -e "  ${DIM}$(find "$TEST_DIR" \( -name 'aegis--*' -o -name 'SKILL.md' -o -name 'AGENTS.md' \) -not -path '*/pkgs/*' 2>/dev/null | head -10 || echo '(none found)')${RESET}"
 
 test_header "skill file exists"
 assert_file_exists "$SKILL_INSTALL_DIR/SKILL.md" "skill file: .agents/skills/helloworld/SKILL.md"
+
+test_header "rule section in AGENTS.md"
+assert_file_exists "$TEST_DIR/AGENTS.md" "AGENTS.md created"
+assert_file_contains "$TEST_DIR/AGENTS.md" "aegis:begin package=helloworld" "AGENTS.md: begin marker present"
+assert_file_contains "$TEST_DIR/AGENTS.md" "aegis:end package=helloworld" "AGENTS.md: end marker present"
 
 test_header "helloworld responds"
 CLI_PROMPT="\$helloworld"

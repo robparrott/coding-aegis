@@ -381,34 +381,56 @@ def cmd_install_prep(args):
         source_text = source_path.read_text()
 
         if a_type in ("rule", "agent"):
-            # Merge managed-by frontmatter
             fm, body = parse_frontmatter(source_text)
-            managed_keys = {
-                "package": name,
-                a_type: Path(a_path).stem,
-                "version": pkg_data.get("version", "0.0.0"),
-                "tier": pkg_data["tier"],
-                "managed-by": "coding-aegis",
-            }
-            # Preserve description from source if present
-            if "description" not in fm:
-                managed_keys["description"] = (
-                    f"{name} governance — {Path(a_path).stem}"
-                )
-            merged_fm = merge_frontmatter(fm, managed_keys)
-            content = render_frontmatter(merged_fm, body)
-            target_filename = compute_target_filename(name, artifact)
-            target_subdir = a_type + "s"  # rules/ or agents/
+            rule_stem = Path(a_path).stem
+            pkg_version = pkg_data.get("version", "0.0.0")
+            pkg_tier = pkg_data["tier"]
 
-            install_path = str(scope_base_path / target_subdir / target_filename)
-            artifacts_out.append({
-                "type": a_type,
-                "source_path": str(source_path),
-                "target_subdir": target_subdir,
-                "target_filename": target_filename,
-                "install_path": install_path,
-                "content": content,
-            })
+            if tool == "codex":
+                # Codex has no .claude/rules/ equivalent.
+                # Deliver rules as marked sections appended to AGENTS.md.
+                begin = (
+                    f"<!-- aegis:begin package={name} rule={rule_stem}"
+                    f" version={pkg_version} tier={pkg_tier} -->"
+                )
+                end = f"<!-- aegis:end package={name} rule={rule_stem} -->"
+                content = begin + "\n" + body.strip() + "\n" + end + "\n"
+                install_path = str(Path.cwd() / "AGENTS.md")
+                artifacts_out.append({
+                    "type": a_type,
+                    "target_mode": "agents-md",
+                    "source_path": str(source_path),
+                    "target_subdir": "",
+                    "target_filename": "AGENTS.md",
+                    "install_path": install_path,
+                    "content": content,
+                })
+            else:
+                # All other tools: write individual managed files.
+                managed_keys = {
+                    "package": name,
+                    a_type: rule_stem,
+                    "version": pkg_version,
+                    "tier": pkg_tier,
+                    "managed-by": "coding-aegis",
+                }
+                if "description" not in fm:
+                    managed_keys["description"] = (
+                        f"{name} governance — {rule_stem}"
+                    )
+                merged_fm = merge_frontmatter(fm, managed_keys)
+                content = render_frontmatter(merged_fm, body)
+                target_filename = compute_target_filename(name, artifact)
+                target_subdir = a_type + "s"  # rules/ or agents/
+                install_path = str(scope_base_path / target_subdir / target_filename)
+                artifacts_out.append({
+                    "type": a_type,
+                    "source_path": str(source_path),
+                    "target_subdir": target_subdir,
+                    "target_filename": target_filename,
+                    "install_path": install_path,
+                    "content": content,
+                })
 
         elif a_type == "skill":
             # Skills: copy the entire skill directory.
@@ -590,6 +612,7 @@ def cmd_uninstall_prep(args):
 
     files_to_remove = []
     dirs_to_remove = []
+    agents_md_rewrites = []
 
     # Scan rules: aegis--{name}--*.md
     rules_dir = scope_base / "rules"
@@ -610,7 +633,25 @@ def cmd_uninstall_prep(args):
     if skill_dir.is_dir():
         dirs_to_remove.append(str(skill_dir))
 
-    if not files_to_remove and not dirs_to_remove:
+    # For Codex: scan AGENTS.md for managed sections and compute rewritten content.
+    if tool == "codex":
+        agents_md_path = Path.cwd() / "AGENTS.md"
+        if agents_md_path.is_file():
+            import re as _re
+            text = agents_md_path.read_text()
+            pattern = (
+                r"<!-- aegis:begin package=" + _re.escape(name) + r"[^\n]*-->\n"
+                r".*?"
+                r"<!-- aegis:end package=" + _re.escape(name) + r"[^\n]*-->\n?"
+            )
+            if _re.search(pattern, text, _re.DOTALL):
+                new_text = _re.sub(pattern, "", text, flags=_re.DOTALL)
+                agents_md_rewrites.append({
+                    "file": str(agents_md_path),
+                    "content": new_text,
+                })
+
+    if not files_to_remove and not dirs_to_remove and not agents_md_rewrites:
         _error(f"Package '{name}' is not installed in {scope_base}")
 
     print(json.dumps({
@@ -619,6 +660,7 @@ def cmd_uninstall_prep(args):
         "scope_base": str(scope_base),
         "files_to_remove": files_to_remove,
         "dirs_to_remove": dirs_to_remove,
+        "agents_md_rewrites": agents_md_rewrites,
     }, indent=2))
 
 
