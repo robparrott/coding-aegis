@@ -1,5 +1,6 @@
 # Standalone Issues
 
+- [ ] `coding-aegis-6pp` [task] Codex T6/T9: replace local pkgs/ catalog with remote-based install
 - [ ] `coding-aegis-c1d` [bug] Suppress tool detection output on implicit runs
 - [x] `coding-aegis-gx0` [task] Add detect-tool command to coding-aegis skill
 - [ ] `coding-aegis-lw7` [task] Add tool detection assertion to every skill install test script

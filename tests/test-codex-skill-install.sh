@@ -47,7 +47,7 @@ SKILL_INSTALL_DIR="$TEST_DIR/.agents/skills/helloworld"
 
 cleanup() {
   section "T9: Teardown — uninstall helloworld"
-  CLI_PROMPT="\$coding-aegis uninstall helloworld"
+  CLI_PROMPT="\$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs"
   CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" codex exec --ephemeral -s workspace-write -o /dev/stdout
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
@@ -146,7 +146,9 @@ section "T6: Use skill — install helloworld"
 test_header "coding-aegis install helloworld"
 # Scope must be specified in prompt — the skill's interactive scope picker
 # cannot be used in Codex headless mode.
-CLI_PROMPT="\$coding-aegis install helloworld to Project scope"
+# --catalog is explicit so the agent doesn't scan the workspace and accidentally
+# load the SKILL.md from pkgs/ instead of dispatching to the installed skill.
+CLI_PROMPT="\$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs"
 CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s workspace-write -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
