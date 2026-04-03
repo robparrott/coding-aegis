@@ -157,12 +157,14 @@ assert_contains "$LAST_OUTPUT" "codex" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
 test_header "coding-aegis list"
-CLI_PROMPT="\$coding-aegis list"
+# read-only sandbox blocks git clone; catalog was copied to $TEST_DIR/pkgs in Phase 3
+CLI_PROMPT="\$coding-aegis list --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill list" codex exec --ephemeral -s read-only -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
 test_header "coding-aegis show helloworld"
-CLI_PROMPT="\$coding-aegis show helloworld"
+# read-only sandbox blocks git clone; pass local catalog
+CLI_PROMPT="\$coding-aegis show helloworld --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill show" codex exec --ephemeral -s read-only -o /dev/stdout
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"

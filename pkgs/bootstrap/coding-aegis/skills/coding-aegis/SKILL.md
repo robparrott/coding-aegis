@@ -9,18 +9,20 @@ Browse, install, and manage governance packages for coding agents.
 
 ## Command Dispatch
 
-Parse the user input after `/coding-aegis` and route to the matching script.
+Match on the **first word** of the user input after `/coding-aegis`. Any additional
+words or flags (e.g. `--catalog pkgs`) are **extra args** — pass them through to the
+script unchanged unless the command section below says otherwise.
 
-| Input | Script | Args |
-|-------|--------|------|
-| _(empty)_ | `aegis-list.py` | — (also print help below) |
-| `list` | `aegis-list.py` | — |
-| `show <name>` | `aegis-show.py` | `<name>` |
-| `install <name>` | `aegis-install.py` | `<name> --scope <scope>` (see below) |
-| `uninstall <name>` | `aegis-uninstall.py` | `<name>` |
-| `status` | `aegis-status.py` | — |
-| `detect-tool` | `detect_tool.py` | — |
-| anything else | print help text | — |
+| First word | Script | Required args | Extra args |
+|------------|--------|---------------|------------|
+| _(empty)_ | `aegis-list.py` | — | pass through |
+| `list` | `aegis-list.py` | — | pass through |
+| `show` | `aegis-show.py` | `<name>` (second word) | pass through |
+| `install` | `aegis-install.py` | `<name> --scope <scope>` (see below) | pass through |
+| `uninstall` | `aegis-uninstall.py` | `<name>` (second word) | pass through |
+| `status` | `aegis-status.py` | — | pass through |
+| `detect-tool` | `detect_tool.py` | — | pass through |
+| anything else | print help text | — | — |
 
 `{skill-dir}` is the directory containing this SKILL.md file.
 
@@ -66,9 +68,10 @@ Where should this package be installed?
 ### Step 2: Run the script
 
 ```bash
-python3 "{skill-dir}/aegis-install.py" <name> --scope <project|user>
+python3 "{skill-dir}/aegis-install.py" <name> --scope <project|user> [extra-args]
 ```
 
+Include any extra args from the user's input (e.g. `--catalog pkgs`).
 Print stdout verbatim. If the script exits non-zero, print stderr verbatim and stop.
 
 ## detect-tool output format
