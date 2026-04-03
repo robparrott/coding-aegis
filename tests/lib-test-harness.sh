@@ -57,6 +57,10 @@ pass() {
 fail() {
   echo -e "  ${RED}FAIL${RESET}: $1"
   FAIL=$((FAIL + 1))
+  if [ "${AEGIS_TEST_FAIL_FAST:-}" = "1" ]; then
+    echo -e "\n  ${RED}FAIL FAST: stopping at first failure — cleanup will run${RESET}"
+    exit 1
+  fi
 }
 
 print_results() {
@@ -153,6 +157,16 @@ run_cli() {
   fi
 
   echo -e "  ${DIM}result: ${elapsed}s elapsed, exit ${LAST_EXIT}${RESET}"
+
+  # Write full output to log file before the screen snippet (bypasses 50-line truncation)
+  if [ -n "${AEGIS_TEST_LOG:-}" ]; then
+    {
+      echo "━━━ FULL OUTPUT: $description (exit=$LAST_EXIT, ${elapsed}s) ━━━"
+      echo "$LAST_OUTPUT"
+      echo "━━━ END OUTPUT ━━━"
+      echo ""
+    } >> "$AEGIS_TEST_LOG"
+  fi
 
   # Print output snippet (first 50 lines)
   if [ -n "$LAST_OUTPUT" ]; then
@@ -318,3 +332,13 @@ test_header() {
   echo ""
   echo -e "${BOLD}TEST: $1${RESET}"
 }
+
+# ── Logging setup (runs at source time) ─────────────────────
+# AEGIS_TEST_LOG=<path>  — tee all screen output to the file and
+#                          write full run_cli output (bypassing 50-line truncation).
+# AEGIS_TEST_FAIL_FAST=1 — stop and clean up on the first fail().
+if [ -n "${AEGIS_TEST_LOG:-}" ]; then
+  : > "$AEGIS_TEST_LOG"
+  exec > >(tee -a "$AEGIS_TEST_LOG") 2>&1
+  echo "=== Test run: $(date) | FAIL_FAST=${AEGIS_TEST_FAIL_FAST:-0} ==="
+fi

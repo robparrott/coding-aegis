@@ -145,6 +145,23 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 | `RUN_DIR` | empty | Working directory; reset after `run_cli` |
 | `LAST_OUTPUT` | — | Captured output |
 | `LAST_EXIT` | — | Exit code |
+| `AEGIS_TEST_FAIL_FAST` | unset | Set to `1` to stop at the first `fail()` and run cleanup immediately. Use when debugging to avoid burning time and API quota on subsequent phases. |
+| `AEGIS_TEST_LOG` | unset | Set to a file path to capture all output. Screen output is teed to the file; additionally, the **full** `LAST_OUTPUT` from every `run_cli` call is appended untruncated (bypassing the 50-line screen limit). Useful for post-mortem review of long agent interactions. |
+
+### Debug workflow
+
+When a test fails and you need to diagnose it:
+
+```bash
+# Stop at first failure, log everything to a file
+AEGIS_TEST_FAIL_FAST=1 AEGIS_TEST_LOG=/tmp/aegis-test.log \
+  tests/test-codex-skill-install.sh
+
+# Review the full agent output for the failing step
+grep -A 200 "FULL OUTPUT: skill install" /tmp/aegis-test.log
+```
+
+`AEGIS_TEST_FAIL_FAST=1` is the standard debugging mode. Never run a slow LLM test in a tight loop without it — each wasted phase costs real API quota.
 
 ### Test Package
 
