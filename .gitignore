@@ -31,3 +31,8 @@ CLAUDE.md
 *.db
 .beads-credential-key
 .serena/
+
+# Coding-agent workspace dirs (created by tool installs/tests)
+.gemini/
+.agents/
+.claude/

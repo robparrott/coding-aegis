@@ -14,6 +14,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 - [ ] [Phase 7: CI & Validation](phase-7-ci-&-validation.md) — 0/3 tasks
 - [ ] [Phase 8: External Package References](phase-8-external-package-references.md) — 0/6 tasks
 - [ ] [coding-aegis Skill UX](coding-aegis-skill-ux.md) — 1/5 tasks
+- [ ] [pytest integration framework for coding-aegis e2e tests](pytest-integration-framework-for-coding-aegis.md) — 3/8 tasks
 
 ## Standalone
 

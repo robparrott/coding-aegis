@@ -28,9 +28,14 @@ TEST_DIR="$(mktemp -d)"
 # Model to use for all agent invocations — flash keeps latency low and avoids quota burn
 GEMINI_MODEL="gemini-2.5-flash"
 
-# Filter noisy keytar warnings from gemini commands; pin model via -m
+# Filter noisy keytar warnings from gemini chat commands; pin model via -m
 gemini_quiet() {
   gemini -m "$GEMINI_MODEL" "$@" 2>&1 | grep -v -E "Keychain initialization|keytar\.node|keytar\.js|FileKeychain fallback|Loaded cached credentials\.|^Require stack:"
+}
+
+# Filter keytar warnings from gemini subcommands (skills, etc.) — no -m flag
+gemini_sub() {
+  gemini "$@" 2>&1 | grep -v -E "Keychain initialization|keytar\.node|keytar\.js|FileKeychain fallback|Loaded cached credentials\.|^Require stack:"
 }
 
 cleanup() {
@@ -49,8 +54,8 @@ cleanup() {
 
   section "Phase 7: Full Cleanup"
   test_header "uninstall coding-aegis skill"
-  run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope workspace || true
-  run_cli "skills list" gemini_quiet skills list || true
+  run_cli "skills uninstall" gemini_sub skills uninstall coding-aegis --scope workspace || true
+  run_cli "skills list" gemini_sub skills list || true
   assert_not_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis no longer in skills list"
 
   test_header "remove test directory"
@@ -93,11 +98,11 @@ assert_contains "$LAST_OUTPUT" "AUTH_OK" "gemini authenticated"
 section "Phase 3: Install coding-aegis Skill"
 
 test_header "gemini skills link"
-run_cli "skills link" gemini_quiet skills link "$SKILL_DIR" --scope workspace --consent
+run_cli "skills link" gemini_sub skills link "$SKILL_DIR" --scope workspace --consent
 assert_contains "$LAST_OUTPUT" "link\|success\|install" "skill linked"
 
 test_header "skill visible in list"
-run_cli "skills list" gemini_quiet skills list
+run_cli "skills list" gemini_sub skills list
 assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in skills list"
 
 test_header "detect_tool.py present"

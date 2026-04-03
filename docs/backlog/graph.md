@@ -117,6 +117,25 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-97z (6 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-97z ● P1 pytest integration framework for coding-aegis e2e…
+  │   ├── ○ coding-aegis-97z.4 ● P1 pytest Codex: port TestCodexJourney, all 7 phases
+  │   ├── ○ coding-aegis-97z.5 ● P2 pytest Gemini: port TestGeminiJourney, handle quo…
+  │   ├── ○ coding-aegis-97z.7 ● P2 pytest CI: add GitHub Actions job, JUnit XML outp…
+  │   ├── ○ coding-aegis-97z.8 ● P2 Add requirements-dev.txt with pytest, pytest-html
+  │   └── ○ coding-aegis-97z.6 ● P3 pytest Cursor: implement TestCursorJourney when C…
+  ├── ○ coding-aegis-97z.4 ● P1 pytest Codex: port TestCodexJourney, all 7 phases
+  ├── ○ coding-aegis-97z.5 ● P2 pytest Gemini: port TestGeminiJourney, handle quo…
+  ├── ○ coding-aegis-97z.6 ● P3 pytest Cursor: implement TestCursorJourney when C…
+  ├── ○ coding-aegis-97z.7 ● P2 pytest CI: add GitHub Actions job, JUnit XML outp…
+  └── ○ coding-aegis-97z.8 ● P2 Add requirements-dev.txt with pytest, pytest-html
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-rkq.8 (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -352,6 +371,12 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-2sv.13`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.4`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.5`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.7`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.8`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.6`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-rkq`](standalone.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
