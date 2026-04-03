@@ -6,7 +6,6 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 - [ ] [Cross-tool artifact model refactor](cross-tool-artifact-model-refactor.md) — 2/15 tasks
 - [ ] [External dependency installation for packages](external-dependency-installation-for-packages.md) — 0/1 tasks
-- [ ] [Implement deterministic CLI scripts for coding-aegis skill (AD-16)](implement-deterministic-cli-scripts-for-coding.md) — 0/10 tasks
 - [ ] [Phase 2: coding-aegis Skill (Claude Code)](phase-2-coding-aegis-skill-claude.md) — 34/41 tasks
 - [ ] [Phase 3: Cursor Bootstrap](phase-3-cursor-bootstrap.md) — 5/8 tasks
 - [ ] [Phase 4: Renderers / Adaptation](phase-4-renderers---adaptation.md) — 0/4 tasks
@@ -18,7 +17,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 ## Standalone
 
-- [Standalone issues](standalone.md) — 36 issues
+- [Standalone issues](standalone.md) — 41 issues
 
 ## Views
 

@@ -1,11 +1,16 @@
 # Standalone Issues
 
+- [x] `coding-aegis-znk` [task] Fix show command: agent wraps output in code block instead of printing verbatim
 - [ ] `coding-aegis-7b7` [bug] Fix Codex uninstall: rm -rf blocked by workspace-write sandbox
-- [ ] `coding-aegis-bc3` [task] Make coding-aegis uninstall lightning fast (currently ~16s)
-- [ ] `coding-aegis-jrc` [task] Make coding-aegis install lightning fast (currently ~24s)
-- [ ] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
+- [x] `coding-aegis-bc3` [task] Make coding-aegis uninstall lightning fast (currently ~16s)
+- [x] `coding-aegis-jrc` [task] Make coding-aegis install lightning fast (currently ~24s)
+- [x] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
 - [ ] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
-- [ ] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
+- [x] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
+- [x] `coding-aegis-8yl` [task] Refactor Cursor test script with Codex test improvements
+- [x] `coding-aegis-egj` [task] Refactor Gemini test script with Codex test improvements
+- [x] `coding-aegis-edx` [task] Refactor Claude test script with Codex test improvements
+- [x] `coding-aegis-4c5` [task] Remove default tool fallback from detect_tool.py
 - [ ] `coding-aegis-eju` [task] Implement validate-install in all integration test scripts
 - [ ] `coding-aegis-2l5` [task] Update testing plan to use validate-install instead of direct file analysis
 - [ ] `coding-aegis-rge` [feature] Add validate-install skill command to coding-aegis

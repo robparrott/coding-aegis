@@ -117,35 +117,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-e5x (11 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-e5x ● P1 Implement deterministic CLI scripts for coding-ae…
-  │   ├── ○ coding-aegis-e5x.1 ● P1 Create aegis_lib.py shared library
-  │   ├── ○ coding-aegis-e5x.2 ● P1 Create aegis-list.py
-  │   ├── ○ coding-aegis-e5x.3 ● P1 Create aegis-show.py
-  │   ├── ○ coding-aegis-e5x.4 ● P1 Create aegis-status.py
-  │   ├── ○ coding-aegis-e5x.5 ● P1 Create aegis-install.py
-  │   ├── ○ coding-aegis-e5x.6 ● P1 Create aegis-uninstall.py
-  │   ├── ○ coding-aegis-e5x.7 ● P1 Rewrite SKILL.md as trivial dispatcher
-  │   ├── ○ coding-aegis-e5x.8 ● P1 Create tests/test-cli-install.sh
-  │   ├── ○ coding-aegis-e5x.10 ● P2 Delete aegis-catalog.py
-  │   └── ○ coding-aegis-e5x.9 ● P2 Create tests/test_aegis_lib.py
-  ├── ○ coding-aegis-e5x.1 ● P1 Create aegis_lib.py shared library
-  ├── ○ coding-aegis-e5x.10 ● P2 Delete aegis-catalog.py
-  ├── ○ coding-aegis-e5x.2 ● P1 Create aegis-list.py
-  ├── ○ coding-aegis-e5x.3 ● P1 Create aegis-show.py
-  ├── ○ coding-aegis-e5x.4 ● P1 Create aegis-status.py
-  ├── ○ coding-aegis-e5x.5 ● P1 Create aegis-install.py
-  ├── ○ coding-aegis-e5x.6 ● P1 Create aegis-uninstall.py
-  ├── ○ coding-aegis-e5x.7 ● P1 Rewrite SKILL.md as trivial dispatcher
-  ├── ○ coding-aegis-e5x.8 ● P1 Create tests/test-cli-install.sh
-  └── ○ coding-aegis-e5x.9 ● P2 Create tests/test_aegis_lib.py
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-bg5 (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -178,19 +149,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
-
-  LAYER 1
-  ├── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
-  └── ○ coding-aegis-pnv ● P2 Research Windsurf and Copilot tool detection sign…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-eju (3 issues, 3 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -203,6 +161,19 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 2
   └── ○ coding-aegis-eju ● P2 Implement validate-install in all integration tes…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
+
+  LAYER 1
+  ├── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
+  └── ○ coding-aegis-pnv ● P2 Research Windsurf and Copilot tool detection sign…
 
 ────────────────────────────────────────────────────────────
 
@@ -226,57 +197,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-jrc (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-jrc ● P1 Make coding-aegis install lightning fast (current…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-7b7 (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   └── ○ coding-aegis-7b7 ● P1 Fix Codex uninstall: rm -rf blocked by workspace-…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-bc3 (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-bc3 ● P1 Make coding-aegis uninstall lightning fast (curre…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-1rg (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-1rg ● P1 Codex test: push changes to GitHub so -installer …
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-i6j (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-i6j ● P1 Make detect-tool, list, show skill commands light…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
 
 ────────────────────────────────────────────────────────────
 
@@ -289,12 +215,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
+  └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
 
 ────────────────────────────────────────────────────────────
 
@@ -304,6 +230,15 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-yjy ● P2 Add OpenCode support
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -400,17 +335,6 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-2sv.13`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-e5x`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.1`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.2`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.3`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.4`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.5`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.6`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.7`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.8`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.10`](implement-deterministic-cli-scripts-for-coding.md)
-- [`coding-aegis-e5x.9`](implement-deterministic-cli-scripts-for-coding.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
@@ -420,24 +344,20 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-wpi.10`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-lw7`](standalone.md)
-- [`coding-aegis-ghv`](standalone.md)
-- [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-eju`](standalone.md)
 - [`coding-aegis-rge`](standalone.md)
 - [`coding-aegis-2l5`](standalone.md)
+- [`coding-aegis-lw7`](standalone.md)
+- [`coding-aegis-ghv`](standalone.md)
+- [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-lf6`](standalone.md)
-- [`coding-aegis-jrc`](standalone.md)
 - [`coding-aegis-7b7`](standalone.md)
-- [`coding-aegis-bc3`](standalone.md)
-- [`coding-aegis-1rg`](standalone.md)
-- [`coding-aegis-i6j`](standalone.md)
-- [`coding-aegis-6pp`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
-- [`coding-aegis-gua`](standalone.md)
+- [`coding-aegis-6pp`](standalone.md)
 - [`coding-aegis-yjy`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

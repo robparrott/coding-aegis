@@ -49,7 +49,7 @@ cleanup() {
   test_header "T7.1 uninstall helloworld via skill"
   CLI_PROMPT="/coding-aegis uninstall helloworld"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" cursor-agent -p --output-format text --force
-  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
+  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|Error" "uninstall — no errors"
 
   # T7.2: Cursor plugin uninstall mechanism TBD
   test_header "T7.2 uninstall coding-aegis plugin (TBD)"
@@ -117,7 +117,8 @@ cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 section "T3: Use skill — list packages"
 
 test_header "coding-aegis list"
-CLI_PROMPT="/coding-aegis list"
+# Pass local catalog — avoids git clone and is explicit about which catalog to use
+CLI_PROMPT="/coding-aegis list --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill list" cursor-agent -p --output-format text
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
@@ -125,7 +126,8 @@ assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 section "T4: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
-CLI_PROMPT="/coding-aegis show helloworld"
+# Pass local catalog — avoids git clone and is explicit about which catalog to use
+CLI_PROMPT="/coding-aegis show helloworld --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill show" cursor-agent -p --output-format text
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
@@ -136,7 +138,7 @@ section "T5: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
 # Scope specified in prompt — scope picker can't run in headless mode.
-CLI_PROMPT="/coding-aegis install helloworld to Project scope"
+CLI_PROMPT="/coding-aegis install helloworld to Project scope --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill install" cursor-agent -p --output-format text --force
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 

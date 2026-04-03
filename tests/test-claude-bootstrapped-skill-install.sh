@@ -30,7 +30,7 @@ cleanup() {
   CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" claude -p \
     --allowedTools "Bash,Read,Glob,Skill" --dangerously-skip-permissions $CLAUDE_COMMON
-  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
+  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|Error" "uninstall — no errors"
 
   section "Phase 7: Full Cleanup"
   test_header "uninstall coding-aegis plugin"
@@ -114,13 +114,15 @@ assert_contains "$LAST_OUTPUT" "claude" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
 test_header "coding-aegis list"
-CLI_PROMPT="/coding-aegis list"
+# Pass local catalog — avoids git clone and is explicit about which catalog to use
+CLI_PROMPT="/coding-aegis list --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill list" claude -p \
   --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
 test_header "coding-aegis show helloworld"
-CLI_PROMPT="/coding-aegis show helloworld"
+# Pass local catalog — avoids git clone and is explicit about which catalog to use
+CLI_PROMPT="/coding-aegis show helloworld --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill show" claude -p \
   --allowedTools "Bash,Read,Glob,Skill" $CLAUDE_COMMON
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
@@ -137,7 +139,7 @@ mkdir -p "$TEST_DIR/.claude/rules" "$TEST_DIR/.claude/skills"
 test_header "coding-aegis install helloworld"
 # Scope specified in prompt — the skill's interactive scope picker may not
 # resolve correctly in headless (-p) mode.
-CLI_PROMPT="/coding-aegis install helloworld to Project scope"
+CLI_PROMPT="/coding-aegis install helloworld to Project scope --catalog pkgs"
 CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" claude -p \
   --allowedTools "Bash,Read,Write,Glob,Skill,AskUserQuestion" \

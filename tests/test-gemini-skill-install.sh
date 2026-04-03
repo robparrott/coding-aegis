@@ -33,6 +33,7 @@ cleanup() {
   CLI_PROMPT="/coding-aegis uninstall helloworld"
   CLI_TIMEOUT="$TIMEOUT_LONG"
   RUN_DIR="$TEST_DIR" run_cli "skill uninstall" gemini_quiet -o text --yolo
+  assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|Error" "uninstall — no errors"
   if echo "$LAST_OUTPUT" | grep -qi "quota\|RESOURCE_EXHAUSTED\|429"; then
     echo -e "  ${DIM}quota exhausted — falling back to manual cleanup${RESET}"
     rm -rf "$TEST_DIR/.claude/rules/aegis--helloworld--helloworld.md"
@@ -113,13 +114,15 @@ assert_contains "$LAST_OUTPUT" "gemini" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
 test_header "coding-aegis list"
-CLI_PROMPT="/coding-aegis list"
+# Pass local catalog — avoids git clone and is explicit about which catalog to use
+CLI_PROMPT="/coding-aegis list --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill list" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
 test_header "coding-aegis show helloworld"
-CLI_PROMPT="/coding-aegis show helloworld"
+# Pass local catalog — avoids git clone and is explicit about which catalog to use
+CLI_PROMPT="/coding-aegis show helloworld --catalog pkgs"
 RUN_DIR="$TEST_DIR" run_cli "skill show" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
@@ -132,7 +135,7 @@ section "Phase 5: Install & Verify helloworld Package"
 test_header "coding-aegis install helloworld"
 # Scope specified in prompt — the skill's interactive scope picker cannot
 # be used in headless mode.
-CLI_PROMPT="/coding-aegis install helloworld to Project scope"
+CLI_PROMPT="/coding-aegis install helloworld to Project scope --catalog pkgs"
 CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
