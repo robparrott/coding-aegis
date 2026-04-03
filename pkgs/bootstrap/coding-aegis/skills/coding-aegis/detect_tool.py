@@ -11,7 +11,7 @@ Usage (standalone):
 Usage (import):
     from detect_tool import detect_tool
     result = detect_tool()
-    tool = result["tool"]   # "claude" | "codex" | "cursor" | "gemini" | "windsurf" | "copilot"
+    tool = result["tool"]   # "claude" | "codex" | "cursor" | "gemini" | "windsurf" | "copilot" | "UNKNOWN"
 
 Validation status of each signal is documented in:
     docs/architecture/spec-tool-detection.md
@@ -85,7 +85,7 @@ _SIGNALS = [
      "gemini"),
 ]
 
-_DEFAULT_TOOL = "claude"
+_DEFAULT_TOOL = "UNKNOWN"
 
 
 def detect_tool(env=None, file_path=None):

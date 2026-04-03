@@ -44,8 +44,12 @@ Usage:
 python3 "{skill-dir}/<script>" [args]
 ```
 
-Print stdout verbatim. If the script exits non-zero, print stderr verbatim
-and stop. Do not improvise, retry, or interpret the output — just print it.
+**Run the script immediately.** Do not read the script source, do not run
+`--help`, do not list directories, do not verify the catalog path exists before
+running. The dispatch table above provides everything needed — any pre-flight
+calls are wasted round-trips. Print stdout verbatim. If the script exits
+non-zero, print stderr verbatim and stop. Do not improvise, retry, or interpret
+the output.
 
 ## Execution — install
 
@@ -91,7 +95,7 @@ If `signals` is empty:
 ```
 ## Active tool: {tool}
 
-No signals fired — defaulted to claude.
+No signals fired — tool is unknown.
 ```
 
 ## Error handling
