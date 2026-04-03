@@ -2,19 +2,14 @@
 # coding-aegis skill test — Google Gemini CLI
 # Usage: tests/test-gemini-skill-install.sh
 #
-# Follows the user journey per docs/test/testing-spec.md:
-#   T0   Prerequisites (installed + authenticated)
-#   T1   Register marketplace (N/A for Gemini — skipped)
-#   T2   Install coding-aegis skill (gemini skills link)
-#   T3   Use skill: detect-tool
-#   T4   Use skill: list packages
-#   T5   Use skill: show helloworld
-#   T6   Use skill: install helloworld
-#   T7   Verify installed files
-#   T8   Invoke installed helloworld skill
-#   T9   Teardown: uninstall helloworld
-#   T10  Teardown: uninstall coding-aegis skill
-#   T11  Teardown: remove test directory
+# Follows the 7-phase test plan per docs/test/testing-spec.md and docs/test/test-gemini.md:
+#   Phase 1  Environment & Tool Validation
+#   Phase 2  Marketplace / Registry Setup (N/A — Gemini uses skills link directly)
+#   Phase 3  Install coding-aegis Skill (gemini skills link)
+#   Phase 4  Validate coding-aegis Skill
+#   Phase 5  Install & Verify helloworld Package
+#   Phase 6  Uninstall helloworld Package
+#   Phase 7  Full Cleanup
 #
 # Note: Gemini CLI on Homebrew emits keytar/keychain warnings.
 # We filter them via gemini_quiet wrapper.
@@ -32,7 +27,7 @@ gemini_quiet() {
 }
 
 cleanup() {
-  section "T9: Teardown — uninstall helloworld"
+  section "Phase 6: Uninstall helloworld Package"
   # Skip agent-mediated uninstall if quota is exhausted — fall back to manual
   # cleanup so teardown doesn't hang.
   CLI_PROMPT="/coding-aegis uninstall helloworld"
@@ -44,12 +39,13 @@ cleanup() {
     rm -rf "$TEST_DIR/.claude/skills/helloworld"
   fi
 
-  section "T10: Teardown — uninstall coding-aegis skill"
-  timeout "$TIMEOUT" gemini_quiet skills uninstall coding-aegis --scope workspace || true
+  section "Phase 7: Full Cleanup"
+  test_header "uninstall coding-aegis skill"
+  run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope workspace || true
   run_cli "skills list" gemini_quiet skills list || true
   assert_not_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis no longer in skills list"
 
-  section "T11: Teardown — remove test directory"
+  test_header "remove test directory"
   rm -rf "$TEST_DIR"
   assert_dir_not_exists "$TEST_DIR" "test directory removed"
 
@@ -64,8 +60,8 @@ echo "  Repo root: $REPO_ROOT"
 echo "  Test dir:  $TEST_DIR"
 echo "  Timeout:   ${TIMEOUT}s"
 
-# ── T0: Prerequisites ────────────────────────────────────────
-section "T0: Prerequisites"
+# ── Phase 1: Environment & Tool Validation ───────────────────
+section "Phase 1: Environment & Tool Validation"
 
 test_header "gemini installed"
 if command -v gemini &>/dev/null; then
@@ -81,12 +77,12 @@ run_cli "auth check" gemini_quiet -o text
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "AUTH_OK" "gemini authenticated"
 
-# ── T1: Register marketplace (N/A for Gemini) ────────────────
+# ── Phase 2: Marketplace / Registry Setup ────────────────────
 # Gemini uses `skills link` directly — no separate marketplace registration.
-# Skipping to T2 per testing-spec.md.
+# Skipping to Phase 3 per testing-spec.md.
 
-# ── T2: Install coding-aegis skill ───────────────────────────
-section "T2: Install coding-aegis skill"
+# ── Phase 3: Install coding-aegis Skill ──────────────────────
+section "Phase 3: Install coding-aegis Skill"
 
 test_header "gemini skills link"
 run_cli "skills link" gemini_quiet skills link "$SKILL_DIR" --scope workspace --consent
@@ -96,31 +92,31 @@ test_header "skill visible in list"
 run_cli "skills list" gemini_quiet skills list
 assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in skills list"
 
+test_header "detect_tool.py present"
+assert_file_exists "$SKILL_DIR/detect_tool.py" "detect_tool.py present at linked skill path"
+
 # Set up test directory with catalog
 git -C "$TEST_DIR" init -q
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
 
-# ── T3: Use skill — detect-tool ──────────────────────────────
-section "T3: Use skill — detect-tool"
+# ── Phase 4: Validate coding-aegis Skill ─────────────────────
+section "Phase 4: Validate coding-aegis Skill"
 
-test_header "coding-aegis detect-tool"
+# Gemini detection requires agent-mediated invocation so GEMINI_CLI=1 is set.
+# Direct bash would not fire the env: signal since the skill path has no
+# tool-specific segment (.claude/, .codex/).
+test_header "coding-aegis detect-tool (skill command)"
 CLI_PROMPT="/coding-aegis detect-tool"
 RUN_DIR="$TEST_DIR" run_cli "skill detect-tool" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "gemini" "detect-tool — tool name reported"
 assert_contains "$LAST_OUTPUT" "env:\|path:" "detect-tool — at least one signal reported"
 
-# ── T4: Use skill — list ─────────────────────────────────────
-section "T4: Use skill — list packages"
-
 test_header "coding-aegis list"
 CLI_PROMPT="/coding-aegis list"
 RUN_DIR="$TEST_DIR" run_cli "skill list" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
-
-# ── T5: Use skill — show ─────────────────────────────────────
-section "T5: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 CLI_PROMPT="/coding-aegis show helloworld"
@@ -130,8 +126,8 @@ assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
 assert_contains "$LAST_OUTPUT" "1.0.0" "show — version present"
 
-# ── T6: Use skill — install ──────────────────────────────────
-section "T6: Use skill — install helloworld"
+# ── Phase 5: Install & Verify helloworld Package ─────────────
+section "Phase 5: Install & Verify helloworld Package"
 
 test_header "coding-aegis install helloworld"
 # Scope specified in prompt — the skill's interactive scope picker cannot
@@ -141,9 +137,6 @@ CLI_TIMEOUT="$TIMEOUT_LONG"
 RUN_DIR="$TEST_DIR" run_cli "skill install" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
-
-# ── T7: Verify installed files ────────────────────────────────
-section "T7: Verify installed files"
 
 SCOPE_DIR="$TEST_DIR/.claude"
 RULE_FILE="$SCOPE_DIR/rules/aegis--helloworld--helloworld.md"
@@ -159,13 +152,10 @@ assert_file_contains "$RULE_FILE" "tier: optional" "frontmatter: tier"
 test_header "skill file exists"
 assert_file_exists "$SCOPE_DIR/skills/helloworld/SKILL.md" "skill file: helloworld/SKILL.md"
 
-# ── T8: Invoke installed helloworld skill ─────────────────────
-section "T8: Invoke helloworld skill"
-
 test_header "helloworld responds"
 CLI_PROMPT="/helloworld"
 RUN_DIR="$TEST_DIR" run_cli "invoke helloworld" gemini_quiet -o text --yolo
 assert_no_quota_error "$LAST_OUTPUT" "Gemini"
 assert_contains "$LAST_OUTPUT" "Hello, World" "helloworld skill responded"
 
-# T9–T11 teardown happens in cleanup trap
+# Phase 6 & 7 teardown happens in cleanup trap

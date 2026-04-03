@@ -4,11 +4,11 @@
 
 ## Install Mechanisms
 
-### T1 — Register Marketplace
+### Phase 2 — Marketplace / Registry Setup
 
-Gemini has no separate marketplace registration step. Skip T1 and proceed directly to T2.
+Gemini has no separate marketplace registration step. Skip Phase 2 and proceed directly to Phase 3.
 
-### T2 — Install Skill
+### Phase 3 — Install coding-aegis Skill
 
 ```bash
 gemini_quiet skills link "$SKILL_DIR" --scope workspace --consent
@@ -18,7 +18,7 @@ Where `$SKILL_DIR` is the local path to `pkgs/bootstrap/coding-aegis/skills/codi
 
 Assert: output contains `link\|success\|install`; `gemini skills list` shows `coding-aegis`.
 
-After T2, copy the `pkgs/` catalog into `$TEST_DIR`:
+After Phase 3, copy the `pkgs/` catalog into `$TEST_DIR`:
 
 ```bash
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
@@ -28,7 +28,7 @@ Also requires `git init` in `$TEST_DIR` (Gemini requires a git repo in the worki
 
 ## CLI Invocation Flags
 
-**Agent-mediated calls** (T2b–T7.1):
+**Agent-mediated calls** (phases 4–6):
 
 ```bash
 gemini_quiet -o text --yolo
@@ -57,27 +57,28 @@ run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope wo
 
 All agent-mediated steps must call `assert_no_quota_error "$LAST_OUTPUT" "Gemini"` immediately after `run_cli`. If a quota error is detected, the harness fails and aborts — do not attempt to continue.
 
-T7.1 (uninstall helloworld) includes a quota fallback: if the agent call returns a quota error, fall back to manual file removal so teardown can complete cleanly.
+Phase 6.1 (uninstall helloworld) includes a quota fallback: if the agent call returns a quota error, fall back to manual file removal so teardown can complete cleanly.
 
-## Prompts (T2b–T7.1)
+## Prompts (phases 4–6)
 
-| Step | Prompt |
-|------|--------|
-| T2b detect-tool (agent) | `/coding-aegis detect-tool` |
-| T2c detect-tool (skill) | `/coding-aegis detect-tool` |
-| T3 list | `/coding-aegis list` |
-| T4 show | `/coding-aegis show helloworld` |
-| T5 install | `/coding-aegis install helloworld to Project scope` |
-| T6b invoke | `/helloworld` |
-| T7.1 uninstall | `/coding-aegis uninstall helloworld` |
+| Phase | Step | Prompt |
+|-------|------|--------|
+| 4.2 | detect-tool skill command | `/coding-aegis detect-tool` |
+| 4.3 | list | `/coding-aegis list` |
+| 4.4 | show | `/coding-aegis show helloworld` |
+| 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope` |
+| 5.5 | invoke helloworld | `/helloworld` |
+| 6.1 | uninstall helloworld | `/coding-aegis uninstall helloworld` |
 
-## Tool Detection (T2b)
+## Tool Detection (Phase 4.2)
 
 Gemini links skills from local paths with no tool-specific directory segment. The `path:.claude` / `path:.codex` signals do not fire. Detection requires an agent-mediated invocation so the `GEMINI_CLI=1` env var is present.
 
 - **Method**: agent-mediated — `/coding-aegis detect-tool` (or direct bash with env var set)
 - **Expected `tool`**: `gemini`
 - **Expected signal**: `env:GEMINI_CLI=1`
+
+Note: Phase 3.3 (`detect_tool.py` present) is verified against the linked `$SKILL_DIR` path directly, since the skill is not copied to a tool-specific install directory.
 
 ## Installed Paths
 
@@ -91,9 +92,9 @@ Gemini uses the same install paths as Claude Code (`.claude/` for project scope)
 
 ## Teardown
 
-| Step | Command | Assertion |
-|------|---------|-----------|
-| T7.1 Uninstall helloworld | `/coding-aegis uninstall helloworld` via agent | no `not installed\|error`; quota fallback removes files manually if needed |
-| T7.2 Uninstall coding-aegis skill | `gemini_quiet skills uninstall coding-aegis --scope workspace` | `gemini skills list` no longer shows `coding-aegis` |
-| T7.3 Remove marketplace | N/A — no separate marketplace | — |
-| T7.4 Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |
+| Phase | Step | Command | Assertion |
+|-------|------|---------|-----------|
+| 6.1 | Uninstall helloworld | `/coding-aegis uninstall helloworld` via agent | no `not installed\|error`; quota fallback removes files manually if needed |
+| 7.1 | Uninstall coding-aegis skill | `gemini_quiet skills uninstall coding-aegis --scope workspace` | `gemini skills list` no longer shows `coding-aegis` |
+| 7.3 | Remove marketplace | N/A — no separate marketplace | — |
+| 7.5 | Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |

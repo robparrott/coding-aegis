@@ -4,16 +4,14 @@ Auto-generated from `bd graph --all --compact`.
 
 ```
 
-📊 Dependency graph for coding-aegis-b5z (35 issues, 5 layers)
+📊 Dependency graph for coding-aegis-b5z (33 issues, 5 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
   │   ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
-  │   ├── ○ coding-aegis-b5z.35 ● P1 Align Gemini test script with user journey contra…
   │   ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
-  │   ├── ○ coding-aegis-b5z.41 ● P1 Fix Codex test: align user journey and scope with…
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   │   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
@@ -22,10 +20,8 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
-  ├── ○ coding-aegis-b5z.35 ● P1 Align Gemini test script with user journey contra…
   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
   ├── ○ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
-  ├── ○ coding-aegis-b5z.41 ● P1 Fix Codex test: align user journey and scope with…
   ├── ○ coding-aegis-b5z.42 ● P2 Add local install fallback for Claude test: insta…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
 
@@ -177,12 +173,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-d07 (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-d07 ● P2 Align test scripts and tool detail files with can…
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -201,15 +197,6 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -261,9 +248,7 @@ Auto-generated from `bd graph --all --compact`.
 
 - [`coding-aegis-b5z`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.34`](phase-2-coding-aegis-skill-claude.md)
-- [`coding-aegis-b5z.35`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.37`](phase-2-coding-aegis-skill-claude.md)
-- [`coding-aegis-b5z.41`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.10`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.11`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.36`](phase-2-coding-aegis-skill-claude.md)
@@ -322,10 +307,9 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-d07`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
-- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

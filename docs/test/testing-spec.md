@@ -32,7 +32,9 @@ This is the flow every test script validates, in order:
 7. **Verify** the installed files exist with correct naming and frontmatter
 8. **Teardown** — remove helloworld, uninstall coding-aegis, remove marketplace, at each step validating that the uninstall was clean. Only then clean up
 
-The skill is the product. Every agent-mediated test goes through it.
+The skill is the product. Every agent-mediated test goes through it. 
+
+Almost every task initiated by the skill should complete in less than 10 seconds. Beyond that the user experience is a problem. The time for completion is part of the success criteria ... steps that take a long time are not a success, even if completed.
 
 ### Principle: exercise the real user journey
 
@@ -85,9 +87,13 @@ Similarly, phases 4–5 prompts should reference the skill by name ("Use the cod
 
 **Phase 7 — teardown ordering**: Run all assertions (7.2, 7.4, 7.6) before the corresponding removal steps. Never remove the test directory before asserting that earlier cleanup steps succeeded — a failing assertion inside a deleted directory produces no output.
 
-## CLI Invocation Standard
+## Testing Mechanics
 
 All test scripts use `lib-test-harness.sh`. These rules are non-negotiable.
+
+### Timing
+
+Any test step that takes over 10 seconds should be regarded as a bug. Do not increase the test step timeout beyond 15 seconds to work around issues, since that very likely means the agent is not well guided and flailing.
 
 ### Prompts are ALWAYS delivered via stdin
 
@@ -108,7 +114,7 @@ run_cli "marketplace add" claude plugin marketplace add "$REPO_ROOT"
 
 For tool-specific flags, sandbox modes, and invocation patterns see each tool's detail file.
 
-## Test Harness (`tests/lib-test-harness.sh`)
+### Test Harness (`tests/lib-test-harness.sh`)
 
 All scripts source this. No script implements its own pass/fail, CLI wrappers, or output formatting.
 
@@ -140,7 +146,7 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 | `LAST_OUTPUT` | — | Captured output |
 | `LAST_EXIT` | — | Exit code |
 
-## Test Package
+### Test Package
 
 `helloworld` from `pkgs/optional/helloworld/`:
 - 1 rule + 1 skill (both artifact types)
@@ -148,7 +154,7 @@ All scripts source this. No script implements its own pass/fail, CLI wrappers, o
 - No side effects
 - Predictable content for assertions
 
-## Test Scripts
+### Test Scripts
 
 | Tool | Script |
 |------|--------|

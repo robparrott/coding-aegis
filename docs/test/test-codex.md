@@ -27,7 +27,7 @@ export AEGIS_TEST_TIMEOUT_LONG=60
 
 ## Install Mechanisms
 
-### T1 — Register Marketplace
+### Phase 2 — Marketplace / Registry Setup
 
 Codex discovers plugin manifests from `.codex-plugin/plugin.json` relative to the working directory. The test must fetch this from the remote GitHub repo (not the local working copy) into `$TEST_DIR/.codex-plugin/` so the user journey — starting from a fresh directory — is faithfully exercised.
 
@@ -35,7 +35,7 @@ Assert: `$TEST_DIR/.codex-plugin/plugin.json` exists and contains `"name": "codi
 
 Tracked in coding-aegis-gua (fetch manifest from remote in test setup).
 
-### T2 — Install Skill
+### Phase 3 — Install coding-aegis Skill
 
 Agent-mediated via `$skill-installer` with `danger-full-access` sandbox (needs GitHub network access):
 
@@ -45,7 +45,7 @@ $skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/co
 
 Assert: output contains `install\|success\|done\|copied\|coding-aegis`; SKILL.md and aegis-catalog.py present in `~/.codex/skills/coding-aegis/`.
 
-After T2, copy the `pkgs/` catalog into `$TEST_DIR`:
+After Phase 3, copy the `pkgs/` catalog into `$TEST_DIR`:
 
 ```bash
 cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
@@ -63,28 +63,28 @@ codex exec --ephemeral -s <sandbox> -o /dev/stdout
 
 | Sandbox | When to use |
 |---------|-------------|
-| `read-only` | T2b, T2c, T3, T4, T6b |
-| `workspace-write` | T5 (install helloworld), T7.1 (uninstall helloworld) |
-| `danger-full-access` | T2 ($skill-installer needs GitHub network access) |
+| `read-only` | Phases 4.1–4.4, 5.5 |
+| `workspace-write` | Phase 5.1 (install helloworld), Phase 6.1 (uninstall helloworld) |
+| `danger-full-access` | Phase 3 ($skill-installer needs GitHub network access) |
 
 - `--ephemeral` — no session persistence
 - `-o /dev/stdout` — captures output (required; default output goes elsewhere)
 
-## Prompts (T2b–T7.1)
+## Prompts (phases 4–6)
 
-| Step | Prompt |
-|------|--------|
-| T2b detect-tool (direct bash) | `python3 ~/.codex/skills/coding-aegis/detect_tool.py` |
-| T2c detect-tool (skill) | `$coding-aegis detect-tool` |
-| T3 list | `$coding-aegis list` |
-| T4 show | `$coding-aegis show helloworld` |
-| T5 install | `$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` |
-| T6b invoke | `$helloworld` |
-| T7.1 uninstall | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` |
+| Phase | Step | Prompt |
+|-------|------|--------|
+| 4.1 | tool detection (direct bash) | `python3 ~/.codex/skills/coding-aegis/detect_tool.py` |
+| 4.2 | detect-tool skill command | `$coding-aegis detect-tool` |
+| 4.3 | list | `$coding-aegis list` |
+| 4.4 | show | `$coding-aegis show helloworld` |
+| 5.1 | install helloworld | `$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` |
+| 5.5 | invoke helloworld | `$helloworld` |
+| 6.1 | uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` |
 
-Pass `--catalog $TEST_DIR/pkgs` in T5 and T7.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `pkgs/` tree instead of dispatching to the installed skill.
+Pass `--catalog $TEST_DIR/pkgs` in phases 5.1 and 6.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `pkgs/` tree instead of dispatching to the installed skill.
 
-## Tool Detection (T2b)
+## Tool Detection (Phase 3.3 / 4.1)
 
 - **Method**: direct bash — `python3 ~/.codex/skills/coding-aegis/detect_tool.py`
 - **Expected `tool`**: `codex`
@@ -100,9 +100,9 @@ Pass `--catalog $TEST_DIR/pkgs` in T5 and T7.1 to prevent the agent from scannin
 
 ## Teardown
 
-| Step | Command | Assertion |
-|------|---------|-----------|
-| T7.1 Uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` via agent (workspace-write) | no `not installed\|error` in output; `$TEST_DIR/.agents/skills/helloworld` absent |
-| T7.2 Uninstall coding-aegis skill | `rm -rf ~/.codex/skills/coding-aegis` | `assert_dir_not_exists ~/.codex/skills/coding-aegis` |
-| T7.3 Remove marketplace | `rm -rf "$TEST_DIR/.codex-plugin"` | `assert_dir_not_exists $TEST_DIR/.codex-plugin` |
-| T7.4 Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |
+| Phase | Step | Command | Assertion |
+|-------|------|---------|-----------|
+| 6.1 | Uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` via agent (workspace-write) | no `not installed\|error` in output; `$TEST_DIR/.agents/skills/helloworld` absent |
+| 7.1 | Uninstall coding-aegis skill | `rm -rf ~/.codex/skills/coding-aegis` | `assert_dir_not_exists ~/.codex/skills/coding-aegis` |
+| 7.3 | Remove marketplace | `rm -rf "$TEST_DIR/.codex-plugin"` | `assert_dir_not_exists $TEST_DIR/.codex-plugin` |
+| 7.5 | Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |
