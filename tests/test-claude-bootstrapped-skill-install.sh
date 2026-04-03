@@ -39,7 +39,7 @@ cleanup() {
   assert_not_contains "$LAST_OUTPUT" "not installed\|not found\|error" "uninstall — no errors"
 
   section "T10: Teardown — uninstall coding-aegis plugin"
-  run_cli "uninstall plugin" claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user || true
+  RUN_DIR="$TEST_DIR" run_cli "uninstall plugin" claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope project || true
 
   section "T11: Teardown — remove marketplace"
   run_cli "remove marketplace" claude plugin marketplace remove "$MARKETPLACE_NAME" || true
@@ -77,10 +77,6 @@ assert_contains "$LAST_OUTPUT" "AUTH_OK" "claude authenticated"
 # ── T1: Register Marketplace ─────────────────────────────────
 section "T1: Register marketplace"
 
-# Clean stale registrations
-claude plugin uninstall "coding-aegis@${MARKETPLACE_NAME}" --scope user 2>/dev/null || true
-claude plugin marketplace remove "$MARKETPLACE_NAME" 2>/dev/null || true
-
 test_header "marketplace add (local)"
 run_cli "marketplace add" claude plugin marketplace add "$REPO_ROOT"
 assert_contains "$LAST_OUTPUT" "added\|success" "marketplace add"
@@ -95,11 +91,11 @@ assert_contains "$LAST_OUTPUT" "$MARKETPLACE_NAME" "marketplace in list"
 section "T2: Install coding-aegis plugin"
 
 test_header "plugin install"
-run_cli "plugin install" claude plugin install "coding-aegis@${MARKETPLACE_NAME}" --scope user
+RUN_DIR="$TEST_DIR" run_cli "plugin install" claude plugin install "coding-aegis@${MARKETPLACE_NAME}" --scope project
 assert_contains "$LAST_OUTPUT" "install" "plugin install"
 
 test_header "plugin visible in list"
-run_cli "plugin list" claude plugin list
+RUN_DIR="$TEST_DIR" run_cli "plugin list" claude plugin list
 assert_contains "$LAST_OUTPUT" "coding-aegis" "coding-aegis in plugin list"
 
 # Set up test directory with catalog

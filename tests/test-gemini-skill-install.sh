@@ -45,7 +45,7 @@ cleanup() {
   fi
 
   section "T10: Teardown — uninstall coding-aegis skill"
-  gemini_quiet skills uninstall coding-aegis --scope user > /dev/null 2>&1 || true
+  timeout "$TIMEOUT" gemini skills uninstall coding-aegis --scope workspace > /dev/null 2>&1 || true
 
   section "T11: Teardown — remove test directory"
   rm -rf "$TEST_DIR"
@@ -85,11 +85,8 @@ assert_contains "$LAST_OUTPUT" "AUTH_OK" "gemini authenticated"
 # ── T2: Install coding-aegis skill ───────────────────────────
 section "T2: Install coding-aegis skill"
 
-# Clean stale registration
-gemini_quiet skills uninstall coding-aegis --scope user > /dev/null || true
-
 test_header "gemini skills link"
-run_cli "skills link" gemini_quiet skills link "$SKILL_DIR" --scope user --consent
+run_cli "skills link" gemini_quiet skills link "$SKILL_DIR" --scope workspace --consent
 assert_contains "$LAST_OUTPUT" "link\|success\|install" "skill linked"
 
 test_header "skill visible in list"

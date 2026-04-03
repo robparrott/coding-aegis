@@ -45,6 +45,10 @@ This repository is a **package catalog and authoring environment**. AGENTS.md go
 
 When packages from this catalog are installed into a **target repository**, the coding-aegis skill generates tool-specific configs there at runtime. See [AD-9](docs/architecture/AD-9-agents-md-source-of-truth.md) for the rendering strategy and [AD-10](docs/architecture/AD-10-modular-guidance-files.md) for how installed rules are composed.
 
+## Testing Rules
+
+When modifying or running tests, reference [docs/test/testing-spec.md](docs/test/testing-spec.md).
+
 ## Package Authoring Rules
 
 When authoring or modifying packages under `pkgs/`, follow the [Package Format Specification](docs/architecture/package-format.md).

@@ -163,7 +163,12 @@ Install a package's artifacts into the target project or user configuration.
 
 ### Step 1 — Choose scope
 
-Ask the user where to install using AskUserQuestion:
+First check whether the user's input already specifies a scope:
+
+- If the input contains "project scope" or "to project" (case-insensitive) → use `--scope project`, skip the picker
+- If the input contains "user scope" or "to user" (case-insensitive) → use `--scope user`, skip the picker
+
+If no scope is specified in the input, ask using AskUserQuestion:
 
 ```
 Where should this package be installed?

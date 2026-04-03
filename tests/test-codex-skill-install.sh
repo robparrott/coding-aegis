@@ -89,17 +89,14 @@ assert_file_exists "$PLUGIN_DIR/plugin.json" ".codex-plugin/plugin.json present"
 assert_file_contains "$PLUGIN_DIR/plugin.json" '"name": "coding-aegis"' "manifest: name"
 assert_file_contains "$PLUGIN_DIR/plugin.json" '"skills"' "manifest: skills path"
 
-# ── T2: Install coding-aegis skill via $skill-installer ──────
+# ── T2: Install coding-aegis skill ───────────────────────────
 section "T2: Install coding-aegis skill"
-
-# Clean stale installation
-rm -rf "$CODEX_SKILL_DIR"
 
 test_header "install via \$skill-installer"
 CLI_PROMPT="\$skill-installer install --repo ${GITHUB_REPO} --path ${SKILL_PATH}"
 CLI_TIMEOUT="$TIMEOUT_LONG"
-RUN_DIR="$TEST_DIR" run_cli "skill install" codex exec --ephemeral -s danger-full-access -o /dev/stdout
-assert_contains "$LAST_OUTPUT" "install\|coding-aegis\|skill" "skill-installer ran"
+RUN_DIR="$TEST_DIR" run_cli "skill-installer" codex exec --ephemeral -s danger-full-access -o /dev/stdout
+assert_contains "$LAST_OUTPUT" "install\|success\|done\|copied\|coding-aegis" "skill-installer — activity reported"
 
 test_header "skill installed to ~/.codex/skills/"
 assert_file_exists "$CODEX_SKILL_DIR/SKILL.md" "SKILL.md installed"

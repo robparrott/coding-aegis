@@ -302,6 +302,23 @@ Remove artifacts in reverse install order: target package first, then the coding
 | Harness | `tests/lib-test-harness.sh` |
 | Unit | `tests/test_aegis_catalog.py` |
 
+**All scripts must be run before closing any task.** Do not limit testing to scripts directly touched by a change — a regression anywhere in the suite is a failure. If a script cannot be run (e.g. tool not installed), note it explicitly and get user agreement before closing.
+
+### Codex: two-phase testing requirement
+
+The Codex `$skill-installer` only supports GitHub sources — it cannot install from local filesystem paths. This means the Codex test script (`test-codex-skill-install.sh`) cannot validate uncommitted local changes directly. Testing Codex changes requires two phases:
+
+1. **Push to GitHub** — commit and push all skill changes to the remote repository.
+2. **Run the Codex test** — the test then installs from GitHub, reflecting the pushed changes.
+
+Do not run the Codex test against a local working copy. If changes have not been pushed, note that the Codex test is blocked and get user agreement before closing the task.
+
+### The user journey contract is inviolable
+
+**NEVER substitute a direct file copy, manual script execution, or any other shortcut for the tool's proper install mechanism.** A test that bypasses the install mechanism does not validate the user journey — it validates nothing useful and creates false confidence. Worse, it hides real failures that will surface in production.
+
+If a tool's install mechanism cannot be exercised (e.g. network unavailable, tool not installed), the correct action is to **skip the test and note it explicitly** — not to substitute a workaround. A skipped test with a clear explanation is always preferable to a test that breaks the user journey contract. A test that does not follow the real install path is worse than no test at all.
+
 ## Coverage Matrix
 
 | Test | Claude | Codex | Gemini | Cursor |
