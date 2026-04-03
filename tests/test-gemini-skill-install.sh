@@ -15,15 +15,22 @@
 # We filter them via gemini_quiet wrapper.
 set -euo pipefail
 
+# Unset Claude Code env vars so they don't leak into Gemini subprocesses when
+# this test is run from within Claude Code's Bash tool.
+unset CLAUDECODE CLAUDE_CODE_ENTRYPOINT 2>/dev/null || true
+
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$(dirname "$0")/lib-test-harness.sh"
 
 SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 TEST_DIR="$(mktemp -d)"
 
-# Filter noisy keytar warnings from gemini commands
+# Model to use for all agent invocations — flash keeps latency low and avoids quota burn
+GEMINI_MODEL="gemini-2.5-flash"
+
+# Filter noisy keytar warnings from gemini commands; pin model via -m
 gemini_quiet() {
-  gemini "$@" 2>&1 | grep -v -E "Keychain initialization|keytar\.node|keytar\.js|FileKeychain fallback|Loaded cached credentials\.|^Require stack:"
+  gemini -m "$GEMINI_MODEL" "$@" 2>&1 | grep -v -E "Keychain initialization|keytar\.node|keytar\.js|FileKeychain fallback|Loaded cached credentials\.|^Require stack:"
 }
 
 cleanup() {

@@ -1,5 +1,6 @@
 # Standalone Issues
 
+- [~] `coding-aegis-rkq` [task] Fix Gemini test script to pass all 7 phases
 - [x] `coding-aegis-znk` [task] Fix show command: agent wraps output in code block instead of printing verbatim
 - [ ] `coding-aegis-7b7` [bug] Fix Codex uninstall: rm -rf blocked by workspace-write sandbox
 - [x] `coding-aegis-bc3` [task] Make coding-aegis uninstall lightning fast (currently ~16s)
