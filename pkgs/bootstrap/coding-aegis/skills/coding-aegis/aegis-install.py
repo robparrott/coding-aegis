@@ -29,7 +29,7 @@ def main():
                         help="Install scope (default: project)")
     parser.add_argument("--catalog", help="Path to pkgs/ directory (skips git clone)")
     parser.add_argument("--tool", default=None,
-                        choices=["claude", "codex", "cursor", "windsurf", "copilot"],
+                        choices=["claude", "codex", "cursor", "gemini", "windsurf", "copilot", "opencode"],
                         help="Override auto-detected tool")
     args = parser.parse_args()
 
@@ -72,8 +72,8 @@ def main():
         if a_type in ("rule", "agent"):
             rule_stem = Path(a_path).stem
 
-            if tool == "codex":
-                # Codex: deliver rules as aegis:begin/end sections in AGENTS.md
+            if tool in ("codex", "opencode"):
+                # Codex + OpenCode: deliver rules as aegis:begin/end sections in AGENTS.md
                 _, body = parse_frontmatter(source_text)
                 begin = (
                     f"<!-- aegis:begin package={name} rule={rule_stem}"
@@ -133,6 +133,7 @@ def main():
             written.append({"type": a_type, "install_path": str(install_path)})
 
     # Claude + project scope: rebuild governance table in AGENTS.md
+    # (Codex and OpenCode use aegis:begin/end sections instead)
     agents_md_updated = False
     if tool == "claude" and args.scope == "project":
         amd = Path.cwd() / "AGENTS.md"

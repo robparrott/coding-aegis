@@ -11,7 +11,7 @@ Usage (standalone):
 Usage (import):
     from detect_tool import detect_tool
     result = detect_tool()
-    tool = result["tool"]   # "claude" | "codex" | "cursor" | "gemini" | "windsurf" | "copilot" | "UNKNOWN"
+    tool = result["tool"]   # "claude" | "codex" | "cursor" | "gemini" | "opencode" | "windsurf" | "copilot" | "UNKNOWN"
 
 Validation status of each signal is documented in:
     docs/architecture/spec-tool-detection.md
@@ -52,6 +52,16 @@ _SIGNALS = [
      lambda env, fp: env.get("CURSOR_AGENT") == "1",
      "cursor"),
 
+    # OpenCode: OPENCODE=1 set in every subprocess during opencode run (confirmed empirically)
+    ("env:OPENCODE=1",
+     lambda env, fp: env.get("OPENCODE") == "1",
+     "opencode"),
+
+    # OpenCode: OPENCODE_PID set to the server PID (secondary, same session scope)
+    ("env:OPENCODE_PID",
+     lambda env, fp: "OPENCODE_PID" in env,
+     "opencode"),
+
     # --- Script path signals (__file__, fallback when env vars absent) ---
     # Codex user-global install: ~/.codex/skills/<name>/
     ("path:.codex",
@@ -83,6 +93,11 @@ _SIGNALS = [
     ("path:.gemini",
      lambda env, fp: ".gemini" in fp.parts,
      "gemini"),
+
+    # OpenCode install path: ~/.config/opencode/skills/<name>/ or .opencode/skills/<name>/
+    ("path:.opencode",
+     lambda env, fp: ".opencode" in fp.parts,
+     "opencode"),
 ]
 
 _DEFAULT_TOOL = "UNKNOWN"

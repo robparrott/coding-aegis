@@ -4,14 +4,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ```
 
-📊 Dependency graph for coding-aegis-b5z (33 issues, 5 layers)
+📊 Dependency graph for coding-aegis-b5z (31 issues, 5 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-b5z ● P2 Phase 2: coding-aegis Skill (Claude Code)
-  │   ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
-  │   ├── ◐ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
   │   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   │   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
   │   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
@@ -19,9 +17,7 @@ Auto-generated from `bd graph --all --compact`.
   │   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
   ├── ○ coding-aegis-b5z.10 ● P2 Add Gemini remote skill install test (git URL)
   ├── ○ coding-aegis-b5z.11 ● P2 Update install/testing docs for Claude, Codex, an…
-  ├── ◐ coding-aegis-b5z.34 ● P1 Fix Codex test: helloworld skill installs to .cla…
   ├── ○ coding-aegis-b5z.36 ● P2 Support local git repo install in Codex test T2
-  ├── ◐ coding-aegis-b5z.37 ● P1 Fix uninstall command for Codex: scan .agents/ski…
   ├── ○ coding-aegis-b5z.42 ● P2 Add local install fallback for Claude test: insta…
   └── ○ coding-aegis-b5z.5 ● P2 Add install-required command to coding-aegis skill
 
@@ -117,39 +113,20 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-97z (6 issues, 1 layers)
+📊 Dependency graph for coding-aegis-97z (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-97z ● P1 pytest integration framework for coding-aegis e2e…
-  │   ├── ○ coding-aegis-97z.4 ● P1 pytest Codex: port TestCodexJourney, all 7 phases
   │   ├── ○ coding-aegis-97z.5 ● P2 pytest Gemini: port TestGeminiJourney, handle quo…
   │   ├── ○ coding-aegis-97z.7 ● P2 pytest CI: add GitHub Actions job, JUnit XML outp…
   │   ├── ○ coding-aegis-97z.8 ● P2 Add requirements-dev.txt with pytest, pytest-html
   │   └── ○ coding-aegis-97z.6 ● P3 pytest Cursor: implement TestCursorJourney when C…
-  ├── ○ coding-aegis-97z.4 ● P1 pytest Codex: port TestCodexJourney, all 7 phases
   ├── ○ coding-aegis-97z.5 ● P2 pytest Gemini: port TestGeminiJourney, handle quo…
   ├── ○ coding-aegis-97z.6 ● P3 pytest Cursor: implement TestCursorJourney when C…
   ├── ○ coding-aegis-97z.7 ● P2 pytest CI: add GitHub Actions job, JUnit XML outp…
   └── ○ coding-aegis-97z.8 ● P2 Add requirements-dev.txt with pytest, pytest-html
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-rkq.8 (5 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ◐ coding-aegis-rkq ● P1 Fix Gemini test script to pass all 7 phases
-  │   ├── ○ coding-aegis-rkq.6 ● P1 Gemini test Phase 5: install helloworld, verify f…
-  │   ├── ○ coding-aegis-rkq.7 ● P1 Gemini test Phase 5b: helloworld skill responds w…
-  │   ├── ○ coding-aegis-rkq.8 ● P1 Gemini test Phase 6: uninstall helloworld, no err…
-  │   └── ○ coding-aegis-rkq.9 ● P1 Gemini test Phase 7: full cleanup, skill uninstal…
-  ├── ○ coding-aegis-rkq.6 ● P1 Gemini test Phase 5: install helloworld, verify f…
-  ├── ○ coding-aegis-rkq.7 ● P1 Gemini test Phase 5b: helloworld skill responds w…
-  ├── ○ coding-aegis-rkq.8 ● P1 Gemini test Phase 6: uninstall helloworld, no err…
-  └── ○ coding-aegis-rkq.9 ● P1 Gemini test Phase 7: full cleanup, skill uninstal…
 
 ────────────────────────────────────────────────────────────
 
@@ -170,6 +147,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-yjy (4 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-yjy ● P1 Add OpenCode support
+  │   ├── ○ coding-aegis-yjy.4 ● P1 OpenCode bootstrap: install coding-aegis skill to…
+  │   ├── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
+  │   └── ○ coding-aegis-yjy.6 ● P2 Document OpenCode support: docs/test/test-opencod…
+  ├── ○ coding-aegis-yjy.4 ● P1 OpenCode bootstrap: install coding-aegis skill to…
+  ├── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
+  └── ○ coding-aegis-yjy.6 ● P2 Document OpenCode support: docs/test/test-opencod…
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-wpi (4 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -185,16 +177,16 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
+📊 Dependency graph for coding-aegis-rkq.8 (3 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
-
-  LAYER 1
-  ├── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
-  └── ○ coding-aegis-pnv ● P2 Research Windsurf and Copilot tool detection sign…
+  ├── ◐ coding-aegis-rkq ● P1 Fix Gemini test script to pass all 7 phases
+  │   ├── ○ coding-aegis-rkq.8 ● P1 Gemini test Phase 6: uninstall helloworld, no err…
+  │   └── ○ coding-aegis-rkq.9 ● P1 Gemini test Phase 7: full cleanup, skill uninstal…
+  ├── ○ coding-aegis-rkq.8 ● P1 Gemini test Phase 6: uninstall helloworld, no err…
+  └── ○ coding-aegis-rkq.9 ● P1 Gemini test Phase 7: full cleanup, skill uninstal…
 
 ────────────────────────────────────────────────────────────
 
@@ -213,6 +205,19 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
+
+  LAYER 1
+  ├── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
+  └── ○ coding-aegis-pnv ● P2 Research Windsurf and Copilot tool detection sign…
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-a0q (2 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -221,15 +226,6 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
   │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-7b7 (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-7b7 ● P1 Fix Codex uninstall: rm -rf blocked by workspace-…
 
 ────────────────────────────────────────────────────────────
 
@@ -242,12 +238,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-7b7 (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+  └── ○ coding-aegis-7b7 ● P1 Fix Codex uninstall: rm -rf blocked by workspace-…
 
 ────────────────────────────────────────────────────────────
 
@@ -269,12 +265,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-yjy (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-yjy ● P2 Add OpenCode support
+  └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
 
 ────────────────────────────────────────────────────────────
 
@@ -325,8 +321,6 @@ Auto-generated from `bd graph --all --compact`.
 ## Task Index
 
 - [`coding-aegis-b5z`](phase-2-coding-aegis-skill-claude.md)
-- [`coding-aegis-b5z.34`](phase-2-coding-aegis-skill-claude.md)
-- [`coding-aegis-b5z.37`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.10`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.11`](phase-2-coding-aegis-skill-claude.md)
 - [`coding-aegis-b5z.36`](phase-2-coding-aegis-skill-claude.md)
@@ -372,35 +366,37 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-97z.4`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.5`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.7`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.8`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.6`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-rkq`](standalone.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
 - [`coding-aegis-z61`](standalone.md)
+- [`coding-aegis-yjy`](add-opencode-support.md)
+- [`coding-aegis-yjy.4`](add-opencode-support.md)
+- [`coding-aegis-yjy.5`](add-opencode-support.md)
+- [`coding-aegis-yjy.6`](add-opencode-support.md)
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.10`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-lw7`](standalone.md)
-- [`coding-aegis-ghv`](standalone.md)
-- [`coding-aegis-pnv`](standalone.md)
+- [`coding-aegis-rkq`](standalone.md)
 - [`coding-aegis-eju`](standalone.md)
 - [`coding-aegis-rge`](standalone.md)
 - [`coding-aegis-2l5`](standalone.md)
+- [`coding-aegis-lw7`](standalone.md)
+- [`coding-aegis-ghv`](standalone.md)
+- [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-7b7`](standalone.md)
 - [`coding-aegis-lf6`](standalone.md)
-- [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-7b7`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-gua`](standalone.md)
-- [`coding-aegis-yjy`](standalone.md)
+- [`coding-aegis-6pp`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

@@ -26,7 +26,7 @@ def main():
     parser.add_argument("--scope", default=None,
                         help="Scope base path override (default: auto-detect)")
     parser.add_argument("--tool", default=None,
-                        choices=["claude", "codex", "cursor", "windsurf", "copilot"],
+                        choices=["claude", "codex", "cursor", "gemini", "windsurf", "copilot", "opencode"],
                         help="Override auto-detected tool")
     args = parser.parse_args()
 
@@ -69,8 +69,8 @@ def main():
                 file=sys.stderr,
             )
 
-    # Codex: strip aegis:begin/end sections from AGENTS.md
-    if tool == "codex":
+    # Codex + OpenCode: strip aegis:begin/end sections from AGENTS.md
+    if tool in ("codex", "opencode"):
         amd = Path.cwd() / "AGENTS.md"
         if strip_agents_md_section(name, amd):
             agents_md_updated = True

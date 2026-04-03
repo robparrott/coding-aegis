@@ -32,13 +32,18 @@ TIERS = ["required", "best-practices", "optional", "goodies"]
 ARTIFACT_TYPE_ORDER = ["rule", "skill", "agent", "mcp", "plugin"]
 
 # Per-tool install path configuration.
+# user_scope_base: home-relative path for user scope when it differs from scope_base
+#   (e.g. opencode uses ~/.config/opencode for user scope, .opencode for project scope)
 TOOL_PATHS = {
-    "claude":   {"scope_base": ".claude",   "skills_dir": "skills"},
-    "codex":    {"scope_base": ".agents",   "skills_dir": ".agents/skills",
-                 "skills_base": "."},  # skills install relative to CWD, not scope_base
-    "cursor":   {"scope_base": ".cursor",   "skills_dir": "skills"},
-    "windsurf": {"scope_base": ".windsurf", "skills_dir": "skills"},
-    "copilot":  {"scope_base": ".github",   "skills_dir": "skills"},
+    "claude":    {"scope_base": ".claude",   "skills_dir": "skills"},
+    "gemini":    {"scope_base": ".claude",   "skills_dir": "skills"},  # Gemini uses Claude-compat paths
+    "codex":     {"scope_base": ".agents",   "skills_dir": ".agents/skills",
+                  "skills_base": "."},  # skills install relative to CWD, not scope_base
+    "cursor":    {"scope_base": ".cursor",   "skills_dir": "skills"},
+    "windsurf":  {"scope_base": ".windsurf", "skills_dir": "skills"},
+    "copilot":   {"scope_base": ".github",   "skills_dir": "skills"},
+    "opencode":  {"scope_base": ".opencode", "skills_dir": "skills",
+                  "user_scope_base": ".config/opencode"},
 }
 
 
@@ -309,7 +314,8 @@ def resolve_scope_base(tool, scope):
     """Return the absolute scope_base Path for the given tool and scope."""
     cfg = TOOL_PATHS.get(tool, TOOL_PATHS["claude"])
     if scope == "user":
-        return Path.home() / cfg["scope_base"]
+        user_base = cfg.get("user_scope_base", cfg["scope_base"])
+        return Path.home() / user_base
     return Path.cwd() / cfg["scope_base"]
 
 
