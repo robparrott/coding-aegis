@@ -9,9 +9,12 @@ Browse, install, and manage governance packages for coding agents.
 
 ## Command Dispatch
 
-Match on the **first word** of the user input after `/coding-aegis`. Any additional
-words or flags (e.g. `--catalog pkgs`) are **extra args** — pass them through to the
-script unchanged unless the command section below says otherwise.
+Match on the **first word** of the user input after `/coding-aegis`.
+
+**CRITICAL**: The first word is consumed by this dispatch table. Do **NOT** pass it
+as an argument to the script. Only the words/flags that follow the first word are
+forwarded (e.g. `/coding-aegis list --catalog pkgs` → run `aegis-list.py --catalog pkgs`,
+NOT `aegis-list.py list --catalog pkgs`).
 
 | First word | Script | Required args | Extra args |
 |------------|--------|---------------|------------|
