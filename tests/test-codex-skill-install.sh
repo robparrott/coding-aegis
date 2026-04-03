@@ -21,6 +21,10 @@
 # is the actual user journey for skill distribution on Codex.
 set -euo pipefail
 
+# Unset Claude Code env vars so they don't leak into Codex sandboxes when this
+# test is run from within Claude Code's Bash tool.
+unset CLAUDECODE CLAUDE_CODE_ENTRYPOINT 2>/dev/null || true
+
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$(dirname "$0")/lib-test-harness.sh"
 
