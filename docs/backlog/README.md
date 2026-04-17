@@ -4,7 +4,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 ## Epics
 
-- [ ] [Cross-tool artifact model refactor](cross-tool-artifact-model-refactor.md) — 2/15 tasks
+- [ ] [Cross-tool artifact model refactor](cross-tool-artifact-model-refactor.md) — 3/15 tasks
 - [ ] [External dependency installation for packages](external-dependency-installation-for-packages.md) — 0/1 tasks
 - [ ] [Phase 2: coding-aegis Skill (Claude Code)](phase-2-coding-aegis-skill-claude.md) — 36/41 tasks
 - [ ] [Phase 3: Cursor Bootstrap](phase-3-cursor-bootstrap.md) — 10/12 tasks

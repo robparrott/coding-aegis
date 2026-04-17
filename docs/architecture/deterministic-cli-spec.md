@@ -187,7 +187,7 @@ Usage: aegis-install.py <name> --scope <project|user> [--catalog PATH] [--tool T
 3. `pkg, pkg_dir = find_package(catalog, name)` — exit 1 if not found
 4. `scope_base = resolve_scope_base(tool, args.scope)`
 5. For each artifact in `pkg["artifacts"]`:
-   - **rule/agent, tool=codex**: Build `aegis:begin`/`aegis:end` section, append to `AGENTS.md`
+   - **rule/agent, tool=codex or opencode**: Build `aegis:begin`/`aegis:end` section, append to `AGENTS.md`
    - **rule/agent, other tools**: Merge frontmatter, write to `{scope_base}/rules/aegis--{pkg}--{rule}.md`
    - **skill**: Copy entire skill directory to `{skills_dir}/{skill_name}/`
 6. For Claude + project scope: rebuild `## Installed Governance Rules` table in `AGENTS.md`
@@ -211,7 +211,7 @@ Usage: aegis-uninstall.py <name> [--scope PATH] [--tool TOOL]
 1. `tool = args.tool or detect_tool()`
 2. Scan for installed artifacts (same logic as current `uninstall-prep`)
 3. Delete files with `os.unlink()`, directories with `shutil.rmtree()`
-4. For Codex: strip `aegis:begin/end` sections from `AGENTS.md`
+4. For Codex/OpenCode: strip `aegis:begin/end` sections from `AGENTS.md`
 5. For Claude: rebuild or remove governance table in `AGENTS.md`
 6. Print markdown uninstall summary
 

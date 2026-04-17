@@ -8,31 +8,32 @@ Establish a canonical mapping of coding-aegis concepts to the native artifact lo
 
 ## Cross-tool artifact matrix
 
-| Concept | Claude Code | Cursor | Windsurf | Copilot |
-|---------|-------------|--------|----------|---------|
-| **Always-on guidance** | `CLAUDE.md`, `AGENTS.md` | `AGENTS.md`, `.cursor/rules/*.mdc` (`alwaysApply: true`) | `AGENTS.md`, `.windsurf/rules/*.md` | `.github/copilot-instructions.md` |
-| **File-scoped rules** | `.claude/rules/*.md` (`globs:`) | `.cursor/rules/*.mdc` (`globs:`) | `.windsurf/rules/*.md` (`globs:`) | `.github/instructions/*.instructions.md` (`applyTo:`) |
-| **Invocable skills** | `.claude/skills/{name}/SKILL.md` | `.cursor/skills/{name}/SKILL.md` | `.agents/skills/{name}/SKILL.md` | Not supported |
-| **Custom agents** | `.claude/agents/{name}/AGENT.md` | Background agents (built-in) | Cascade (built-in) | Agent mode (built-in) |
-| **MCP config** | `.mcp.json` (project), `~/.claude.json` (user) | `.mcp.json` (project), `~/.cursor/mcp.json` (user) | `.mcp.json` (project), `~/.codeium/windsurf/mcp_config.json` (user) | Not supported |
-| **Plugin system** | `.claude-plugin/` marketplace | `.cursor-plugin/` marketplace | Not supported | GitHub Marketplace |
+| Concept | Claude Code | Codex | OpenCode | Cursor | Windsurf | Copilot |
+|---------|-------------|-------|----------|--------|----------|---------|
+| **Always-on guidance** | `CLAUDE.md`, `AGENTS.md` | `AGENTS.md` | `AGENTS.md` | `AGENTS.md`, `.cursor/rules/*.mdc` (`alwaysApply: true`) | `AGENTS.md`, `.windsurf/rules/*.md` | `.github/copilot-instructions.md` |
+| **File-scoped rules** | `.claude/rules/*.md` (`globs:`) | _(none — use AGENTS.md)_ | _(none — use AGENTS.md)_ | `.cursor/rules/*.mdc` (`globs:`) | `.windsurf/rules/*.md` (`globs:`) | `.github/instructions/*.instructions.md` (`applyTo:`) |
+| **coding-aegis rule delivery** | `.claude/rules/aegis--{pkg}--{rule}.md` | `AGENTS.md` `aegis:begin/end` section | `AGENTS.md` `aegis:begin/end` section | `.cursor/rules/aegis--{pkg}--{rule}.mdc` | `.windsurf/rules/aegis--{pkg}--{rule}.md` | _(TBD)_ |
+| **Invocable skills** | `.claude/skills/{name}/SKILL.md` | `.agents/skills/{name}/SKILL.md` | `.opencode/skills/{name}/SKILL.md` | `.cursor/skills/{name}/SKILL.md` | `.agents/skills/{name}/SKILL.md` | Not supported |
+| **Custom agents** | `.claude/agents/{name}/AGENT.md` | N/A | N/A | Background agents (built-in) | Cascade (built-in) | Agent mode (built-in) |
+| **MCP config** | `.mcp.json` (project), `~/.claude.json` (user) | N/A | N/A | `.mcp.json` (project), `~/.cursor/mcp.json` (user) | `.mcp.json` (project), `~/.codeium/windsurf/mcp_config.json` (user) | Not supported |
+| **Plugin system** | `.claude-plugin/` marketplace | `.codex-plugin/` manifest | _(none)_ | `.cursor-plugin/` marketplace | Not supported | GitHub Marketplace |
 
 ## Frontmatter format comparison
 
-| Feature | Claude Code | Cursor | Windsurf | Copilot |
-|---------|-------------|--------|----------|---------|
-| **Format** | YAML frontmatter in `.md` | YAML frontmatter in `.mdc` | YAML frontmatter in `.md` | YAML frontmatter in `.md` |
-| **Always-on** | Implicit (all `CLAUDE.md` files) | `alwaysApply: true` | Implicit (all rule files) | Implicit (instructions file) |
-| **File scoping** | `globs: "*.ts"` | `globs: "*.ts"` | `globs: "*.ts"` | `applyTo: "*.ts"` |
-| **Description** | `description:` | `description:` | `description:` | N/A |
+| Feature | Claude Code | Codex / OpenCode | Cursor | Windsurf | Copilot |
+|---------|-------------|------------------|--------|----------|---------|
+| **Format** | YAML frontmatter in `.md` | AGENTS.md sections (no frontmatter) | YAML frontmatter in `.mdc` | YAML frontmatter in `.md` | YAML frontmatter in `.md` |
+| **Always-on** | Implicit (all `CLAUDE.md` files) | Implicit (`AGENTS.md` always read) | `alwaysApply: true` | Implicit (all rule files) | Implicit (instructions file) |
+| **File scoping** | `globs: "*.ts"` | N/A — no file-scoped rules | `globs: "*.ts"` | `globs: "*.ts"` | `applyTo: "*.ts"` |
+| **Description** | `description:` | N/A | `description:` | `description:` | N/A |
 
 ## Scope levels per tool
 
-| Scope | Claude Code | Cursor | Windsurf | Copilot |
-|-------|-------------|--------|----------|---------|
-| **Project** | `{repo}/.claude/` | `{repo}/.cursor/` | `{repo}/.windsurf/` | `{repo}/.github/` |
-| **User** | `~/.claude/` | `~/.cursor/` | `~/.codeium/windsurf/` | VS Code settings |
-| **Team** | N/A | Cursor Team Marketplace | N/A | GitHub org-level |
+| Scope | Claude Code | Codex | OpenCode | Cursor | Windsurf | Copilot |
+|-------|-------------|-------|----------|--------|----------|---------|
+| **Project** | `{repo}/.claude/` | `{repo}/.agents/` | `{repo}/.opencode/` | `{repo}/.cursor/` | `{repo}/.windsurf/` | `{repo}/.github/` |
+| **User** | `~/.claude/` | N/A | `~/.config/opencode/` | `~/.cursor/` | `~/.codeium/windsurf/` | VS Code settings |
+| **Team** | N/A | N/A | N/A | Cursor Team Marketplace | N/A | GitHub org-level |
 
 > **Note**: Claude Code supports a local settings override via `.claude/settings.local.json`, but does not discover skills, rules, or agents from a `.claude.local/` directory. The two supported installation scopes for artifacts are Project and User.
 
@@ -41,6 +42,8 @@ Establish a canonical mapping of coding-aegis concepts to the native artifact lo
 The [Agent Skills](https://agentskills.io) open standard defines a portable `SKILL.md` format. Adoption status:
 
 - **Claude Code**: Native support via `.claude/skills/{name}/SKILL.md`
+- **Codex**: Supports `.agents/skills/{name}/SKILL.md`
+- **OpenCode**: Supports `.opencode/skills/{name}/SKILL.md`
 - **Cursor**: Native support via `.cursor/skills/{name}/SKILL.md` and `.agents/skills/{name}/SKILL.md`
 - **Windsurf**: Supports `.agents/skills/{name}/SKILL.md`
 - **Copilot**: Not supported

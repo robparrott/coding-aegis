@@ -76,13 +76,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-2sv (14 issues, 2 layers)
+📊 Dependency graph for coding-aegis-2sv (13 issues, 2 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-2sv ● P1 Cross-tool artifact model refactor
-  │   ├── ◐ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
   │   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
   │   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   │   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
@@ -99,7 +98,6 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   ├── ○ coding-aegis-2sv.11 ● P3 Add MCP server stub to pirate-speak package
   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
-  ├── ◐ coding-aegis-2sv.15 ● P1 Deliver Codex governance rules via AGENTS.md inst…
   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   ├── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
@@ -306,7 +304,6 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-cdb.5`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.6`](phase-8-external-package-references.md)
 - [`coding-aegis-2sv`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-2sv.15`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.1`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.10`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.12`](cross-tool-artifact-model-refactor.md)
