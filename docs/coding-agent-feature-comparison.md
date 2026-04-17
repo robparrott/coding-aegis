@@ -195,7 +195,7 @@ Additional instruction files can be referenced via `opencode.json` `instructions
 
 ## Gemini CLI
 
-Supported; uses `gemini skills link` for skill installation. Rules use Claude-compatible paths.
+Supported; uses `gemini skills link` for skill installation. All artifacts install under `.gemini/`.
 
 ### Marketplace / Plugin installation
 
@@ -215,16 +215,17 @@ Supported; uses `gemini skills link` for skill installation. Rules use Claude-co
 
 | Feature | Path / config | Notes |
 |---------|--------------|-------|
-| Always-on rules | `.claude/rules/aegis--{pkg}--{rule}.md` | Gemini uses Claude-compatible rule paths (confirmed from test teardown) |
+| Always-on rules | `.gemini/rules/aegis--{pkg}--{rule}.md` | Confirmed 2026-04-17 manual walkthrough |
 | File-scoped rules | ❌ (unverified) | No confirmed file-scoped mechanism |
-| Invocable skills | Linked local path via `gemini skills link` | `/skill-name` slash-command syntax (confirmed from test prompts) |
+| Invocable skills | `.gemini/skills/{name}/SKILL.md` | Confirmed 2026-04-17; `/skill-name` slash-command syntax works after install |
 | MCP config | ❌ not supported | |
 | Custom agents | ❌ not supported | |
 
 ### coding-aegis install status
 
 - Supported; integration tests exist (`tests/integration/test_gemini.py`) but currently deferred due to free-tier quota constraints (task `97z.13`).
-- Rules delivered to `.claude/rules/aegis--*` (same as Claude Code paths) because Gemini reads Claude-compatible rule files (confirmed from test output).
+- Rules delivered to `.gemini/rules/aegis--*` (confirmed 2026-04-17 manual walkthrough; previous `.claude/rules/` assumption was wrong).
+- Skills delivered to `.gemini/skills/{name}/SKILL.md` (confirmed 2026-04-17; previous `.claude/skills/` assumption was wrong — Gemini only discovers skills from `.gemini/skills/`).
 - Detection signal: `GEMINI_CLI=1` env var (confirmed live — user ran `env` in a Gemini session); `GEMINI_CLI_NO_RELAUNCH=true` also present.
 - Note: `__file__` path-based fallback detection is unverified for Gemini since skills are linked, not copied to a tool-specific directory.
 - Output filtering required in headless tests: Homebrew keytar warnings pollute stdout and must be filtered.
@@ -308,7 +309,7 @@ Limited support; no skill execution, no MCP. Rules delivered via a single instru
 | Codex | `AGENTS.md` (aegis:begin/end markers) | — |
 | Cursor | `.cursor/rules/aegis--{pkg}--{rule}.mdc` | `.mdc` |
 | OpenCode | `AGENTS.md` (aegis:begin/end markers) | — |
-| Gemini CLI | `.claude/rules/aegis--{pkg}--{rule}.md` | `.md` |
+| Gemini CLI | `.gemini/rules/aegis--{pkg}--{rule}.md` | `.md` |
 | Windsurf | `.windsurf/rules/aegis--{pkg}--{rule}.md` | `.md` |
 | Copilot | `.github/instructions/aegis--{pkg}--{rule}.instructions.md` | `.instructions.md` |
 
@@ -320,7 +321,7 @@ Limited support; no skill execution, no MCP. Rules delivered via a single instru
 | Codex | `.agents/skills/{name}/SKILL.md` |
 | Cursor | `.cursor/skills/{name}/SKILL.md` |
 | OpenCode | `.opencode/skills/{name}/SKILL.md` |
-| Gemini CLI | Linked local path (no copy) |
+| Gemini CLI | `.gemini/skills/{name}/SKILL.md` |
 | Windsurf | `.agents/skills/{name}/SKILL.md` |
 | Copilot | Not supported |
 

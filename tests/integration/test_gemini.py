@@ -13,7 +13,7 @@ fixture. Key Gemini differences from the Claude and Codex tests:
     passed via stdin.
   - CLAUDECODE / CLAUDE_CODE_ENTRYPOINT are unset (clean_env built inline) so
     detect_tool.py returns "gemini" when invoked through the agent.
-  - Rules and skills written to .claude/ (same format as Claude Code).
+  - Rules written to .gemini/rules/, skills to .gemini/skills/ (confirmed 2026-04-17).
   - Quota errors trigger pytest.skip (not fail) via assert_no_quota_error.
   - TIMEOUT_LONG = 120s — Gemini retries internally; steps can take 60-90s
     under quota pressure.
@@ -87,10 +87,10 @@ class TestGeminiJourney:
           - Builds a clean env without Claude Code vars leaking in.
           - Resolves the skill_dir from the repo root.
           - Creates a shared temporary test directory with git init.
-          - Copies pkgs/ catalog into test_dir so the agent can reach it.
+          - Catalog fetched from GitHub by ensure_catalog() on first agent command.
           - Links the coding-aegis skill via ``gemini skills link``.
           - Asserts "coding-aegis" appears in ``gemini skills list``.
-          - Pre-creates .claude/rules and .claude/skills directories.
+          - Pre-creates .gemini/rules and .gemini/skills directories.
 
         TEARDOWN:
           - Best-effort helloworld uninstall (if helloworld_installed is True).
@@ -115,11 +115,6 @@ class TestGeminiJourney:
         # git init the test directory
         run_cli(["git", "init", "-q"], cwd=test_dir)
 
-        # Copy pkgs/ catalog into test_dir so agent can access it
-        pkgs_dest = test_dir / "pkgs"
-        if not pkgs_dest.exists():
-            shutil.copytree(str(repo_root / "pkgs"), str(pkgs_dest))
-
         # Phase 3: link the coding-aegis skill
         result = run_cli(
             ["gemini", "skills", "link", str(skill_dir), "--scope", "user", "--consent"],
@@ -135,8 +130,8 @@ class TestGeminiJourney:
             f"coding-aegis not found in skills list after link:\n{list_result.stdout[:2000]}"
         )
 
-        # Pre-create .claude directories so the agent can write to them
-        scope_dir = test_dir / ".claude"
+        # Pre-create .gemini directories so the agent can write to them
+        scope_dir = test_dir / ".gemini"
         (scope_dir / "rules").mkdir(parents=True, exist_ok=True)
         (scope_dir / "skills").mkdir(parents=True, exist_ok=True)
 
@@ -253,7 +248,7 @@ class TestGeminiJourney:
         """Phase 4c — /coding-aegis list shows helloworld."""
         result = run_cli(
             _gemini_prompt(),
-            prompt="/coding-aegis list --catalog pkgs",
+            prompt="/coding-aegis list",
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -269,7 +264,7 @@ class TestGeminiJourney:
         """Phase 4d — /coding-aegis show helloworld returns name, tier, version."""
         result = run_cli(
             _gemini_prompt(),
-            prompt="/coding-aegis show helloworld --catalog pkgs",
+            prompt="/coding-aegis show helloworld",
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -294,7 +289,7 @@ class TestGeminiJourney:
         """Phase 5 — /coding-aegis install helloworld writes rule and skill files."""
         result = run_cli(
             _gemini_prompt(),
-            prompt="/coding-aegis install helloworld to Project scope --catalog pkgs",
+            prompt="/coding-aegis install helloworld to Project scope",
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -356,14 +351,14 @@ class TestGeminiJourney:
 
         # Verify rule file was removed
         rule_file = (
-            journey["test_dir"] / ".claude" / "rules" / "aegis--helloworld--helloworld.md"
+            journey["test_dir"] / ".gemini" / "rules" / "aegis--helloworld--helloworld.md"
         )
         assert not rule_file.exists(), (
             f"Rule file still present after uninstall: {rule_file}"
         )
 
         # Verify skill directory was removed
-        skill_dir = journey["test_dir"] / ".claude" / "skills" / "helloworld"
+        skill_dir = journey["test_dir"] / ".gemini" / "skills" / "helloworld"
         assert not skill_dir.exists(), (
             f"Skill dir still present after uninstall: {skill_dir}"
         )

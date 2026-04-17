@@ -36,7 +36,8 @@ ARTIFACT_TYPE_ORDER = ["rule", "skill", "agent", "mcp", "plugin"]
 #   (e.g. opencode uses ~/.config/opencode for user scope, .opencode for project scope)
 TOOL_PATHS = {
     "claude":    {"scope_base": ".claude",   "skills_dir": "skills"},
-    "gemini":    {"scope_base": ".claude",   "skills_dir": "skills"},  # Gemini uses Claude-compat paths
+    "gemini":    {"scope_base": ".gemini",   "skills_dir": "skills",
+                  "skills_base": ".gemini"},  # rules → .gemini/rules/, skills → .gemini/skills/
     "codex":     {"scope_base": ".agents",   "skills_dir": ".agents/skills",
                   "skills_base": "."},  # skills install relative to CWD, not scope_base
     "cursor":    {"scope_base": ".cursor",   "skills_dir": "skills", "rule_ext": ".mdc"},

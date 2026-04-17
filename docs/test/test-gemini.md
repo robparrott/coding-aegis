@@ -89,8 +89,8 @@ Gemini uses the same install paths as Claude Code (`.claude/` for project scope)
 | Artifact | Path |
 |----------|------|
 | Skill dir | `$SKILL_DIR` (linked repo path, not copied) |
-| Rules (project scope) | `$TEST_DIR/.claude/rules/aegis--*` |
-| Skills (project scope) | `$TEST_DIR/.claude/skills/helloworld/` |
+| Rules (project scope) | `$TEST_DIR/.gemini/rules/aegis--*` |
+| Skills (project scope) | `$TEST_DIR/.gemini/skills/helloworld/` |
 
 ## Teardown
 
