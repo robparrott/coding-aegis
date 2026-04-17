@@ -9,6 +9,7 @@
 - [x] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
 - [x] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
 - [x] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
+- [x] `coding-aegis-5k6` [task] Create coding-agent-feature-comparison.md
 - [x] `coding-aegis-8yl` [task] Refactor Cursor test script with Codex test improvements
 - [x] `coding-aegis-egj` [task] Refactor Gemini test script with Codex test improvements
 - [x] `coding-aegis-edx` [task] Refactor Claude test script with Codex test improvements
