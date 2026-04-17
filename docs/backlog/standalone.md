@@ -14,8 +14,8 @@
 - [x] `coding-aegis-egj` [task] Refactor Gemini test script with Codex test improvements
 - [x] `coding-aegis-edx` [task] Refactor Claude test script with Codex test improvements
 - [x] `coding-aegis-4c5` [task] Remove default tool fallback from detect_tool.py
-- [ ] `coding-aegis-eju` [task] Implement validate-install in all integration test scripts
-- [ ] `coding-aegis-2l5` [task] Update testing plan to use validate-install instead of direct file analysis
+- [x] `coding-aegis-eju` [task] Implement validate-install in all integration test scripts
+- [x] `coding-aegis-2l5` [task] Update testing plan to use validate-install instead of direct file analysis
 - [x] `coding-aegis-rge` [feature] Add validate-install skill command to coding-aegis
 - [x] `coding-aegis-ffu` [task] Update docs/test/TEST.md to reflect current test structure and phase numbering
 - [x] `coding-aegis-a84` [task] Add back-reference to testing-spec.md at top of each tool detail file

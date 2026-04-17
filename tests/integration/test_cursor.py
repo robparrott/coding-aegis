@@ -39,6 +39,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -81,6 +82,9 @@ pytestmark = pytest.mark.skipif(
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 TIMEOUT_LONG = 60  # install/uninstall operations may be slower
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 
 def _cursor_p(*extra_flags) -> list:
@@ -338,36 +342,16 @@ class TestCursorJourney:
             "denied", "unable to write", "permission"
         )), f"install: permission error in output:\n{result.stdout[:2000]}"
 
-        # Verify rule file was written to .cursor/rules/
-        rule_file = (
-            journey["test_dir"]
-            / ".cursor"
-            / "rules"
-            / "aegis--helloworld--helloworld.mdc"
+        # Verify installation via validate-install
+        v = subprocess.run(
+            [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
+             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "cursor"],
+            capture_output=True, text=True,
+            cwd=str(journey["test_dir"]),
         )
-        assert rule_file.exists(), (
-            f"Rule file not found: {rule_file}\n"
-            f"Contents of .cursor/rules/: "
-            f"{list((journey['test_dir'] / '.cursor' / 'rules').iterdir())}"
+        assert v.returncode == 0, (
+            f"validate-install failed:\n{v.stdout}\n{v.stderr}"
         )
-
-        # Verify rule file frontmatter
-        text = rule_file.read_text()
-        assert "managed-by: coding-aegis" in text, (
-            f"frontmatter missing 'managed-by: coding-aegis':\n{text[:500]}"
-        )
-        assert "package: helloworld" in text, (
-            f"frontmatter missing 'package: helloworld':\n{text[:500]}"
-        )
-        assert "tier: optional" in text, (
-            f"frontmatter missing 'tier: optional':\n{text[:500]}"
-        )
-
-        # Verify skill file was written to .cursor/skills/helloworld/
-        skill_file = (
-            journey["test_dir"] / ".cursor" / "skills" / "helloworld" / "SKILL.md"
-        )
-        assert skill_file.exists(), f"Skill file not found: {skill_file}"
 
         journey["helloworld_installed"] = True
 

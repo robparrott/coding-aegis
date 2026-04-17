@@ -63,7 +63,7 @@ Every tool's pytest class implements exactly these 10 phases. Tools without a ma
 | 4b | detect_tool_skill | `/coding-aegis detect-tool` via the agent returns the correct tool name |
 | 4c | list | `/coding-aegis list --catalog pkgs` returns helloworld |
 | 4d | show | `/coding-aegis show helloworld --catalog pkgs` returns name, tier, version |
-| 5 | install_helloworld | `/coding-aegis install helloworld` writes rule and skill files; asserts file contents |
+| 5 | install_helloworld | `/coding-aegis install helloworld` writes rule and skill files; verified by `aegis-validate.py` (see below) |
 | 5b | helloworld_responds | `/helloworld` skill responds with `Hello, World` |
 | 6 | uninstall_helloworld | `/coding-aegis uninstall helloworld` removes all installed files cleanly |
 
@@ -76,6 +76,27 @@ Almost every task initiated by the skill should complete in less than 10 seconds
 Prompts must invoke the tool's **built-in mechanisms** — never instruct the agent to bypass them. For example, Codex has a built-in `$skill-installer` skill for installing skills from GitHub. The test prompt says "Use the skill-installer to install a skill from GitHub repo X, path Y" and lets the agent invoke `$skill-installer` naturally. It does NOT call `install-skill-from-github.py` directly or copy files manually.
 
 Similarly, phases 4–5 prompts should reference the skill by name ("Use the coding-aegis skill to list packages") rather than providing implementation details about internal scripts or directory paths.
+
+### Phase 5 verification: validate-install
+
+After the agent runs `/coding-aegis install helloworld`, the test verifies the result by calling `aegis-validate.py` directly (no agent round-trip):
+
+```python
+v = subprocess.run(
+    [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
+     "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "<tool>"],
+    capture_output=True, text=True,
+    cwd=str(journey["test_dir"]),
+)
+assert v.returncode == 0, f"validate-install failed:\n{v.stdout}\n{v.stderr}"
+```
+
+`aegis-validate.py` checks each artifact declared in `pkg.yaml`:
+- **rule/agent on codex/opencode**: AGENTS.md contains `aegis:begin package=helloworld` section
+- **rule/agent on other tools**: `rules/aegis--helloworld--<stem>.md` exists with `managed-by: coding-aegis` frontmatter
+- **skill**: `<scope>/skills/helloworld/SKILL.md` exists
+
+This centralises verification logic in the skill itself rather than duplicating it across five test files.
 
 ### Install mechanism preference (phase 3)
 
@@ -105,9 +126,7 @@ Similarly, phases 4–5 prompts should reference the skill by name ("Use the cod
 | | 4.3 | `list` skill command | Output contains `helloworld` |
 | | 4.4 | `show` skill command | Output contains name, tier `optional`, version `1.0.0` |
 | **5. Install helloworld Package** | 5.1 | `install helloworld` skill command | Agent reports install activity |
-| | 5.2 | Rule file present | `aegis--helloworld--helloworld.md` exists at expected path |
-| | 5.3 | Rule frontmatter correct | Contains `managed-by: coding-aegis`, `package: helloworld`, `tier: optional` |
-| | 5.4 | Skill file present | `skills/helloworld/SKILL.md` exists |
+| | 5.2–5.4 | Artifacts verified | `aegis-validate.py helloworld --tool <tool>` exits 0; checks rule file (or AGENTS.md section), frontmatter, and skill dir |
 | | 5.5 | helloworld skill responds | Invoking `$helloworld` / `/helloworld` returns `Hello, World` |
 | **6. Uninstall helloworld Package** | 6.1 | `uninstall helloworld` skill command | No errors in output |
 | | 6.2 | Installed files removed | Rule file and skill directory absent |

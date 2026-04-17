@@ -190,18 +190,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-eju (2 issues, 2 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-2l5 ● P2 Update testing plan to use validate-install inste…
-
-  LAYER 1
-  └── ○ coding-aegis-eju ● P2 Implement validate-install in all integration tes…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-a0q (2 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -210,6 +198,15 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
   │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -228,15 +225,6 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -352,13 +340,11 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
-- [`coding-aegis-eju`](standalone.md)
-- [`coding-aegis-2l5`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
-- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

@@ -26,6 +26,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -51,6 +52,9 @@ GITHUB_REPO = "robparrott/coding-aegis"
 SKILL_PATH = "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 CODEX_SKILL_DIR = Path.home() / ".codex" / "skills" / "coding-aegis"
 TIMEOUT_LONG = 60  # install/uninstall via workspace-write are slower
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 
 def _codex_exec(*sandbox_flags, extra_flags=()) -> list:
@@ -268,20 +272,16 @@ class TestCodexJourney:
             "install", "aegis--helloworld", "wrote", "created"
         )), f"install: expected activity in output:\n{result.stdout[:2000]}"
 
-        # Verify AGENTS.md rule section
-        agents_md = journey["test_dir"] / "AGENTS.md"
-        assert agents_md.exists(), f"AGENTS.md not created at {agents_md}"
-        agents_text = agents_md.read_text()
-        assert "aegis:begin package=helloworld" in agents_text, (
-            f"AGENTS.md missing begin marker:\n{agents_text[:500]}"
+        # Verify installation via validate-install
+        v = subprocess.run(
+            [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
+             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "codex"],
+            capture_output=True, text=True,
+            cwd=str(journey["test_dir"]),
         )
-        assert "aegis:end package=helloworld" in agents_text, (
-            f"AGENTS.md missing end marker:\n{agents_text[:500]}"
+        assert v.returncode == 0, (
+            f"validate-install failed:\n{v.stdout}\n{v.stderr}"
         )
-
-        # Verify skill file
-        skill_file = journey["test_dir"] / ".agents" / "skills" / "helloworld" / "SKILL.md"
-        assert skill_file.exists(), f"Skill file not found: {skill_file}"
 
         journey["helloworld_installed"] = True
 

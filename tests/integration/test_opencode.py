@@ -26,6 +26,8 @@ Run:
 import os
 import re
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -48,6 +50,9 @@ pytestmark = pytest.mark.skipif(
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 TIMEOUT_LONG = 120  # agent-mediated operations may be slow
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 # ANSI escape code pattern (opencode emits coloured output by default)
 _ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[mK]")
@@ -289,25 +294,15 @@ class TestOpenCodeJourney:
             "install", "helloworld", "wrote", "created", "agents.md"
         )), f"install: expected activity in output:\n{result.stdout[:2000]}"
 
-        # Verify AGENTS.md was written with aegis:begin/end markers
-        agents_md = journey["test_dir"] / "AGENTS.md"
-        assert agents_md.exists(), (
-            f"AGENTS.md not found at {agents_md}\n"
-            f"Contents of test_dir: {list(journey['test_dir'].iterdir())}"
+        # Verify installation via validate-install
+        v = subprocess.run(
+            [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
+             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "opencode"],
+            capture_output=True, text=True,
+            cwd=str(journey["test_dir"]),
         )
-        text = agents_md.read_text()
-        assert "aegis:begin" in text and "helloworld" in text, (
-            f"AGENTS.md missing aegis:begin marker for helloworld:\n{text[:1000]}"
-        )
-        assert "aegis:end" in text, (
-            f"AGENTS.md missing aegis:end marker:\n{text[:1000]}"
-        )
-
-        # Verify skill directory was created
-        skill_dir = journey["test_dir"] / ".opencode" / "skills" / "helloworld"
-        assert skill_dir.exists(), f"Skill dir not found: {skill_dir}"
-        assert (skill_dir / "SKILL.md").exists(), (
-            f"SKILL.md not found in {skill_dir}"
+        assert v.returncode == 0, (
+            f"validate-install failed:\n{v.stdout}\n{v.stderr}"
         )
 
         journey["helloworld_installed"] = True

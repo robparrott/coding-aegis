@@ -32,6 +32,8 @@ Run:
 import json
 import os
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -56,6 +58,9 @@ pytestmark = pytest.mark.skipif(
 GEMINI_MODEL = "gemini-3-flash-preview"
 SKILL_PATH = "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 TIMEOUT_LONG = 120  # Gemini retries internally; each step can take 60-90s
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 
 def _gemini_prompt(*extra_flags) -> list:
@@ -301,33 +306,16 @@ class TestGeminiJourney:
             "install", "aegis--helloworld", "wrote", "created"
         )), f"install: expected activity in output:\n{result.stdout[:2000]}"
 
-        # Verify rule file was written
-        rule_file = (
-            journey["test_dir"] / ".claude" / "rules" / "aegis--helloworld--helloworld.md"
+        # Verify installation via validate-install
+        v = subprocess.run(
+            [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
+             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "gemini"],
+            capture_output=True, text=True,
+            cwd=str(journey["test_dir"]),
         )
-        assert rule_file.exists(), (
-            f"Rule file not found: {rule_file}\n"
-            f"Contents of .claude/rules/: "
-            f"{list((journey['test_dir'] / '.claude' / 'rules').iterdir())}"
+        assert v.returncode == 0, (
+            f"validate-install failed:\n{v.stdout}\n{v.stderr}"
         )
-
-        # Verify rule file frontmatter
-        text = rule_file.read_text()
-        assert "managed-by: coding-aegis" in text, (
-            f"frontmatter missing 'managed-by: coding-aegis':\n{text[:500]}"
-        )
-        assert "package: helloworld" in text, (
-            f"frontmatter missing 'package: helloworld':\n{text[:500]}"
-        )
-        assert "tier: optional" in text, (
-            f"frontmatter missing 'tier: optional':\n{text[:500]}"
-        )
-
-        # Verify skill file was written
-        skill_file = (
-            journey["test_dir"] / ".claude" / "skills" / "helloworld" / "SKILL.md"
-        )
-        assert skill_file.exists(), f"Skill file not found: {skill_file}"
 
         # Mark installed so teardown knows to attempt cleanup
         journey["helloworld_installed"] = True
