@@ -24,6 +24,7 @@ NOT `aegis-list.py list --catalog pkgs`).
 | `install` | `aegis-install.py` | `<name> --scope <scope>` (see below) | pass through |
 | `uninstall` | `aegis-uninstall.py` | `<name>` (second word) | pass through |
 | `status` | `aegis-status.py` | — | pass through |
+| `validate-install` | `aegis-validate.py` | `<name>` (second word) | pass through |
 | `detect-tool` | `detect_tool.py` | — | pass through |
 | anything else | print help text | — | — |
 
@@ -38,6 +39,7 @@ Usage:
   /coding-aegis install <package> Install a package into the current project
   /coding-aegis uninstall <package> Remove an installed package
   /coding-aegis status            Show installed packages and versions
+  /coding-aegis validate-install <package> Verify a package's artifacts are correctly installed
   /coding-aegis detect-tool       Show which coding agent is active and why
 ```
 

@@ -8,6 +8,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 - [ ] [External dependency installation for packages](external-dependency-installation-for-packages.md) — 0/1 tasks
 - [ ] [Phase 2: coding-aegis Skill (Claude Code)](phase-2-coding-aegis-skill-claude.md) — 36/41 tasks
 - [ ] [Phase 3: Cursor Bootstrap](phase-3-cursor-bootstrap.md) — 10/12 tasks
+- [!] [Phase 4: Copilot Support](phase-4-copilot-support.md) — 0/6 tasks
 - [ ] [Phase 4: Renderers / Adaptation](phase-4-renderers---adaptation.md) — 0/4 tasks
 - [ ] [Phase 5: CLI Tooling](phase-5-cli-tooling.md) — 0/4 tasks
 - [ ] [Phase 6: Seed Packages & Quickstarts](phase-6-seed-packages-&-quickstarts.md) — 0/3 tasks

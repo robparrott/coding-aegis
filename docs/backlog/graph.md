@@ -113,6 +113,27 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-9m0 (7 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ● coding-aegis-9m0 ● P1 Phase 4: Copilot Support
+  │   ├── ○ coding-aegis-9m0.1 ● P1 Spike: verify Copilot CLI env vars, skill path, A…
+  │   ├── ○ coding-aegis-9m0.2 ● P1 Add Copilot detection signals to detect_tool.py
+  │   ├── ○ coding-aegis-9m0.3 ● P1 Fix TOOL_PATHS[copilot] and install/uninstall rou…
+  │   ├── ○ coding-aegis-9m0.5 ● P1 Write tests/integration/test_copilot.py
+  │   ├── ○ coding-aegis-9m0.4 ● P2 Write docs/test/test-copilot.md test spec
+  │   └── ○ coding-aegis-9m0.6 ● P2 Update docs: feature-comparison, spec-tool-detect…
+  ├── ○ coding-aegis-9m0.1 ● P1 Spike: verify Copilot CLI env vars, skill path, A…
+  ├── ○ coding-aegis-9m0.2 ● P1 Add Copilot detection signals to detect_tool.py
+  ├── ○ coding-aegis-9m0.3 ● P1 Fix TOOL_PATHS[copilot] and install/uninstall rou…
+  ├── ○ coding-aegis-9m0.4 ● P2 Write docs/test/test-copilot.md test spec
+  ├── ○ coding-aegis-9m0.5 ● P1 Write tests/integration/test_copilot.py
+  └── ○ coding-aegis-9m0.6 ● P2 Update docs: feature-comparison, spec-tool-detect…
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-bg5 (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -130,19 +151,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
-  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-97z (3 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -153,6 +161,19 @@ Auto-generated from `bd graph --all --compact`.
   │   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
   ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
 
 ────────────────────────────────────────────────────────────
 
@@ -169,17 +190,14 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-eju (3 issues, 3 layers)
+📊 Dependency graph for coding-aegis-eju (2 issues, 2 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-rge ● P2 Add validate-install skill command to coding-aegis
-
-  LAYER 1
   └── ○ coding-aegis-2l5 ● P2 Update testing plan to use validate-install inste…
 
-  LAYER 2
+  LAYER 1
   └── ○ coding-aegis-eju ● P2 Implement validate-install in all integration tes…
 
 ────────────────────────────────────────────────────────────
@@ -192,15 +210,6 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
   │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -219,6 +228,15 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -313,28 +331,34 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-2sv.13`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
+- [`coding-aegis-9m0`](phase-4-copilot-support.md)
+- [`coding-aegis-9m0.1`](phase-4-copilot-support.md)
+- [`coding-aegis-9m0.2`](phase-4-copilot-support.md)
+- [`coding-aegis-9m0.3`](phase-4-copilot-support.md)
+- [`coding-aegis-9m0.5`](phase-4-copilot-support.md)
+- [`coding-aegis-9m0.4`](phase-4-copilot-support.md)
+- [`coding-aegis-9m0.6`](phase-4-copilot-support.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
 - [`coding-aegis-z61`](standalone.md)
-- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.13`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.16`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-eju`](standalone.md)
-- [`coding-aegis-rge`](standalone.md)
 - [`coding-aegis-2l5`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)
