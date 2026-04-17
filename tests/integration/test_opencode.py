@@ -164,6 +164,12 @@ class TestOpenCodeJourney:
             f"Expected AUTH_OK in output, got:\n{result.stdout[:2000]}"
         )
 
+    # ── Phase 2: No marketplace ───────────────────────────────────────────
+
+    def test_phase2_no_marketplace(self, journey):
+        """Phase 2 — OpenCode has no plugin marketplace; phase not applicable."""
+        pytest.skip("OpenCode has no plugin marketplace; phase 2 not applicable")
+
     # ── Phase 3: Skill discoverability ────────────────────────────────────
 
     def test_phase3_skill_files_present(self, journey):

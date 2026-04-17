@@ -8,29 +8,35 @@ Validate the coding-aegis skill install lifecycle across agentic coding tools. T
 
 Each tool has a detail file covering CLI invocation, install mechanisms, tool detection, teardown, and caveats.
 
-| Tool | Detail file | pytest | Status |
-|------|------------|--------|--------|
-| Claude Code | [test-claude.md](test-claude.md) | `tests/integration/test_claude.py` | **8/8 passing** |
-| Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | **10/10 passing** |
-| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | **3 pass / 6 skip** (quota) |
-| Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | **4 pass / 6 fail** — `cursor-agent 2026.04.16` broken; was 10/10 on `2026.03.30` |
-| OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | **9/9 passing** |
-| Windsurf | TBD | TBD | not started |
+All tools have exactly 10 tests. Tools without a marketplace (Gemini, OpenCode) have phase 2 as an explicit skip stub rather than a silent omission.
+
+| Tool | Detail file | pytest | Tests | Status |
+|------|------------|--------|-------|--------|
+| Claude Code | [test-claude.md](test-claude.md) | `tests/integration/test_claude.py` | 10 | **10/10 passing** |
+| Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | 10 | **10/10 passing** |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **4 pass / 6 skip** (quota exhausted; not failures) |
+| Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 skip** — `cursor-agent 2026.04.16` binary broken (`wpi.14`); was 10/10 on `2026.03.30` |
+| OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
+| Windsurf | TBD | TBD | — | not started |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
 
-## User Journey
+## Test Phases
 
-This is the flow every test script validates, in order:
+Every tool's pytest class implements exactly these 10 phases. Tools without a marketplace (Gemini, OpenCode) have phase 2 as an explicit `pytest.skip` stub — the omission is documented, not silent.
 
-1. **Register the coding-aegis marketplace/registry** — add the catalog source so the tool can discover and install the skill. This validates the distribution mechanism itself.
-2. **Install the coding-aegis skill from the marketplace** — use the tool's native install command to install the skill from the registered source. Marketplace-based install is **strongly preferred**. Fall back to local file copy ONLY if the tool has no marketplace or registry mechanism.
-3. **Use the skill to list** packages in the catalog
-4. **Use the skill to show** the helloworld package details
-5. **Use the skill to install** the helloworld package into a test directory
-6. **Use the helloworld skill** to verify it is properly installed
-7. **Verify** the installed files exist with correct naming and frontmatter
-8. **Teardown** — remove helloworld, uninstall coding-aegis, remove marketplace, at each step validating that the uninstall was clean. Only then clean up
+| Phase | Name | What it tests |
+|-------|------|--------------|
+| 1 | auth | Tool CLI is present, authenticated, and responds |
+| 2 | plugin_manifest | Marketplace manifest file exists and lists `coding-aegis`; skip with reason if tool has no marketplace |
+| 3 | skill_files_present / skill_discoverable | coding-aegis skill is installed and its key files are accessible |
+| 4a | detect_tool_direct | `detect_tool.py` run directly (outside the agent) returns the correct tool name and at least one signal |
+| 4b | detect_tool_skill | `/coding-aegis detect-tool` via the agent returns the correct tool name |
+| 4c | list | `/coding-aegis list --catalog pkgs` returns helloworld |
+| 4d | show | `/coding-aegis show helloworld --catalog pkgs` returns name, tier, version |
+| 5 | install_helloworld | `/coding-aegis install helloworld` writes rule and skill files; asserts file contents |
+| 5b | helloworld_responds | `/helloworld` skill responds with `Hello, World` |
+| 6 | uninstall_helloworld | `/coding-aegis uninstall helloworld` removes all installed files cleanly |
 
 The skill is the product. Every agent-mediated test goes through it. 
 

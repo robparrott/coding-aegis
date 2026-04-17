@@ -49,6 +49,8 @@ pytestmark = pytest.mark.skipif(
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
+TIMEOUT_LONG = 60  # install/uninstall/write operations
+
 CLAUDE_COMMON_FLAGS = [
     "--strict-mcp-config",
     "--mcp-config",
@@ -186,6 +188,23 @@ class TestClaudeJourney:
             f"Expected AUTH_OK in output, got:\n{result.stdout[:2000]}"
         )
 
+    # ── Phase 2: Plugin manifest ──────────────────────────────────────────
+
+    def test_phase2_plugin_manifest(self, journey):
+        """Phase 2 — .claude-plugin/marketplace.json exists with expected fields."""
+        manifest = journey["repo_root"] / ".claude-plugin" / "marketplace.json"
+        assert manifest.exists(), (
+            f".claude-plugin/marketplace.json not found at {manifest}"
+        )
+        import json
+        data = json.loads(manifest.read_text())
+        plugins = data.get("plugins", [])
+        assert len(plugins) > 0, f"marketplace.json 'plugins' list is empty: {data}"
+        names = [p.get("name", "") for p in plugins]
+        assert "coding-aegis" in names, (
+            f"marketplace.json does not list 'coding-aegis': {data}"
+        )
+
     # ── Phase 3: Skill discoverability ────────────────────────────────────
 
     def test_phase3_skill_discoverable(self, journey):
@@ -201,16 +220,44 @@ class TestClaudeJourney:
 
     # ── Phase 4: Validate coding-aegis skill ──────────────────────────────
 
-    def test_phase4a_detect_tool(self, journey):
-        """Phase 4a — /coding-aegis detect-tool reports 'claude' and a signal."""
+    def test_phase4a_detect_tool_direct(self, journey):
+        """Phase 4a — detect_tool.py run directly returns tool=claude.
+
+        Runs detect_tool.py from the repo source (the claude plugin mechanism
+        does not copy files to a predictable local path). The test runs inside
+        a Claude Code session so CLAUDECODE=1 is already set.
+        """
+        import json as _json
+        skill_dir = (
+            journey["repo_root"]
+            / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis"
+        )
+        result = run_cli(
+            ["python3", str(skill_dir / "detect_tool.py")],
+        )
+        assert_no_timeout(result, "detect_tool.py direct")
+        json_start = result.stdout.find("{")
+        assert json_start != -1, (
+            f"No JSON in detect_tool.py output:\n{result.stdout}"
+        )
+        data = _json.loads(result.stdout[json_start:])
+        assert data.get("tool") == "claude", (
+            f"detect_tool.py: expected tool='claude', got {data}"
+        )
+        assert len(data.get("signals", [])) > 0, (
+            f"detect_tool.py: expected non-empty signals, got {data}"
+        )
+
+    def test_phase4b_detect_tool_skill(self, journey):
+        """Phase 4b — /coding-aegis detect-tool via agent reports 'claude' and a signal."""
         result = run_cli(
             _claude_p(ALLOWED_TOOLS_RO),
             prompt="/coding-aegis detect-tool",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
         )
-        assert_no_timeout(result, "detect-tool")
-        warn_if_slow(result, label="detect-tool")
+        assert_no_timeout(result, "detect-tool skill")
+        warn_if_slow(result, label="detect-tool skill")
         assert_no_quota_error(result, "claude")
         assert "claude" in result.stdout.lower(), (
             f"detect-tool: expected 'claude' in output:\n{result.stdout[:2000]}"
@@ -220,8 +267,8 @@ class TestClaudeJourney:
             f"{result.stdout[:2000]}"
         )
 
-    def test_phase4b_list(self, journey):
-        """Phase 4b — /coding-aegis list shows helloworld."""
+    def test_phase4c_list(self, journey):
+        """Phase 4c — /coding-aegis list shows helloworld."""
         result = run_cli(
             _claude_p(ALLOWED_TOOLS_RO),
             prompt="/coding-aegis list --catalog pkgs",
@@ -235,8 +282,8 @@ class TestClaudeJourney:
             f"list: expected 'helloworld' in output:\n{result.stdout[:2000]}"
         )
 
-    def test_phase4c_show(self, journey):
-        """Phase 4c — /coding-aegis show helloworld returns name, tier, version."""
+    def test_phase4d_show(self, journey):
+        """Phase 4d — /coding-aegis show helloworld returns name, tier, version."""
         result = run_cli(
             _claude_p(ALLOWED_TOOLS_RO),
             prompt="/coding-aegis show helloworld --catalog pkgs",
@@ -265,10 +312,10 @@ class TestClaudeJourney:
             _claude_p("--dangerously-skip-permissions", allowed_tools=ALLOWED_TOOLS_RW),
             prompt="/coding-aegis install helloworld to Project scope --catalog pkgs",
             cwd=journey["test_dir"],
-            timeout=DEFAULT_TIMEOUT,
+            timeout=TIMEOUT_LONG,
         )
         assert_no_timeout(result, "install helloworld")
-        warn_if_slow(result, label="install helloworld")
+        warn_if_slow(result, budget_seconds=TIMEOUT_LONG, label="install helloworld")
         assert_no_quota_error(result, "claude")
         output_lower = result.stdout.lower()
         assert any(kw in output_lower for kw in (
@@ -334,10 +381,10 @@ class TestClaudeJourney:
             _claude_p("--dangerously-skip-permissions", allowed_tools=ALLOWED_TOOLS_RW),
             prompt="/coding-aegis uninstall helloworld",
             cwd=journey["test_dir"],
-            timeout=DEFAULT_TIMEOUT,
+            timeout=TIMEOUT_LONG,
         )
         assert_no_timeout(result, "uninstall helloworld")
-        warn_if_slow(result, label="uninstall helloworld")
+        warn_if_slow(result, budget_seconds=TIMEOUT_LONG, label="uninstall helloworld")
         assert_no_quota_error(result, "claude")
         assert not any(kw in result.stdout for kw in ("not installed", "not found", "Error")), (
             f"uninstall: unexpected error in output:\n{result.stdout[:2000]}"

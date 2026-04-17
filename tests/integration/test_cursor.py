@@ -38,6 +38,7 @@ Run:
 import json
 import os
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -50,11 +51,31 @@ from .harness import (
     warn_if_slow,
 )
 
-# ── Skip entire module if cursor-agent is not on PATH ────────────────────────
+
+def _cursor_agent_functional() -> bool:
+    """Return True only if cursor-agent is on PATH and produces clean --help output.
+
+    Broken cursor-agent releases (e.g. 2026.04.16) dump their entire minified
+    JS bundle to stderr on every invocation. We detect this and skip rather than
+    letting every test fail with an unreadable error.
+    """
+    if not shutil.which("cursor-agent"):
+        return False
+    try:
+        r = subprocess.run(
+            ["cursor-agent", "--help"],
+            capture_output=True, text=True, timeout=10,
+        )
+        return "dist-package/index.js" not in r.stderr and r.returncode == 0
+    except Exception:
+        return False
+
+
+# ── Skip entire module if cursor-agent is absent or broken ───────────────────
 
 pytestmark = pytest.mark.skipif(
-    not shutil.which("cursor-agent"),
-    reason="cursor-agent not installed / not on PATH",
+    not _cursor_agent_functional(),
+    reason="cursor-agent not installed, not on PATH, or binary is broken",
 )
 
 # ── Constants ─────────────────────────────────────────────────────────────────

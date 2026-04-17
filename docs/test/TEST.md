@@ -14,13 +14,15 @@ Run all tools at once:
 pytest tests/integration/ -v
 ```
 
-| Tool | Test file | Result | Notes |
-|------|-----------|--------|-------|
-| Claude Code | `test_claude.py` | **8/8 passing** | — |
-| Codex | `test_codex.py` | **10/10 passing** | Requires push to GitHub first |
-| Gemini | `test_gemini.py` | **3 pass / 6 skip** | Skips on quota exhaustion (not failures); model: `gemini-3-flash-preview` |
-| Cursor | `test_cursor.py` | **4 pass / 6 fail** | `cursor-agent 2026.04.16` broken (JS bundle crash); was 10/10 on `2026.03.30` |
-| OpenCode | `test_opencode.py` | **9/9 passing** | — |
+All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an explicit skip.
+
+| Tool | Test file | Tests | Result | Notes |
+|------|-----------|-------|--------|-------|
+| Claude Code | `test_claude.py` | 10 | **10/10 passing** | — |
+| Codex | `test_codex.py` | 10 | **10/10 passing** | Requires push to GitHub first |
+| Gemini | `test_gemini.py` | 10 | **4 pass / 6 skip** | Quota exhaustion → skip (not failure); model: `gemini-3-flash-preview` |
+| Cursor | `test_cursor.py` | 10 | **10/10 skip** | `cursor-agent 2026.04.16` binary broken (`wpi.14`); was 10/10 on `2026.03.30` |
+| OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
 
 ### Bash harness (legacy)
 
