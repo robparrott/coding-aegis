@@ -6,7 +6,7 @@
 
 - [x] `coding-aegis-wpi.1` Create .cursor-plugin/marketplace.json
 - [x] `coding-aegis-wpi.10` Create Cursor test script following user journey contract
-- [ ] `coding-aegis-wpi.11` cursor-agent CLI investigation: verify flags and skill loading
+- [x] `coding-aegis-wpi.11` cursor-agent CLI investigation: verify flags and skill loading
 - [x] `coding-aegis-wpi.12` Fix Cursor rule file extension: .mdc not .md
 - [x] `coding-aegis-wpi.13` Merge test-cursor.md and test-cursor-agent.md into test-cursor.md
 - [x] `coding-aegis-wpi.2` Create coding-aegis Cursor plugin.json
@@ -18,4 +18,4 @@
 - [ ] `coding-aegis-wpi.8` Test Cursor Remote Rules (Option D) with current Cursor version
 - [ ] `coding-aegis-wpi.9` Simplify Cursor local installation process
 
-**Progress**: 8/11 tasks complete
+**Progress**: 9/11 tasks complete

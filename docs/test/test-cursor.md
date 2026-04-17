@@ -2,7 +2,7 @@
 
 > Tool-specific details for the Cursor skill install test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md).
 
-> **Status**: Research largely complete — live CLI investigation (Q1–Q9) still required before the full integration test can be validated end-to-end. See [Open Questions](#9-open-questions-ordered-by-priority) below.
+> **Status**: Complete. All 10 pytest phases passing (2026-04-03, cursor-agent 2026.03.30).
 
 ## Test Script / pytest
 
@@ -28,19 +28,23 @@ Confirmed from `cursor-agent --help` (live output, 2026-04-03):
 | `--yolo` | Alias for `--force` |
 | `--model <model>` | Override model |
 
-Prompt is passed as a positional argument after all flags.
+Prompt is passed as a positional argument OR via stdin (both confirmed). The pytest harness uses stdin (`input=prompt`).
 
-### Still to verify
+`--trust` is required for headless use in non-interactive temp directories — without it, cursor-agent prints a Workspace Trust prompt and exits. Add it to all headless invocations that don't already use `--force`/`--yolo`.
+
+Version: `2026.03.30-a5d3e17`
 
 | Question | Status |
 |----------|--------|
-| Is `-p` the correct headless flag? | **Confirmed** (from `--help`) |
+| Is `-p` the correct headless flag? | **Confirmed** |
 | Is `--output-format text` supported? | **Confirmed** |
 | Is `--force` or `--yolo` the auto-approve flag? | **Confirmed** (both work) |
+| Is `--trust` required for temp dirs? | **Confirmed** — must be set for non-interactive use |
 | Is the binary `cursor-agent` or `agent`? | **Confirmed** — `cursor-agent` on Homebrew |
-| What does `cursor-agent --version` output? | UNVERIFIED |
-| Is there a `run` subcommand analogous to `codex exec`? | **Confirmed — no** `run` subcommand exists |
-| Does it require `git init` in the working directory? | UNVERIFIED |
+| What does `cursor-agent --version` output? | **Confirmed** — `2026.03.30-a5d3e17` |
+| Is there a `run` subcommand analogous to `codex exec`? | **Confirmed — no** |
+| Does it require `git init` in the working directory? | **Confirmed** — yes, required |
+| Does cursor-agent load `.cursor/skills/` from CWD? | **Confirmed** — yes |
 
 ---
 
@@ -57,7 +61,7 @@ Prompt is passed as a positional argument after all flags.
 
 Rule files use `.mdc` extension (not `.md`). The `alwaysApply` frontmatter key controls always-on vs. invoked behaviour.
 
-**Known bug**: `compute_target_filename()` in `aegis_lib.py` currently writes `.md` for all tools. Cursor needs `.mdc`. Tracked in `coding-aegis-wpi.12`.
+**Fixed (wpi.12)**: `compute_target_filename()` now accepts an optional `tool` parameter and writes `.mdc` for Cursor.
 
 ### AGENTS.md
 
@@ -129,9 +133,11 @@ cursor-agent -p --output-format text \
 | Scope | Rules path | Skills path |
 |-------|-----------|------------|
 | Project | `{repo}/.cursor/rules/aegis--{pkg}--{rule}.mdc` | `{repo}/.cursor/skills/{name}/SKILL.md` |
-| User | `~/.cursor/rules/aegis--{pkg}--{rule}.mdc` | `~/.cursor/skills/{name}/SKILL.md` |
+| User | `~/.cursor/rules/aegis--{pkg}--{rule}.mdc` | `~/.cursor/skills-cursor/{name}/SKILL.md` |
 
-Rule files use `.mdc` extension for Cursor (not `.md`). See `coding-aegis-wpi.12` for the fix.
+**Note**: The user-scope skills directory is `~/.cursor/skills-cursor/` (not `skills/`). Confirmed from live `~/.cursor/` directory listing. The `TOOL_PATHS["cursor"]` user scope may need updating.
+
+Rule files use `.mdc` extension for Cursor (not `.md`). Fixed in `coding-aegis-wpi.12`.
 
 ### Plugin / marketplace path
 
@@ -148,13 +154,13 @@ Rule files use `.mdc` extension for Cursor (not `.md`). See `coding-aegis-wpi.12
 }
 ```
 
-### Proposed TOOL_PATHS entry (pending wpi.12)
+### Current TOOL_PATHS entry
 
 ```python
 "cursor": {
     "scope_base": ".cursor",
     "skills_dir": "skills",
-    "rule_ext": ".mdc",   # NEW: rule file extension override (wpi.12)
+    "rule_ext": ".mdc",
 }
 ```
 
@@ -194,17 +200,16 @@ Expected to use `/coding-aegis ...` syntax (same as Claude and Gemini).
 
 | # | Question | Blocks | Investigation method |
 |---|----------|--------|---------------------|
-| Q1 | What are the exact `cursor-agent --help` flags? | All phases | **Done** — see §1 above |
-| Q2 | Does `-p` flag work for headless invocation? | Phase 1 auth, all agent phases | **Confirmed** |
+| Q1 | What are the exact `cursor-agent --help` flags? | All phases | **Confirmed** — see §1 |
+| Q2 | Does `-p` flag work for headless invocation? | Phase 1 auth | **Confirmed** |
 | Q3 | What is the auto-approve flag (`--force` or `--yolo`)? | Phase 5 | **Confirmed** (both) |
-| Q4 | Does `cursor-agent` set `CURSOR_AGENT=1` in subprocesses? | Phase 4a | UNVERIFIED live |
-| Q5 | Does cursor-agent load `.cursor/skills/` from CWD? | Phase 3/5 | UNVERIFIED |
-| Q6 | Is there a `cursor-agent plugin install` subcommand? | Phase 3 install | **Confirmed — no** |
-| Q7 | Does `~/.cursor/skills/` exist and work for user-scope install? | User scope | UNVERIFIED |
-| Q8 | What does `cursor-agent --version` return? | Version tracking | UNVERIFIED |
-| Q9 | Are there additional `CURSOR_*` env vars beyond `CURSOR_AGENT`? | Detection completeness | UNVERIFIED |
-
-See `coding-aegis-wpi.11` for the CLI investigation task.
+| Q4 | Does `cursor-agent` set `CURSOR_AGENT=1` in subprocesses? | Phase 4a | Tests pass with env injected; live unverified |
+| Q5 | Does cursor-agent load `.cursor/skills/` from CWD? | Phase 3/5 | **Confirmed** — yes |
+| Q6 | Is there a `cursor-agent plugin install` subcommand? | Phase 3 | **Confirmed — no** |
+| Q7 | User-scope skills dir path? | User scope | **Confirmed** — `~/.cursor/skills-cursor/` (not `skills/`) |
+| Q8 | What does `cursor-agent --version` return? | Version tracking | **Confirmed** — `2026.03.30-a5d3e17` |
+| Q9 | Are there additional `CURSOR_*` env vars? | Detection | Unverified; tests pass without it |
+| Q10 | Is `--trust` required for headless temp dirs? | All phases | **Confirmed** — yes, must add to base invocation |
 
 ---
 

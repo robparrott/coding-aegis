@@ -10,9 +10,9 @@
 - [x] `coding-aegis-97z.3` pytest Claude: TestClaudeJourney class, all 7 phases, passing
 - [x] `coding-aegis-97z.4` pytest Codex: port TestCodexJourney, all 7 phases @Rob Parrott
 - [ ] `coding-aegis-97z.5` pytest Gemini: port TestGeminiJourney, handle quota as skip not fail
-- [ ] `coding-aegis-97z.6` pytest Cursor: implement TestCursorJourney when CLI available
+- [x] `coding-aegis-97z.6` pytest Cursor: implement TestCursorJourney when CLI available
 - [ ] `coding-aegis-97z.7` pytest CI: add GitHub Actions job, JUnit XML output
 - [ ] `coding-aegis-97z.8` Add requirements-dev.txt with pytest, pytest-html
 - [x] `coding-aegis-97z.9` pytest Gemini: port TestGeminiJourney from bash test script @Rob Parrott
 
-**Progress**: 6/10 tasks complete
+**Progress**: 7/10 tasks complete

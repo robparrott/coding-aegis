@@ -63,13 +63,10 @@ TIMEOUT_LONG = 60  # install/uninstall operations may be slower
 
 
 def _cursor_p(*extra_flags) -> list:
-    """Return the base ``cursor-agent -p`` command list.
-
-    # TODO: verify invocation — flags inferred from bash prototype; confirm
-    # against a live cursor-agent binary once available.
-    """
+    """Return the base ``cursor-agent -p`` command list."""
+    # --trust: required for headless mode in temp dirs (no interactive trust prompt)
     # --output-format text: plain text (no rich/ANSI decorations)
-    return ["cursor-agent", "-p", "--output-format", "text"] + list(extra_flags)
+    return ["cursor-agent", "-p", "--output-format", "text", "--trust"] + list(extra_flags)
 
 
 # ── Test class ────────────────────────────────────────────────────────────────
