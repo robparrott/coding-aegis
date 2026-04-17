@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 
 # Add skill dir to path
-SKILL_DIR = Path(__file__).parent.parent / "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+SKILL_DIR = Path(__file__).parent.parent.parent / "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
 sys.path.insert(0, str(SKILL_DIR))
 
 import aegis_lib as lib

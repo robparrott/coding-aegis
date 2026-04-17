@@ -24,7 +24,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          pytest tests/test_aegis_catalog.py -v \
+          pytest tests/unit/ -v \
             --junitxml=test-results/unit.xml
 
       - name: Upload test results

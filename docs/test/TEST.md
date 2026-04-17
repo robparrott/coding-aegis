@@ -26,9 +26,9 @@ All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an 
 |------|-----------|-------|--------|-------|
 | Claude Code | `test_claude.py` | 10 | **10/10 passing** | — |
 | Codex | `test_codex.py` | 10 | **10/10 passing** | Requires push to GitHub first; phase 6 uses `danger-full-access` sandbox |
-| Gemini | `test_gemini.py` | 10 | **deferred** | Free-tier quota exhausts frequently; deferred for day-to-day dev. See [test-gemini.md](test-gemini.md). Revival tracked in `97z.13`. |
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
+| Gemini | `test_gemini.py` | 10 | **deferred** | Free-tier quota exhausts frequently; deferred for day-to-day dev. See [test-gemini.md](test-gemini.md). Revival tracked in `97z.13`. |
 | Windsurf | TBD | — | not started | — |
 
 ---
@@ -41,9 +41,9 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 |------|------------|--------|-------|--------|
 | Claude Code | [test-claude.md](test-claude.md) | `tests/integration/test_claude.py` | 10 | **10/10 passing** |
 | Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | 10 | **10/10 passing** — phase 6 uses `danger-full-access` to allow skill dir removal |
-| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **Deferred** — free-tier quota exhausts frequently; not run in day-to-day dev. Revival tracked in task `97z.13`. |
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **Deferred** — free-tier quota exhausts frequently; not run in day-to-day dev. Revival tracked in task `97z.13`. |
 | Windsurf | TBD | TBD | — | not started |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
@@ -149,7 +149,7 @@ pytest tests/integration/test_opencode.py -v
 ### Unit tests
 
 ```bash
-pytest tests/test_aegis_catalog.py -v
+pytest tests/unit/ -v
 ```
 
 ### Useful flags

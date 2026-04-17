@@ -12,7 +12,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SCRIPT = REPO_ROOT / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis" / "aegis-catalog.py"
 CATALOG = REPO_ROOT / "pkgs"
 
