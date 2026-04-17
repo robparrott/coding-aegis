@@ -3,7 +3,7 @@
 pytest-based integration tests for coding-aegis. Ports the 7-phase user journey
 from the bash scripts in `tests/` to a Python/pytest framework.
 
-Reference design: `docs/test/qa-architect-proposal.md`
+Reference design: [AD-17: QA pytest Framework](../../docs/architecture/AD-17-qa-pytest-framework.md)
 
 ## Prerequisites
 
@@ -68,8 +68,10 @@ tests/integration/
 ├── conftest.py          # shared fixtures (repo_root, test_dir, clean_env, run_cli)
 ├── harness.py           # CLIResult dataclass, run_cli(), assert helpers
 ├── test_claude.py       # full 7-phase journey for Claude Code
-├── test_codex.py        # stub — Codex phases marked skip pending port
-├── test_gemini.py       # stub — Gemini phases marked skip pending port
+├── test_codex.py        # full 7-phase journey for Codex
+├── test_cursor.py       # full 7-phase journey for Cursor
+├── test_gemini.py       # Gemini — deferred (quota; see task 97z.13)
+├── test_opencode.py     # full 7-phase journey for OpenCode
 └── README.md            # this file
 ```
 

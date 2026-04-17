@@ -2,7 +2,7 @@
 
 **Date**: 2026-04-03
 **Task**: coding-aegis-rkq — Fix Gemini test script to pass all 7 phases
-**Script**: `tests/test-gemini-skill-install.sh`
+**Test**: `tests/integration/test_gemini.py`
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## Fixes Applied to Test Script
 
-All fixes are in `tests/test-gemini-skill-install.sh`.
+All fixes are in `tests/integration/test_gemini.py`.
 
 ### Fix 1: Unset CLAUDECODE env vars to prevent detect-tool leak
 
@@ -73,7 +73,7 @@ The `gemini_quiet` wrapper retries with exponential back-off. During the `show` 
 
 ### Impact on the test timeout policy
 
-`docs/test/testing-spec.md` specifies that any step exceeding 10s is a bug. The `show` command (Phase 4c) took 2m34s. However, the excess time is entirely in quota-throttling retries imposed by the external Gemini API — not in script logic or skill behavior. The underlying operation completes correctly once quota clears.
+`docs/test/TEST.md` specifies that any step exceeding 10s is a bug. The `show` command (Phase 4c) took 2m34s. However, the excess time is entirely in quota-throttling retries imposed by the external Gemini API — not in script logic or skill behavior. The underlying operation completes correctly once quota clears.
 
 **This is an infrastructure constraint, not a script defect.**
 
@@ -89,7 +89,7 @@ Phases 5–7 each require at least one LLM call (install, invoke, uninstall). Ru
 
 2. **Add a cooldown between heavy phases.** Insert a `sleep 60` between Phase 4c (show) and Phase 5 (install) in the test script to allow quota to reset. This is appropriate given the external constraint.
 
-3. **Document the timeout exception in testing-spec.md.** The 10s threshold should note that Gemini free-tier throttling is exempt from the bug classification, with a cap (e.g., 5 minutes total) that still flags genuine hangs.
+3. **Document the timeout exception in TEST.md.** The 10s threshold should note that Gemini free-tier throttling is exempt from the bug classification, with a cap (e.g., 5 minutes total) that still flags genuine hangs.
 
 4. **Consider a paid Gemini tier for CI.** Automated CI runs will reliably hit free-tier quota. A paid account removes the retry overhead and makes the 10s timing budget achievable.
 

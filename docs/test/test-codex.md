@@ -1,10 +1,10 @@
 # Codex — Test Detail
 
-> Tool-specific details for the Codex skill install test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md).
+> Tool-specific details for the Codex skill install test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md).
 
 ## Two-Phase Testing Requirement
 
-The Codex `$skill-installer` only supports GitHub sources — it cannot install from local filesystem paths. This means `test-codex-skill-install.sh` cannot validate uncommitted local changes directly:
+The Codex `$skill-installer` only supports GitHub sources — it cannot install from local filesystem paths. This means `tests/integration/test_codex.py` cannot validate uncommitted local changes directly:
 
 1. **Push to GitHub** — commit and push all skill changes to the remote repository.
 2. **Run the Codex test** — the test installs from GitHub, reflecting the pushed changes.
@@ -64,8 +64,8 @@ codex exec --ephemeral -s <sandbox> -o /dev/stdout
 | Sandbox | When to use |
 |---------|-------------|
 | `read-only` | Phases 4.1–4.4, 5.5 |
-| `workspace-write` | Phase 5.1 (install helloworld), Phase 6.1 (uninstall helloworld) |
-| `danger-full-access` | Phase 3 ($skill-installer needs GitHub network access) |
+| `workspace-write` | Phase 5.1 (install helloworld) |
+| `danger-full-access` | Phase 3 ($skill-installer needs GitHub network access); Phase 6.1 (uninstall — needed so aegis-uninstall.py can run shutil.rmtree on the skill directory; workspace-write blocks that syscall) |
 
 - `--ephemeral` — no session persistence
 - `-o /dev/stdout` — captures output (required; default output goes elsewhere)
@@ -102,7 +102,7 @@ Pass `--catalog $TEST_DIR/pkgs` in phases 5.1 and 6.1 to prevent the agent from 
 
 | Phase | Step | Command | Assertion |
 |-------|------|---------|-----------|
-| 6.1 | Uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` via agent (workspace-write) | no `not installed\|error` in output; `$TEST_DIR/.agents/skills/helloworld` absent |
+| 6.1 | Uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` via agent (danger-full-access) | no `not installed\|error` in output; `$TEST_DIR/.agents/skills/helloworld` absent |
 | 7.1 | Uninstall coding-aegis skill | `rm -rf ~/.codex/skills/coding-aegis` | `assert_dir_not_exists ~/.codex/skills/coding-aegis` |
 | 7.3 | Remove marketplace | `rm -rf "$TEST_DIR/.codex-plugin"` | `assert_dir_not_exists $TEST_DIR/.codex-plugin` |
 | 7.5 | Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |

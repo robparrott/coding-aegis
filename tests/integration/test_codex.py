@@ -12,9 +12,9 @@ fixture. Key Codex differences from the Claude test:
     detect_tool.py returns "codex" not "claude" when run from Claude Code.
   - Rules delivered via AGENTS.md sections (not .claude/rules/).
   - Skills installed to .agents/skills/<name>/ (not .claude/skills/).
-  - Known: workspace-write sandbox blocks shutil.rmtree (coding-aegis-7b7),
-    so skill dir may remain after uninstall — tested with a soft check.
-  - TIMEOUT_LONG = 60s for install/uninstall (workspace-write is slower).
+  - Phase 6 uninstall uses danger-full-access so shutil.rmtree can remove the
+    skill directory (workspace-write blocks that syscall).
+  - TIMEOUT_LONG = 60s for install/uninstall (agent-mediated operations are slower).
 
 Run:
     pytest tests/integration/test_codex.py -v
@@ -303,13 +303,13 @@ class TestCodexJourney:
     # ── Phase 6: Uninstall helloworld ─────────────────────────────────────
 
     def test_phase6_uninstall_helloworld(self, journey):
-        """Phase 6 — $coding-aegis uninstall helloworld cleans AGENTS.md.
+        """Phase 6 — $coding-aegis uninstall helloworld cleans AGENTS.md and skill dir.
 
-        Note: workspace-write sandbox blocks shutil.rmtree (coding-aegis-7b7),
-        so the skill directory may remain — this is expected and checked softly.
+        Uses danger-full-access so aegis-uninstall.py can run shutil.rmtree on the
+        skill directory (workspace-write blocks that syscall).
         """
         result = run_cli(
-            _codex_exec("-s", "workspace-write"),
+            _codex_exec("-s", "danger-full-access"),
             prompt="$coding-aegis uninstall helloworld",
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
@@ -330,11 +330,10 @@ class TestCodexJourney:
                 f"{agents_text[:500]}"
             )
 
-        # Skill dir: soft check (workspace-write sandbox may block rmtree — coding-aegis-7b7)
+        # Skill dir must be fully removed (danger-full-access allows shutil.rmtree)
         skill_dir = journey["test_dir"] / ".agents" / "skills" / "helloworld"
-        if skill_dir.exists():
-            # Expected in workspace-write sandbox — not a failure
-            pass
-        # else: removed cleanly — also fine
+        assert not skill_dir.exists(), (
+            f"Skill dir still present after uninstall: {skill_dir}"
+        )
 
         journey["helloworld_installed"] = False

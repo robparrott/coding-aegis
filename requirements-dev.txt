@@ -1,5 +1,6 @@
 # Development and test dependencies for coding-aegis
 # Install with: pip install -r requirements-dev.txt
 
-pytest>=7.0
-pytest-html          # optional: HTML test reports via --html=report.html
+pytest>=7.0,<9
+pytest-html>=3.2,<5       # HTML test reports via --html=report.html
+pytest-metadata>=3.0,<4   # Metadata plugin required by pytest-html

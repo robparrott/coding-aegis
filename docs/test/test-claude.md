@@ -1,6 +1,6 @@
 # Claude Code — Test Detail
 
-> Tool-specific details for the Claude Code skill install test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md).
+> Tool-specific details for the Claude Code skill install test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md).
 
 ## Install Mechanisms
 

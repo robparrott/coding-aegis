@@ -47,7 +47,7 @@ When packages from this catalog are installed into a **target repository**, the 
 
 ## Testing Rules
 
-When modifying or running tests, reference [docs/test/testing-spec.md](docs/test/testing-spec.md).
+When modifying or running tests, reference [docs/test/TEST.md](docs/test/TEST.md).
 
 ## Package Authoring Rules
 

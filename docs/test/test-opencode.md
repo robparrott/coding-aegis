@@ -1,6 +1,6 @@
 # OpenCode — Test Detail
 
-> Tool-specific details for the OpenCode integration test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md). For how OpenCode skills and rules work, see [opencode-integration.md](../architecture/opencode-integration.md).
+> Tool-specific details for the OpenCode integration test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md). For how OpenCode skills and rules work, see [opencode-integration.md](../architecture/opencode-integration.md).
 
 > **Status**: Spec ready — pytest not yet written (`yjy.5`). Detection signals confirmed. See §4.
 

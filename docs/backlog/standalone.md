@@ -3,11 +3,11 @@
 - [x] `coding-aegis-drg` [task] Refactor test_claude.py to Pattern 1: class-scoped journey fixture
 - [x] `coding-aegis-rkq` [task] Fix Gemini test script to pass all 7 phases
 - [x] `coding-aegis-znk` [task] Fix show command: agent wraps output in code block instead of printing verbatim
-- [ ] `coding-aegis-7b7` [bug] Fix Codex uninstall: rm -rf blocked by workspace-write sandbox
+- [x] `coding-aegis-7b7` [bug] Fix Codex uninstall: rm -rf blocked by workspace-write sandbox
 - [x] `coding-aegis-bc3` [task] Make coding-aegis uninstall lightning fast (currently ~16s)
 - [x] `coding-aegis-jrc` [task] Make coding-aegis install lightning fast (currently ~24s)
 - [x] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
-- [ ] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
+- [x] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
 - [x] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
 - [x] `coding-aegis-8yl` [task] Refactor Cursor test script with Codex test improvements
 - [x] `coding-aegis-egj` [task] Refactor Gemini test script with Codex test improvements
@@ -34,6 +34,7 @@
 - [x] `coding-aegis-ele` [task] Add dependency graph with hyperlinked tasks to beads-sync skill
 - [x] `coding-aegis-9ys` [task] Create beads-sync skill package
 - [ ] `coding-aegis-3m9` [decision] Resolve multi-tool repository support (AD-11)
+- [x] `coding-aegis-idq` [task] Move docs/INSTALL.md into docs/howto/
 - [ ] `coding-aegis-135` [task] Create conventional-commits best-practices skill
 - [ ] `coding-aegis-400` [task] Author GitHub Copilot install section in docs/howto/install.md
 - [ ] `coding-aegis-ytb` [task] Author Windsurf install section in docs/howto/install.md

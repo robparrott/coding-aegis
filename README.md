@@ -60,7 +60,7 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 - [AD-12: External package references](docs/architecture/AD-12-external-package-references.md)
 
 ### Guides
-- [Install guide](docs/INSTALL.md) — How to install and use coding-aegis across Claude Code, Codex, Gemini, and Cursor
+- [Install guide](docs/howto/install.md) — How to install and use coding-aegis across Claude Code, Codex, Gemini, and Cursor
 - [Build guide](docs/build/BUILD.md) — How to build, install, and use the CLI
 - [Test guide](docs/test/TEST.md) — How to run tests and verify the system
 - [AGENTS.md](AGENTS.md) — Coding agent guidance for contributors

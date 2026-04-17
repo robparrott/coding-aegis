@@ -1,6 +1,6 @@
 # Cursor — Test Detail
 
-> Tool-specific details for the Cursor skill install test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md).
+> Tool-specific details for the Cursor skill install test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md).
 
 > **Status**: **10/10 passing** (2026-04-17, `cursor-agent 2026.04.16-2d20146`). Requires macOS quarantine fix after install — see §12.
 

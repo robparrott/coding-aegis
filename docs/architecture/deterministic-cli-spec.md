@@ -285,7 +285,7 @@ If any script exits non-zero, print stderr verbatim. Do not improvise or retry.
 # Phase 8: Cleanup
 ```
 
-Uses `lib-test-harness.sh` assert functions. Runs in <5s total.
+Runs in <5s total.
 
 ### tests/test_aegis_lib.py (new, unit tests)
 
