@@ -21,7 +21,7 @@ All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an 
 | Claude Code | `test_claude.py` | 10 | **10/10 passing** | — |
 | Codex | `test_codex.py` | 10 | **10/10 passing** | Requires push to GitHub first |
 | Gemini | `test_gemini.py` | 10 | **4 pass / 6 skip** | Quota exhaustion → skip (not failure); model: `gemini-3-flash-preview` |
-| Cursor | `test_cursor.py` | 10 | **10/10 skip** | `cursor-agent 2026.04.16` binary broken (`wpi.14`); was 10/10 on `2026.03.30` |
+| Cursor | `test_cursor.py` | 10 | **10/10 passing** | `cursor-agent 2026.04.16` working after macOS quarantine fix; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
 
 ### Bash harness (legacy)
@@ -69,7 +69,7 @@ pytest tests/test_aegis_catalog.py -v
 | Claude Code | `claude` | `claude /login` | — |
 | Codex | `codex` | `codex auth login` | Changes must be pushed to GitHub first — Codex `$skill-installer` installs from GitHub, not local paths. See [test-codex.md](test-codex.md). |
 | Gemini | `gemini` | Google account | Free-tier quota exhausts quickly; skips convert to `pytest.skip`, not failures. |
-| Cursor | `cursor-agent` | Cursor account | `cursor-agent 2026.04.16` is currently broken. Tests pass on `2026.03.30`. |
+| Cursor | `cursor-agent` | Cursor account | After `brew install cursor-cli`, run `xattr -rd com.apple.quarantine $(brew --prefix)/Caskroom/cursor-cli/<version>/` to clear macOS quarantine. See [test-cursor.md §12](test-cursor.md). |
 | OpenCode | `opencode` | Provider API key | `opencode run` requires `git init` in the working directory. |
 
 ---

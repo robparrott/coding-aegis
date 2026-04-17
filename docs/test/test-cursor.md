@@ -2,7 +2,7 @@
 
 > Tool-specific details for the Cursor skill install test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md).
 
-> **Status**: Complete. All 10 pytest phases passing (2026-04-03, cursor-agent 2026.03.30).
+> **Status**: **10/10 passing** (2026-04-17, `cursor-agent 2026.04.16-2d20146`). Requires macOS quarantine fix after install — see §12.
 
 ## Test Script / pytest
 
@@ -230,7 +230,27 @@ Integration test teardown: best-effort `cursor-agent -p --force "/coding-aegis u
 
 ---
 
-## 12. Investigation Commands (for the person with cursor-agent installed)
+## 12. macOS Quarantine (Gatekeeper)
+
+After installing cursor-cli via Homebrew on Apple Silicon, macOS may block the bundled native binaries (`merkle-tree-napi.darwin-arm64.node`, `pty.node`, `rg`, etc.) with a "Not Opened" Gatekeeper dialog.
+
+**Symptom**: Gatekeeper dialog appears for `merkle-tree-napi.darwin-arm64.node` or `rg` on first use; `cursor-agent` may crash or produce garbled output.
+
+**Fix**: Strip the quarantine extended attribute from the entire Caskroom package after install:
+
+```bash
+xattr -rd com.apple.quarantine $(brew --prefix)/Caskroom/cursor-cli/<version>/
+# Example:
+xattr -rd com.apple.quarantine /opt/homebrew/Caskroom/cursor-cli/2026.04.16-2d20146/
+```
+
+If Gatekeeper prompts appear, click **Done** (not "Move to Trash"), then run the command above. Running `xattr -rd` on the whole directory clears all quarantine flags at once and prevents further dialogs.
+
+This is a one-time step after each `brew install` or `brew upgrade` of `cursor-cli`.
+
+---
+
+## 13. Investigation Commands (for the person with cursor-agent installed)
 
 ```bash
 # 1. Version
@@ -262,4 +282,4 @@ cursor-agent skills --help 2>/dev/null || echo "no skills subcommand"
 
 ---
 
-*Last updated: 2026-04-03.*
+*Last updated: 2026-04-17.*

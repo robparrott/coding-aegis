@@ -15,7 +15,7 @@ All tools have exactly 10 tests. Tools without a marketplace (Gemini, OpenCode) 
 | Claude Code | [test-claude.md](test-claude.md) | `tests/integration/test_claude.py` | 10 | **10/10 passing** |
 | Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | 10 | **10/10 passing** |
 | Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **4 pass / 6 skip** (quota exhausted; not failures) |
-| Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 skip** — `cursor-agent 2026.04.16` binary broken (`wpi.14`); was 10/10 on `2026.03.30` |
+| Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
 | Windsurf | TBD | TBD | — | not started |
 
