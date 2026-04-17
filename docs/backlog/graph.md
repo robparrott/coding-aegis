@@ -130,6 +130,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-wpi (4 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.14 ● P1 cursor-agent 2026.04.16 broken: JS bundle crash o…
+  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.14 ● P1 cursor-agent 2026.04.16 broken: JS bundle crash o…
+  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-97z (4 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -142,19 +157,6 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-97z.5 ● P2 pytest Gemini: port TestGeminiJourney, handle quo…
   ├── ○ coding-aegis-97z.7 ● P2 pytest CI: add GitHub Actions job, JUnit XML outp…
   └── ○ coding-aegis-97z.8 ● P2 Add requirements-dev.txt with pytest, pytest-html
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
-  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
 
 ────────────────────────────────────────────────────────────
 
@@ -186,17 +188,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-yjy (2 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-yjy ● P1 Add OpenCode support
-  │   └── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
-  └── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-a0q (2 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -208,21 +199,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-7b7 (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-7b7 ● P1 Fix Codex uninstall: rm -rf blocked by workspace-…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-lf6 (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   └── ○ coding-aegis-lf6 ● P1 Investigate and fix Codex uninstall timeout (60s)…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-7b7 (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-7b7 ● P1 Fix Codex uninstall: rm -rf blocked by workspace-…
 
 ────────────────────────────────────────────────────────────
 
@@ -349,25 +340,24 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
 - [`coding-aegis-z61`](standalone.md)
+- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.14`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.5`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.7`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.8`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-eju`](standalone.md)
 - [`coding-aegis-rge`](standalone.md)
 - [`coding-aegis-2l5`](standalone.md)
-- [`coding-aegis-yjy`](add-opencode-support.md)
-- [`coding-aegis-yjy.5`](add-opencode-support.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-7b7`](standalone.md)
 - [`coding-aegis-lf6`](standalone.md)
+- [`coding-aegis-7b7`](standalone.md)
 - [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)

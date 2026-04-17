@@ -9,6 +9,7 @@
 - [x] `coding-aegis-wpi.11` cursor-agent CLI investigation: verify flags and skill loading
 - [x] `coding-aegis-wpi.12` Fix Cursor rule file extension: .mdc not .md
 - [x] `coding-aegis-wpi.13` Merge test-cursor.md and test-cursor-agent.md into test-cursor.md
+- [ ] `coding-aegis-wpi.14` cursor-agent 2026.04.16 broken: JS bundle crash on every invocation
 - [x] `coding-aegis-wpi.2` Create coding-aegis Cursor plugin.json
 - [x] `coding-aegis-wpi.3` Create Cursor-native coding-aegis.mdc rule
 - [ ] `coding-aegis-wpi.4` Register GitHub Enterprise App at Cursor dashboard
@@ -18,4 +19,4 @@
 - [ ] `coding-aegis-wpi.8` Test Cursor Remote Rules (Option D) with current Cursor version
 - [ ] `coding-aegis-wpi.9` Simplify Cursor local installation process
 
-**Progress**: 9/11 tasks complete
+**Progress**: 9/12 tasks complete

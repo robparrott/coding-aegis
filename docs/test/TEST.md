@@ -2,53 +2,90 @@
 
 ## Overview
 
-Tests validate the coding-aegis skill install lifecycle across agentic coding tools. Every test follows the 7-phase plan defined in [testing-spec.md](testing-spec.md). Tool-specific setup and caveats are in the per-tool detail files.
+Tests validate the coding-aegis skill install lifecycle across agentic coding tools. Every test follows the 7-phase user journey defined in [testing-spec.md](testing-spec.md). Tool-specific setup, invocation, and caveats are in the per-tool detail files.
 
-| Script | Tool | Detail file |
-|--------|------|-------------|
-| `tests/test-claude-bootstrapped-skill-install.sh` | Claude Code | [test-claude.md](test-claude.md) |
-| `tests/test-codex-skill-install.sh` | Codex | [test-codex.md](test-codex.md) |
-| `tests/test-gemini-skill-install.sh` | Gemini | [test-gemini.md](test-gemini.md) |
-| `tests/test-cursor-skill-install.sh` | Cursor | [test-cursor.md](test-cursor.md) (future) |
-| `tests/test_aegis_catalog.py` | Unit (Python) | — |
+## Current Status (2026-04-17)
 
-All integration scripts source `tests/lib-test-harness.sh` for assertions, output formatting, and timeouts.
+### pytest integration suite
+
+Run all tools at once:
+
+```bash
+pytest tests/integration/ -v
+```
+
+| Tool | Test file | Result | Notes |
+|------|-----------|--------|-------|
+| Claude Code | `test_claude.py` | **8/8 passing** | — |
+| Codex | `test_codex.py` | **10/10 passing** | Requires push to GitHub first |
+| Gemini | `test_gemini.py` | **3 pass / 6 skip** | Skips on quota exhaustion (not failures); model: `gemini-3-flash-preview` |
+| Cursor | `test_cursor.py` | **4 pass / 6 fail** | `cursor-agent 2026.04.16` broken (JS bundle crash); was 10/10 on `2026.03.30` |
+| OpenCode | `test_opencode.py` | **9/9 passing** | — |
+
+### Bash harness (legacy)
+
+| Script | Tool | Status |
+|--------|------|--------|
+| `tests/test-claude-bootstrapped-skill-install.sh` | Claude Code | passing |
+| `tests/test-codex-skill-install.sh` | Codex | passing |
+| `tests/test-gemini-skill-install.sh` | Gemini | passing (quota-dependent) |
+
+---
 
 ## Running the Tests
+
+### Full pytest suite (recommended)
+
+```bash
+pytest tests/integration/ -v
+```
+
+Requires all tools installed. Tests that cannot find their CLI binary skip automatically.
+
+### Single tool
+
+```bash
+pytest tests/integration/test_claude.py -v
+pytest tests/integration/test_codex.py -v
+pytest tests/integration/test_gemini.py -v
+pytest tests/integration/test_cursor.py -v
+pytest tests/integration/test_opencode.py -v
+```
 
 ### Unit tests
 
 ```bash
-python3 -m pytest tests/test_aegis_catalog.py -v
+pytest tests/test_aegis_catalog.py -v
 ```
 
-### Claude Code integration test
+---
 
-Requires: `claude` installed and authenticated.
+## Prerequisites by Tool
 
-```bash
-tests/test-claude-bootstrapped-skill-install.sh
-```
+| Tool | Binary | Auth | Notes |
+|------|--------|------|-------|
+| Claude Code | `claude` | `claude /login` | — |
+| Codex | `codex` | `codex auth login` | Changes must be pushed to GitHub first — Codex `$skill-installer` installs from GitHub, not local paths. See [test-codex.md](test-codex.md). |
+| Gemini | `gemini` | Google account | Free-tier quota exhausts quickly; skips convert to `pytest.skip`, not failures. |
+| Cursor | `cursor-agent` | Cursor account | `cursor-agent 2026.04.16` is currently broken. Tests pass on `2026.03.30`. |
+| OpenCode | `opencode` | Provider API key | `opencode run` requires `git init` in the working directory. |
 
-### Gemini integration test
+---
 
-Requires: `gemini` installed and authenticated.
+## Per-Tool Detail Files
 
-```bash
-tests/test-gemini-skill-install.sh
-```
+| Tool | Detail file |
+|------|-------------|
+| Claude Code | [test-claude.md](test-claude.md) |
+| Codex | [test-codex.md](test-codex.md) |
+| Gemini | [test-gemini.md](test-gemini.md) |
+| Cursor | [test-cursor.md](test-cursor.md) |
+| OpenCode | [test-opencode.md](test-opencode.md) |
 
-### Codex integration test
-
-Requires: `codex` installed and authenticated. **Changes must be pushed to GitHub first** — the Codex `$skill-installer` only installs from GitHub, not from local paths. See [test-codex.md](test-codex.md) for the two-phase testing requirement.
-
-```bash
-git push
-tests/test-codex-skill-install.sh
-```
+---
 
 ## Policy
 
-**All scripts must be run before closing any task.** Do not limit testing to scripts directly touched by a change — a regression anywhere in the suite is a failure. If a script cannot be run (e.g. tool not installed, changes not pushed), note it explicitly and get user agreement before closing.
+**All tests must be run before closing any task.** Do not limit testing to scripts directly touched by a change — a regression anywhere in the suite is a failure. If a test cannot be run (tool not installed, binary broken, changes not pushed), note it explicitly and get user agreement before closing.
 
 See [testing-spec.md](testing-spec.md) for the full test plan, phase definitions, pass criteria, and the user journey contract.

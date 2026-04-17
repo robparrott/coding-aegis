@@ -8,14 +8,14 @@ Validate the coding-aegis skill install lifecycle across agentic coding tools. T
 
 Each tool has a detail file covering CLI invocation, install mechanisms, tool detection, teardown, and caveats.
 
-| Tool | Detail file | Test script | Status |
-|------|------------|-------------|--------|
-| Claude Code | [test-claude.md](test-claude.md) | `tests/test-claude-bootstrapped-skill-install.sh` | done |
-| Codex | [test-codex.md](test-codex.md) | `tests/test-codex-skill-install.sh` | done |
-| Gemini | [test-gemini.md](test-gemini.md) | `tests/test-gemini-skill-install.sh` | done |
-| Cursor | [test-cursor.md](test-cursor.md) | `tests/test-cursor-skill-install.sh` | TBD |
-| OpenCode | TBD | TBD | TBD |
-| Windsurf | TBD | TBD | TBD |
+| Tool | Detail file | pytest | Status |
+|------|------------|--------|--------|
+| Claude Code | [test-claude.md](test-claude.md) | `tests/integration/test_claude.py` | **8/8 passing** |
+| Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | **10/10 passing** |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | **3 pass / 6 skip** (quota) |
+| Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | **4 pass / 6 fail** — `cursor-agent 2026.04.16` broken; was 10/10 on `2026.03.30` |
+| OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | **9/9 passing** |
+| Windsurf | TBD | TBD | not started |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
 
