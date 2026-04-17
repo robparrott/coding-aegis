@@ -158,19 +158,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-yjy (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-yjy ● P1 Add OpenCode support
-  │   ├── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
-  │   └── ○ coding-aegis-yjy.6 ● P2 Document OpenCode support: docs/test/test-opencod…
-  ├── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
-  └── ○ coding-aegis-yjy.6 ● P2 Document OpenCode support: docs/test/test-opencod…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -196,6 +183,17 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 2
   └── ○ coding-aegis-eju ● P2 Implement validate-install in all integration tes…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-yjy (2 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-yjy ● P1 Add OpenCode support
+  │   └── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
+  └── ○ coding-aegis-yjy.5 ● P1 pytest OpenCode: implement TestOpenCodeJourney
 
 ────────────────────────────────────────────────────────────
 
@@ -358,15 +356,14 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-yjy`](add-opencode-support.md)
-- [`coding-aegis-yjy.5`](add-opencode-support.md)
-- [`coding-aegis-yjy.6`](add-opencode-support.md)
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-eju`](standalone.md)
 - [`coding-aegis-rge`](standalone.md)
 - [`coding-aegis-2l5`](standalone.md)
+- [`coding-aegis-yjy`](add-opencode-support.md)
+- [`coding-aegis-yjy.5`](add-opencode-support.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-7b7`](standalone.md)

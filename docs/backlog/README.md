@@ -4,7 +4,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 ## Epics
 
-- [ ] [Add OpenCode support](add-opencode-support.md) — 4/6 tasks
+- [ ] [Add OpenCode support](add-opencode-support.md) — 5/6 tasks
 - [ ] [Cross-tool artifact model refactor](cross-tool-artifact-model-refactor.md) — 2/15 tasks
 - [ ] [External dependency installation for packages](external-dependency-installation-for-packages.md) — 0/1 tasks
 - [ ] [Phase 2: coding-aegis Skill (Claude Code)](phase-2-coding-aegis-skill-claude.md) — 36/41 tasks

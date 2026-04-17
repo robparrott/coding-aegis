@@ -1,6 +1,6 @@
 # OpenCode Integration Spec
 
-**Status**: Draft — detection signal unverified; all other findings confirmed from official docs (2026-04-17).
+**Status**: Confirmed — all signals verified live against opencode v1.4.7 (2026-04-17).
 
 ---
 
@@ -13,21 +13,21 @@
 ## 2. Headless Invocation
 
 ```bash
-opencode run '<prompt>' --quiet
+opencode run '<prompt>'
 ```
 
 | Flag | Meaning |
 |------|---------|
 | `run '<prompt>'` | Execute a single prompt non-interactively |
-| `-q` / `--quiet` | Suppress spinner (required for script piping) |
 | `-m` / `--model <provider/model>` | Model override, e.g. `anthropic/claude-sonnet-4-20250514` |
-| `-a` / `--agent <name>` | Agent selection: `build`, `plan`, `general`, `explore`, or custom |
-| `-f json` / `--format json` | Structured JSON output |
+| `--agent <name>` | Agent selection: `build`, `plan`, `general`, `explore`, or custom |
+| `--format json` | Raw JSON events output (default: formatted) |
 | `-s` / `--session <id>` | Resume a specific session |
 | `-c` / `--continue` | Resume previous session |
 | `--print-logs` | Emit logs to stderr |
+| `--log-level` | Log level: DEBUG, INFO, WARN, ERROR |
 
-The `run` command bootstraps a temporary server and streams the response to stdout. Does not require a pseudo-terminal.
+Note: no `--quiet` flag exists. The `run` command bootstraps a temporary server and streams the response to stdout. Does not require a pseudo-terminal.
 
 ---
 
@@ -114,21 +114,16 @@ Additional files can be referenced via `opencode.json`:
 
 | Signal | Type | Confidence |
 |--------|------|-----------|
-| `OPENCODE=1` env var | Env | **Unverified** — not in official docs; may be set by `opencode run` |
-| `OPENCODE_PID` env var | Env | **Unverified** — not in official docs |
-| `.opencode` in `__file__` path | Path | Low — only fires if skill is installed under `.opencode/skills/` |
+| `OPENCODE=1` env var | Env | **Confirmed** — set by `opencode run` in all subprocesses |
+| `OPENCODE_PID` env var | Env | **Confirmed** — set to the opencode server PID |
+| `.opencode` in `__file__` path | Path | Low fallback — only fires if skill installed under `.opencode/skills/` |
 
-### Open question
+Both `OPENCODE=1` and `OPENCODE_PID` confirmed via live test (opencode v1.4.7, 2026-04-17):
 
-No official documentation confirms that `opencode run` injects any `OPENCODE_*` env var into agent subprocesses. The `OPENCODE=1` and `OPENCODE_PID` signals currently in `detect_tool.py` are **unverified**. Before shipping OpenCode support, run:
-
-```bash
-opencode run 'bash -c "env | grep -i opencode"' --quiet
 ```
-
-and record what variables appear.
-
-If no env var is set, the path-based signal (`.opencode` in `__file__`) is the fallback — low confidence but functional for project-scoped skills.
+OPENCODE_PID=49906
+OPENCODE=1
+```
 
 ---
 

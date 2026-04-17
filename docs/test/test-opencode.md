@@ -2,7 +2,7 @@
 
 > Tool-specific details for the OpenCode integration test. For the full test plan, phase definitions, and pass criteria see [testing-spec.md](testing-spec.md). For how OpenCode skills and rules work, see [opencode-integration.md](../architecture/opencode-integration.md).
 
-> **Status**: Spec ready — pytest not yet written. Blocked on confirming the tool-detection signal. See §4.
+> **Status**: Spec ready — pytest not yet written (`yjy.5`). Detection signals confirmed. See §4.
 
 ---
 
@@ -15,15 +15,17 @@
 ## 2. Headless Invocation
 
 ```bash
-opencode run '<prompt>' --quiet
+opencode run '<prompt>'
 ```
 
 | Flag | Purpose |
 |------|---------|
 | `run '<prompt>'` | Non-interactive single-prompt execution |
-| `-q` / `--quiet` | Suppress spinner (required for clean stdout capture) |
+| `--format json` | Raw JSON event stream (use for structured output) |
+| `-m <provider/model>` | Model override |
+| `--agent <name>` | Agent selection (build, plan, general, explore) |
 
-Prompt is a positional argument. No `--trust` equivalent known (not required — opencode does not have a workspace trust prompt).
+Prompt is a positional argument. No `--trust` equivalent (opencode has no workspace trust prompt). No `--quiet` flag exists.
 
 ---
 
@@ -46,22 +48,19 @@ No user-scope (`~/.config/opencode/skills/`) installation required for project-s
 
 ## 4. Tool Detection — Open Question
 
-**Blocked**: `detect_tool.py` currently asserts `OPENCODE=1` and `OPENCODE_PID` env signals, but these are **not confirmed** in official documentation.
+**Confirmed** (opencode v1.4.7, 2026-04-17): `opencode run` injects both signals into all subprocesses.
 
-Before writing the pytest, run this inside an `opencode run` session and record the output:
-
-```bash
-opencode run 'bash -c "env | grep -i opencode"' --quiet
+```
+OPENCODE=1
+OPENCODE_PID=<server-pid>
 ```
 
-| Signal | Current status |
-|--------|---------------|
-| `OPENCODE=1` | In detect_tool.py; unverified |
-| `OPENCODE_PID` | In detect_tool.py; unverified |
+| Signal | Status |
+|--------|--------|
+| `OPENCODE=1` | **Confirmed** — use as primary detection signal |
+| `OPENCODE_PID` | **Confirmed** — secondary signal |
 
-If neither is set by `opencode run`, the test fixture should inject a synthetic env var (same pattern as Cursor's `CURSOR_AGENT=1` injection) and update `detect_tool.py` accordingly.
-
-Phase 4a (`detect_tool.py` direct) must be adjusted to match whatever signal is confirmed.
+`detect_tool.py` signals are correct as-is. Phase 4a can assert `tool == "opencode"` when `OPENCODE=1` is in the environment.
 
 ---
 
@@ -121,3 +120,4 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 | Does `opencode run` require `git init` in the working directory? | Unverified |
 | Does the skill invocation syntax `/coding-aegis` work in opencode? | Unverified — may differ from Claude/Cursor |
 | Does opencode read `.opencode/skills/` immediately or require restart? | Unverified |
+| What does opencode output look like — ANSI stripped or raw? | Unverified — may need output cleaning like Gemini |
