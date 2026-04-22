@@ -1,5 +1,7 @@
 # Standalone Issues
 
+- [x] `coding-aegis-vbp` [task] Integration tests: verify bootstrap install leaves no side effects
+- [x] `coding-aegis-ds9` [task] Improve install.md: invocation clarity, standardization, no side effects
 - [x] `coding-aegis-nui` [task] Add install/uninstall instructions for bootstrap skill to HOWTO
 - [x] `coding-aegis-2ap` [bug] Integration tests must clean up all tool-specific directories after each run
 - [x] `coding-aegis-drg` [task] Refactor test_claude.py to Pattern 1: class-scoped journey fixture

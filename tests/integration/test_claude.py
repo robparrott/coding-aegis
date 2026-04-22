@@ -175,6 +175,12 @@ class TestClaudeJourney:
         run_cli(
             ["claude", "plugin", "marketplace", "remove", state["marketplace_name"]],
         )
+        # Verify marketplace registration was removed (global state).
+        list_result = run_cli(["claude", "plugin", "marketplace", "list"])
+        assert state["marketplace_name"] not in list_result.stdout, (
+            f"Marketplace {state['marketplace_name']!r} still registered after teardown — "
+            f"global state leak.\n{list_result.stdout[:500]}"
+        )
 
         # Explicit cleanup of tool-specific directories so pytest's retained
         # temp dirs don't pollute subsequent test runs.

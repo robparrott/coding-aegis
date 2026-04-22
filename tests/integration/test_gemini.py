@@ -156,6 +156,16 @@ class TestGeminiJourney:
             cwd=test_dir,
             env=clean_env,
         )
+        # Verify skill was unlinked (workspace-scoped state).
+        list_result = run_cli(
+            ["gemini", "skills", "list"],
+            cwd=test_dir,
+            env=clean_env,
+        )
+        assert "coding-aegis" not in list_result.stdout, (
+            f"coding-aegis skill still linked after teardown — "
+            f"workspace state leak.\n{list_result.stdout[:500]}"
+        )
 
         # Explicit cleanup of tool-specific directories so pytest's retained
         # temp dirs don't pollute subsequent test runs.

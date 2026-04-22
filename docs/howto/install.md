@@ -1,6 +1,13 @@
 # Install Guide
 
-How to install the coding-aegis skill and use it to manage governance packages, organized by coding-agent tool.
+How to install the coding-aegis skill and use it to manage packages, organized by coding-agent tool.
+
+**Command prefix legend:**
+- `$ ` — run in a shell (bash/zsh terminal)
+- `/coding-aegis ...` — type into the tool's chat or prompt (Claude Code, Cursor, OpenCode, Gemini)
+- `$coding-aegis ...` — Codex skill invocation syntax
+
+**Package name format:** `<package-name>` is the bare package name only — e.g. `helloworld` — not a tier-qualified path like `optional/helloworld`.
 
 ---
 
@@ -8,41 +15,37 @@ How to install the coding-aegis skill and use it to manage governance packages, 
 
 ### Prerequisites
 
-- Claude Code CLI v1.0.33+ (`claude --version`)
-- GitHub access to the coding-aegis repo (or a local clone)
+- Claude Code CLI v1.0.33+ (`$ claude --version`)
+- GitHub access to the coding-aegis repo
 
-### Steps
+### Install
 
 1. **Add the coding-aegis marketplace**
 
-   From GitHub:
    ```
-   /plugin marketplace add robparrott/coding-aegis
+   $ claude plugin marketplace add robparrott/coding-aegis
    ```
 
-   Or from a local clone:
-   ```bash
-   claude plugin marketplace add /path/to/coding-aegis
-   ```
+   > **Alternative:** If you have a local clone, you can also run `/plugin marketplace add /path/to/coding-aegis` from within Claude chat.
 
    *Expect:* `Successfully added marketplace: robparrott-coding-aegis`
 
    Verify:
-   ```bash
-   claude plugin marketplace list
-   # Should show: coding-aegis
    ```
+   $ claude plugin marketplace list
+   ```
+   Should show: `coding-aegis`
 
 2. **Install the coding-aegis plugin**
 
    ```
-   /plugin install coding-aegis@robparrott-coding-aegis
+   $ claude plugin install coding-aegis@robparrott-coding-aegis
    ```
 
    Select the appropriate scope:
-   - **User scope** — governance applies across all your repositories
-   - **Project scope** — governance applies to this repository for all collaborators
-   - **Local scope** — governance applies to you in this repository only
+   - **User scope** — skill available across all your repositories
+   - **Project scope** — skill available to all collaborators in this repository
+   - **Local scope** — skill available to you in this repository only
 
    *Expect:* `Installed coding-aegis. Restart Claude Code to load new plugins.`
 
@@ -65,25 +68,23 @@ How to install the coding-aegis skill and use it to manage governance packages, 
    /coding-aegis show <package-name>
    ```
 
-   *Expect:* Packages listed by tier (required, best-practices, optional, goodies).
+   Packages are listed by tier: `required`, `best-practices`, `optional`, `goodies`. The tiers are informational — choose the packages relevant to your project.
 
-6. **Install governance packages**
+6. **Install a package**
 
    ```
    /coding-aegis install <package-name>
    ```
 
-   Start with `required` tier packages — these are non-negotiable governance. Then review `best-practices` for recommended defaults.
-
    The skill installs rule files to `.claude/rules/` and skill files to `.claude/skills/`. Restart Claude Code to load newly installed skills.
 
-7. **Uninstall a governance package**
+7. **Uninstall a package**
 
    ```
    /coding-aegis uninstall <package-name>
    ```
 
-   Removes all governance-managed files for the package. Restart Claude Code to unload removed skills.
+   Removes all managed files for the package. Restart Claude Code to unload removed skills.
 
 8. **Check status**
 
@@ -91,14 +92,14 @@ How to install the coding-aegis skill and use it to manage governance packages, 
    /coding-aegis status
    ```
 
-   Shows installed packages, versions, and whether they're current with the catalog.
+   Shows installed packages, versions, and whether they are current with the catalog.
 
 ### Updating
 
 To pick up new packages or updates from the catalog:
 
 ```
-/plugin marketplace update robparrott-coding-aegis
+$ claude plugin marketplace update robparrott-coding-aegis
 ```
 
 ### Troubleshooting
@@ -108,29 +109,23 @@ To pick up new packages or updates from the catalog:
 This can happen when the marketplace was re-registered under a different name or the cached version is stale. Fix by removing both the plugin and the marketplace, then reinstalling:
 
 ```
-/plugin uninstall coding-aegis@coding-aegis
-/plugin marketplace remove coding-aegis
-/plugin marketplace add robparrott/coding-aegis
-/plugin install coding-aegis@robparrott-coding-aegis
+$ claude plugin uninstall coding-aegis@coding-aegis
+$ claude plugin marketplace remove coding-aegis
+$ claude plugin marketplace add robparrott/coding-aegis
+$ claude plugin install coding-aegis@robparrott-coding-aegis
 ```
 
 Restart Claude Code after reinstalling.
 
 **Skill only works in the coding-aegis repo, not other projects**
 
-The plugin was installed with local (project) scope. Uninstall and reinstall with user scope so it's available across all repositories.
+The plugin was installed with local (project) scope. Uninstall and reinstall with user scope so it is available across all repositories.
 
 ### Removing
 
-```bash
-/plugin uninstall coding-aegis@robparrott-coding-aegis
-/plugin marketplace remove robparrott-coding-aegis
 ```
-
-Or using the CLI directly:
-```bash
-claude plugin uninstall coding-aegis@coding-aegis --scope user
-claude plugin marketplace remove coding-aegis
+$ claude plugin uninstall coding-aegis@robparrott-coding-aegis
+$ claude plugin marketplace remove robparrott-coding-aegis
 ```
 
 ---
@@ -139,29 +134,42 @@ claude plugin marketplace remove coding-aegis
 
 ### Prerequisites
 
-- `cursor-agent` CLI installed (`brew install cursor-cli` on macOS)
+- `cursor-agent` CLI installed (`$ brew install cursor-cli` on macOS)
 - Authenticated (Cursor account)
-- Local clone of the coding-aegis repo
 
-> **macOS note**: After `brew install cursor-cli`, clear the quarantine flag:
-> ```bash
-> xattr -rd com.apple.quarantine "$(brew --prefix)/Caskroom/cursor-cli/<version>/"
+> **macOS note:** After `brew install cursor-cli`, clear the quarantine flag:
+> ```
+> $ xattr -rd com.apple.quarantine "$(brew --prefix)/Caskroom/cursor-cli/<version>/"
 > ```
 > Substitute the installed version number. See [test-cursor.md](../test/test-cursor.md) for details.
 
 ### Install
 
-Copy the skill directory into your target project:
+1. **Clone the coding-aegis repo**
 
-```bash
-SKILL_SRC=/path/to/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis
-mkdir -p .cursor/skills
-cp -r "$SKILL_SRC" .cursor/skills/coding-aegis
-```
+   ```
+   $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+   ```
 
-The skill makes `/coding-aegis` available as an invocable skill in Cursor chat.
+2. **Copy the skill into your target project**
 
-> **Symlinks also work** for personal use: `ln -s "$SKILL_SRC" .cursor/skills/coding-aegis`. Copy is preferred for team repos since symlinks require every contributor to have the same clone path.
+   ```
+   $ SKILL_SRC=/tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis
+   $ mkdir -p .cursor/skills
+   $ cp -r "$SKILL_SRC" .cursor/skills/coding-aegis
+   ```
+
+   The skill makes `/coding-aegis` available as an invocable skill in Cursor chat.
+
+   > **Symlinks also work** for personal use: `ln -s "$SKILL_SRC" .cursor/skills/coding-aegis`. Copy is preferred for team repos since symlinks require every contributor to have the same clone path.
+
+3. **Remove the clone**
+
+   The installed skill is self-contained. The clone is only needed during setup.
+
+   ```
+   $ rm -rf /tmp/coding-aegis
+   ```
 
 ### Verify
 
@@ -173,18 +181,32 @@ In a Cursor chat:
 
 *Expect:* Catalog output listing packages by tier.
 
+### Install a package
+
+```
+/coding-aegis install <package-name>
+```
+
+### Uninstall a package
+
+```
+/coding-aegis uninstall <package-name>
+```
+
 ### Updating
 
-Pull a fresh copy of the skill directory:
+Re-clone temporarily, copy the updated skill over the existing one, then remove the clone:
 
-```bash
-cp -r /path/to/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis .cursor/skills/coding-aegis
+```
+$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+$ cp -r /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis .cursor/skills/coding-aegis
+$ rm -rf /tmp/coding-aegis
 ```
 
 ### Removing
 
-```bash
-rm -rf .cursor/skills/coding-aegis
+```
+$ rm -rf .cursor/skills/coding-aegis
 ```
 
 ---
@@ -193,7 +215,7 @@ rm -rf .cursor/skills/coding-aegis
 
 ### Prerequisites
 
-- Codex CLI installed and authenticated (`codex --version`)
+- Codex CLI installed and authenticated (`$ codex --version`)
 - The coding-aegis repo pushed to GitHub (Codex installs from GitHub, not local paths)
 
 ### 1. Install the coding-aegis skill
@@ -221,7 +243,7 @@ The catalog is fetched automatically from GitHub on first use and cached locally
 $coding-aegis install <package-name>
 ```
 
-Codex installs governance packages as:
+Codex installs packages as:
 - **Rules**: appended to `AGENTS.md` as `<!-- aegis:begin -->` / `<!-- aegis:end -->` sections
 - **Skills**: copied to `.agents/skills/<name>/`
 
@@ -233,10 +255,20 @@ $coding-aegis uninstall <package-name>
 
 Removes the `AGENTS.md` section and skill directory.
 
+### Updating
+
+Reinstall the skill from GitHub to pick up updates:
+
+```
+$skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/coding-aegis/skills/coding-aegis
+```
+
+Restart Codex after updating.
+
 ### 5. Remove coding-aegis
 
-```bash
-rm -rf ~/.codex/skills/coding-aegis
+```
+$ rm -rf ~/.codex/skills/coding-aegis
 ```
 
 Restart Codex to unload.
@@ -247,19 +279,32 @@ Restart Codex to unload.
 
 ### Prerequisites
 
-- OpenCode CLI installed and authenticated (`opencode --version`)
-- Local clone of the coding-aegis repo
+- OpenCode CLI installed and authenticated (`$ opencode --version`)
 - `git init` in your target project directory (OpenCode requires a git repo)
 
 ### Install
 
-Copy the skill directory into your target project:
+1. **Clone the coding-aegis repo**
 
-```bash
-SKILL_SRC=/path/to/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis
-mkdir -p .opencode/skills
-cp -r "$SKILL_SRC" .opencode/skills/coding-aegis
-```
+   ```
+   $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+   ```
+
+2. **Copy the skill into your target project**
+
+   ```
+   $ SKILL_SRC=/tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis
+   $ mkdir -p .opencode/skills
+   $ cp -r "$SKILL_SRC" .opencode/skills/coding-aegis
+   ```
+
+3. **Remove the clone**
+
+   The installed skill is self-contained. The clone is only needed during setup.
+
+   ```
+   $ rm -rf /tmp/coding-aegis
+   ```
 
 ### Verify
 
@@ -277,7 +322,7 @@ In an OpenCode session:
 /coding-aegis install <package-name>
 ```
 
-OpenCode installs governance packages as:
+OpenCode installs packages as:
 - **Rules**: appended to `AGENTS.md` as `<!-- aegis:begin -->` / `<!-- aegis:end -->` sections
 - **Skills**: copied to `.opencode/skills/<name>/`
 
@@ -287,10 +332,20 @@ OpenCode installs governance packages as:
 /coding-aegis uninstall <package-name>
 ```
 
-### Remove coding-aegis
+### Updating
 
-```bash
-rm -rf .opencode/skills/coding-aegis
+Re-clone temporarily, copy the updated skill over the existing one, then remove the clone:
+
+```
+$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+$ cp -r /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis .opencode/skills/coding-aegis
+$ rm -rf /tmp/coding-aegis
+```
+
+### Removing
+
+```
+$ rm -rf .opencode/skills/coding-aegis
 ```
 
 ---
@@ -299,34 +354,47 @@ rm -rf .opencode/skills/coding-aegis
 
 ### Prerequisites
 
-- Gemini CLI installed (`gemini --version`)
-- Authenticated (Google account via `gemini auth login`)
-- Local clone of the coding-aegis repo
+- Gemini CLI installed (`$ gemini --version`)
+- Authenticated (`$ gemini auth login`)
 - `git init` in your target project directory (Gemini requires a git repo for workspace-scoped skills)
 
-### 1. Install the coding-aegis skill
+### 1. Clone the coding-aegis repo
+
+```
+$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+```
+
+### 2. Install the coding-aegis skill
 
 Choose a scope:
 
 **User scope** (available in all projects):
-```bash
-gemini skills link /path/to/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+```
+$ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
   --scope user --consent
 ```
 
-**Workspace scope** (this project only, from the project directory):
-```bash
-gemini skills link /path/to/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+**Workspace scope** (this project only, run from the project directory):
+```
+$ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
   --scope workspace --consent
 ```
 
 Verify:
-```bash
-gemini skills list
-# Should show: coding-aegis
+```
+$ gemini skills list
+```
+Should show: `coding-aegis`
+
+### 3. Remove the clone
+
+The installed skill is self-contained. The clone is only needed during setup.
+
+```
+$ rm -rf /tmp/coding-aegis
 ```
 
-### 2. Browse the catalog
+### 4. Browse the catalog
 
 ```
 /coding-aegis list
@@ -335,29 +403,45 @@ gemini skills list
 
 The catalog is fetched automatically from GitHub on first use and cached locally in `.coding-aegis-catalog/`. No local clone of the catalog is needed.
 
-### 3. Install a package
+### 5. Install a package
 
 ```
 /coding-aegis install <package-name>
 ```
 
-Gemini installs governance packages as:
+Gemini installs packages as:
 - **Rules**: written to `.gemini/rules/aegis--<pkg>--<rule>.md`
 - **Skills**: copied to `.gemini/skills/<name>/`
 
-### 4. Uninstall a package
+### 6. Uninstall a package
 
 ```
 /coding-aegis uninstall <package-name>
 ```
 
-### 5. Remove coding-aegis
+### Updating
 
-```bash
-# Match the scope used during install:
-gemini skills uninstall coding-aegis --scope user
-# or:
-gemini skills uninstall coding-aegis --scope workspace
+Re-clone temporarily, relink the skill at the same scope, then remove the clone:
+
+```
+$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+$ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+  --scope user --consent
+$ rm -rf /tmp/coding-aegis
+```
+
+Use `--scope workspace` instead if the skill was installed at workspace scope.
+
+### 7. Remove coding-aegis
+
+```
+$ gemini skills uninstall coding-aegis --scope user
+```
+
+Or, if installed at workspace scope:
+
+```
+$ gemini skills uninstall coding-aegis --scope workspace
 ```
 
 ---
@@ -378,6 +462,6 @@ gemini skills uninstall coding-aegis --scope workspace
 
 - **Skill invocation syntax** differs by tool: Claude Code, Cursor, Gemini, and OpenCode use `/skill-name`; Codex uses `$skill-name`
 - **Install paths** are auto-detected — the skill places files where each tool discovers them
-- **Catalog access** — fetched automatically from GitHub on first use via `ensure_catalog()`. No local clone required; the catalog is cached in `.coding-aegis-catalog/` with a 30-second TTL
+- **Catalog access** — fetched automatically from GitHub on first use via `ensure_catalog()`. No local clone required at runtime; the catalog is cached in `.coding-aegis-catalog/` with a 30-second TTL
 - **Rules** are installed as markdown files with `managed-by: coding-aegis` frontmatter (rule-based tools) or as `<!-- aegis:begin/end -->` sections in `AGENTS.md` (Codex, OpenCode)
 - **Skills** are installed into the tool's discovery path and are immediately invocable without a restart (except Codex)

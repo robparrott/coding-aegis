@@ -2,13 +2,16 @@
 conftest.py — shared pytest fixtures for coding-aegis integration tests.
 
 Fixtures provided:
-  repo_root      — Path to the repository root (session scope)
-  catalog_path   — Path to pkgs/ in the repo (session scope)
-  test_dir       — Fresh temp directory per test function, auto-cleaned up
-  clean_env      — os.environ copy with Claude Code vars stripped
-  run_cli        — The harness run_cli function (for convenience)
-  timeout        — Default timeout integer
+  repo_root          — Path to the repository root (session scope)
+  catalog_path       — Path to pkgs/ in the repo (session scope)
+  test_dir           — Fresh temp directory per test function, auto-cleaned up
+  clean_env          — os.environ copy with Claude Code vars stripped
+  run_cli            — The harness run_cli function (for convenience)
+  timeout            — Default timeout integer
+  no_stray_clones    — Session-scoped guard: asserts no /tmp/coding-aegis* dirs
+                       survive after the full test session (auto-used).
 """
+import glob
 import os
 import shutil
 import subprocess
@@ -78,3 +81,22 @@ def clean_env() -> dict:
 def run_cli():
     """Expose harness.run_cli as a fixture for test functions that prefer it."""
     return _run_cli
+
+
+# ── Session-level side-effect guards ─────────────────────────────────────────
+
+@pytest.fixture(autouse=True, scope="session")
+def no_stray_clones():
+    """Guard against stray /tmp/coding-aegis* repo clones.
+
+    The install guide instructs users to clone to /tmp/coding-aegis and remove
+    it after bootstrapping. This fixture asserts that no such clone is left
+    behind after the entire test session, catching any test that accidentally
+    creates a persistent clone.
+    """
+    yield
+    stray = glob.glob("/tmp/coding-aegis*")
+    assert not stray, (
+        f"Stray coding-aegis clone(s) found in /tmp after test session — "
+        f"bootstrap install must not leave persistent side effects: {stray}"
+    )

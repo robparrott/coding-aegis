@@ -138,6 +138,9 @@ class TestCodexJourney:
 
         # Phase 7: remove coding-aegis skill
         shutil.rmtree(CODEX_SKILL_DIR, ignore_errors=True)
+        assert not CODEX_SKILL_DIR.exists(), (
+            f"Bootstrap skill not cleaned up — global state leak: {CODEX_SKILL_DIR}"
+        )
 
         # Explicit cleanup of tool-specific directories so pytest's retained
         # temp dirs don't pollute subsequent test runs.
