@@ -169,7 +169,7 @@ class TestCopilotJourney:
         # ── TEARDOWN ──────────────────────────────────────────────────────────
         if state.get("helloworld_installed") and _COPILOT_SKILL_INVOCATION_VALIDATED:
             run_cli(
-                _copilot_cmd("/coding-aegis uninstall helloworld --catalog modules"),
+                _copilot_cmd("/coding-aegis uninstall helloworld"),
                 cwd=test_dir,
                 timeout=TIMEOUT_LONG,
                 env=clean_env,
@@ -411,7 +411,7 @@ class TestCopilotJourney:
     def test_phase6_uninstall_helloworld(self, journey):
         """Phase 6 — uninstall helloworld removes installed files."""
         result = run_cli(
-            _copilot_cmd("/coding-aegis uninstall helloworld --catalog modules"),
+            _copilot_cmd("/coding-aegis uninstall helloworld"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],

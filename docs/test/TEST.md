@@ -29,7 +29,7 @@ All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an 
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
 | Gemini | `test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** | Path bugs fixed 2026-04-22. Phases 1, 3, 4a pass. Phases 4b–6 skip on free-tier quota. Revival tracked in `97z.13`. |
-| Copilot | `test_copilot.py` | 10 | **10/10 passing** | All phases validated 2026-04-22. Skill invocation confirmed. No env var signal — path:.github only. Natural language prompts required for catalog commands. |
+| Copilot | `test_copilot.py` | 10 | **10/10 passing** | All phases validated 2026-04-22. No env var signal — path:.github only. Steps take 30–40s (Copilot LLM latency); UX budget warnings are expected. |
 
 ---
 
@@ -44,7 +44,7 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
 | Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** — path bugs fixed 2026-04-22; phases 4b–6 quota-skip on free tier. Revival tracked in `97z.13`. |
-| Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **10/10 passing** — all phases validated 2026-04-22. Natural language prompts used for catalog commands (slash-command syntax with `--catalog` flag causes Copilot to attempt binary execution). |
+| Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **10/10 passing** — all phases validated 2026-04-22. Steps take 30–40s (Copilot LLM latency); UX budget warnings are expected and not a defect. |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
 
