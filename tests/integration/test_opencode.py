@@ -152,6 +152,12 @@ class TestOpenCodeJourney:
                 env=clean_env,
             )
 
+        # Explicit cleanup of tool-specific directories so pytest's retained
+        # temp dirs don't pollute subsequent test runs.
+        shutil.rmtree(test_dir / ".opencode", ignore_errors=True)
+        (test_dir / "AGENTS.md").unlink(missing_ok=True)
+        # Temp dir is cleaned automatically by tmp_path_factory.
+
     # ── Phase 1: Environment & Tool Validation ────────────────────────────
 
     def test_phase1_auth(self, journey):

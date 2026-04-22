@@ -1,6 +1,6 @@
 # Gemini — Test Detail
 
-> **DEFERRED**: Gemini testing is currently deferred due to free-tier quota constraints. The tests exist (`tests/integration/test_gemini.py`) but are not run as part of day-to-day development. Revival and a quota-resilient strategy are tracked in task `97z.13`.
+> **STATUS (2026-04-22)**: Path bugs fixed. Tests run and produce: 3 pass / 1 skip (no marketplace) / 6 quota-skip. Phases 1, 3, 4a pass on free tier. Agent-mediated phases (4b–6) skip gracefully on quota exhaustion. Full pass requires paid Gemini quota — tracked in `97z.13`.
 
 > Tool-specific details for the Gemini skill install test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md).
 

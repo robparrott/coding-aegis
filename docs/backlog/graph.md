@@ -199,12 +199,12 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-2ap (1 issues, 1 layers)
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
-  └── ○ coding-aegis-2ap ● P1 Integration tests must clean up all tool-specific…
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -223,15 +223,6 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -348,10 +339,9 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-2ap`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
-- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

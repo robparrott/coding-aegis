@@ -10,7 +10,7 @@ Validate the coding-aegis skill install lifecycle across agentic coding tools. T
 
 ---
 
-## Current Status (2026-04-17)
+## Current Status (2026-04-22)
 
 ### pytest integration suite
 
@@ -28,7 +28,7 @@ All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an 
 | Codex | `test_codex.py` | 10 | **10/10 passing** | Requires push to GitHub first; phase 6 uses `danger-full-access` sandbox |
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
-| Gemini | `test_gemini.py` | 10 | **deferred** | Free-tier quota exhausts frequently; deferred for day-to-day dev. See [test-gemini.md](test-gemini.md). Revival tracked in `97z.13`. |
+| Gemini | `test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** | Path bugs fixed 2026-04-22. Phases 1, 3, 4a pass. Phases 4b–6 skip on free-tier quota. Revival tracked in `97z.13`. |
 | Windsurf | TBD | — | not started | — |
 
 ---
@@ -43,7 +43,7 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 | Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | 10 | **10/10 passing** — phase 6 uses `danger-full-access` to allow skill dir removal |
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
-| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **Deferred** — free-tier quota exhausts frequently; not run in day-to-day dev. Revival tracked in task `97z.13`. |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** — path bugs fixed 2026-04-22; phases 4b–6 quota-skip on free tier. Revival tracked in `97z.13`. |
 | Windsurf | TBD | TBD | — | not started |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.

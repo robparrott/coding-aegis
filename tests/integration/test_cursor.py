@@ -181,6 +181,9 @@ class TestCursorJourney:
                 env=clean_env,
             )
 
+        # Explicit cleanup of tool-specific directories so pytest's retained
+        # temp dirs don't pollute subsequent test runs.
+        shutil.rmtree(test_dir / ".cursor", ignore_errors=True)
         # Temp dir is cleaned automatically by tmp_path_factory.
 
     # ── Phase 1: Environment & Tool Validation ────────────────────────────

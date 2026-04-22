@@ -139,6 +139,10 @@ class TestCodexJourney:
         # Phase 7: remove coding-aegis skill
         shutil.rmtree(CODEX_SKILL_DIR, ignore_errors=True)
 
+        # Explicit cleanup of tool-specific directories so pytest's retained
+        # temp dirs don't pollute subsequent test runs.
+        shutil.rmtree(test_dir / ".agents", ignore_errors=True)
+        (test_dir / "AGENTS.md").unlink(missing_ok=True)
         # Temp dir is cleaned automatically by tmp_path_factory.
 
     # ── Phase 1: Environment & Tool Validation ────────────────────────────

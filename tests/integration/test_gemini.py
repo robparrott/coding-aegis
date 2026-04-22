@@ -157,6 +157,10 @@ class TestGeminiJourney:
             env=clean_env,
         )
 
+        # Explicit cleanup of tool-specific directories so pytest's retained
+        # temp dirs don't pollute subsequent test runs.
+        shutil.rmtree(test_dir / ".gemini", ignore_errors=True)
+        shutil.rmtree(test_dir / ".coding-aegis-catalog", ignore_errors=True)
         # Temp dir is cleaned automatically by tmp_path_factory.
 
     # ── Phase 1: Environment & Tool Validation ────────────────────────────
