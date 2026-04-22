@@ -32,7 +32,7 @@ Prompt is passed as a positional argument OR via stdin (both confirmed). The pyt
 
 `--trust` is required for headless use in non-interactive temp directories — without it, cursor-agent prints a Workspace Trust prompt and exits. Add it to all headless invocations that don't already use `--force`/`--yolo`.
 
-Version: `2026.03.30-a5d3e17`
+Version: `2026.04.16-2d20146`
 
 | Question | Status |
 |----------|--------|
@@ -85,12 +85,12 @@ The `.cursor/skills/` path is preferred. Skill invocation uses `/skill-name` sla
 
 ### Skill discovery within cursor-agent
 
-Whether `cursor-agent` (headless CLI) picks up skills from `.cursor/skills/` in the CWD the same way the GUI IDE does is unconfirmed.
+Confirmed: `cursor-agent` (headless CLI) picks up skills from `.cursor/skills/` in the CWD.
 
 | Question | Status |
 |----------|--------|
-| Does headless cursor-agent load `.cursor/skills/` from CWD? | UNVERIFIED |
-| Skill invocation syntax: `/skill-name`? | UNVERIFIED — likely `/` |
+| Does headless cursor-agent load `.cursor/skills/` from CWD? | **Confirmed** — yes (tests passing) |
+| Skill invocation syntax: `/skill-name`? | **Confirmed** — `/` prefix (same as Claude Code) |
 | Does `cursor-agent` read `.cursor/rules/` from CWD? | UNVERIFIED |
 
 ---
@@ -207,7 +207,7 @@ Expected to use `/coding-aegis ...` syntax (same as Claude and Gemini).
 | Q5 | Does cursor-agent load `.cursor/skills/` from CWD? | Phase 3/5 | **Confirmed** — yes |
 | Q6 | Is there a `cursor-agent plugin install` subcommand? | Phase 3 | **Confirmed — no** |
 | Q7 | User-scope skills dir path? | User scope | **Confirmed** — `~/.cursor/skills-cursor/` (not `skills/`) |
-| Q8 | What does `cursor-agent --version` return? | Version tracking | **Confirmed** — `2026.03.30-a5d3e17` |
+| Q8 | What does `cursor-agent --version` return? | Version tracking | **Confirmed** — `2026.04.16-2d20146` |
 | Q9 | Are there additional `CURSOR_*` env vars? | Detection | Unverified; tests pass without it |
 | Q10 | Is `--trust` required for headless temp dirs? | All phases | **Confirmed** — yes, must add to base invocation |
 

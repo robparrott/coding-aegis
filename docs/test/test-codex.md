@@ -43,7 +43,7 @@ Agent-mediated via `$skill-installer` with `danger-full-access` sandbox (needs G
 $skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/coding-aegis/skills/coding-aegis
 ```
 
-Assert: output contains `install\|success\|done\|copied\|coding-aegis`; SKILL.md and aegis-catalog.py present in `~/.codex/skills/coding-aegis/`.
+Assert: output contains `install\|success\|done\|copied\|coding-aegis`; `SKILL.md`, `aegis_lib.py`, `aegis-install.py`, `aegis-uninstall.py`, and `detect_tool.py` present in `~/.codex/skills/coding-aegis/`.
 
 After Phase 3, copy the `pkgs/` catalog into `$TEST_DIR`:
 
@@ -80,7 +80,7 @@ codex exec --ephemeral -s <sandbox> -o /dev/stdout
 | 4.4 | show | `$coding-aegis show helloworld` |
 | 5.1 | install helloworld | `$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` |
 | 5.5 | invoke helloworld | `$helloworld` |
-| 6.1 | uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` |
+| 6.1 | uninstall helloworld | `$coding-aegis uninstall helloworld` |
 
 Pass `--catalog $TEST_DIR/pkgs` in phases 5.1 and 6.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `pkgs/` tree instead of dispatching to the installed skill.
 
@@ -95,14 +95,14 @@ Pass `--catalog $TEST_DIR/pkgs` in phases 5.1 and 6.1 to prevent the agent from 
 | Artifact | Path |
 |----------|------|
 | Skill dir | `~/.codex/skills/coding-aegis/` |
-| Rules (project scope) | `$TEST_DIR/.agents/rules/aegis--*` |
+| Rules (project scope) | `$TEST_DIR/AGENTS.md` (`aegis:begin/end` sections) |
 | Skills (project scope) | `$TEST_DIR/.agents/skills/helloworld/` |
 
 ## Teardown
 
 | Phase | Step | Command | Assertion |
 |-------|------|---------|-----------|
-| 6.1 | Uninstall helloworld | `$coding-aegis uninstall helloworld --catalog $TEST_DIR/pkgs` via agent (danger-full-access) | no `not installed\|error` in output; `$TEST_DIR/.agents/skills/helloworld` absent |
+| 6.1 | Uninstall helloworld | `$coding-aegis uninstall helloworld` via agent (danger-full-access) | no `not installed\|error` in output; `$TEST_DIR/.agents/skills/helloworld` absent |
 | 7.1 | Uninstall coding-aegis skill | `rm -rf ~/.codex/skills/coding-aegis` | `assert_dir_not_exists ~/.codex/skills/coding-aegis` |
 | 7.3 | Remove marketplace | `rm -rf "$TEST_DIR/.codex-plugin"` | `assert_dir_not_exists $TEST_DIR/.codex-plugin` |
 | 7.5 | Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |

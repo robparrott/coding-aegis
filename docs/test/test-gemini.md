@@ -84,8 +84,6 @@ Note: Phase 3.3 (`detect_tool.py` present) is verified against the linked `$SKIL
 
 ## Installed Paths
 
-Gemini uses the same install paths as Claude Code (`.claude/` for project scope) because it reads Claude-compatible rule files.
-
 | Artifact | Path |
 |----------|------|
 | Skill dir | `$SKILL_DIR` (linked repo path, not copied) |

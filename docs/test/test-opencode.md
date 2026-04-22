@@ -2,13 +2,13 @@
 
 > Tool-specific details for the OpenCode integration test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md). For how OpenCode skills and rules work, see [opencode-integration.md](../architecture/opencode-integration.md).
 
-> **Status**: Spec ready — pytest not yet written (`yjy.5`). Detection signals confirmed. See §4.
+> **Status**: Tests written and passing (9/10). Detection signals confirmed. See §4.
 
 ---
 
 ## 1. pytest Location
 
-`tests/integration/test_opencode.py` — not yet written. Skipped automatically when `opencode` is not on PATH.
+`tests/integration/test_opencode.py` — Skipped automatically when `opencode` is not on PATH.
 
 ---
 
@@ -88,7 +88,7 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 
 | Phase | What | Notes |
 |-------|------|-------|
-| 1 | Auth — `opencode run 'Reply with: AUTH_OK' --quiet` | Confirms binary present and authenticated |
+| 1 | Auth — `opencode run 'Reply with: AUTH_OK'` | Confirms binary present and authenticated |
 | 2 | No marketplace — skip or assert no error | No plugin registry for opencode |
 | 3 | Skill files present in `.opencode/skills/coding-aegis/` | Fixture-created; assert SKILL.md, aegis_lib.py, etc. |
 | 4a | `detect_tool.py` direct — confirm tool=opencode | Depends on confirmed signal (see §4) |
@@ -116,8 +116,4 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 
 | Question | Status |
 |----------|--------|
-| What env var does `opencode run` inject into subprocesses? | **Must confirm before writing test** |
-| Does `opencode run` require `git init` in the working directory? | Unverified |
-| Does the skill invocation syntax `/coding-aegis` work in opencode? | Unverified — may differ from Claude/Cursor |
-| Does opencode read `.opencode/skills/` immediately or require restart? | Unverified |
 | What does opencode output look like — ANSI stripped or raw? | Unverified — may need output cleaning like Gemini |

@@ -90,10 +90,11 @@ ARTIFACT_TYPE_ORDER = ["rule", "skill", "agent", "mcp", "plugin"]
 
 TOOL_PATHS = {
     "claude":   {"scope_base": ".claude",   "skills_dir": "skills"},
-    "codex":    {"scope_base": ".agents",   "skills_dir": ".agents/skills",
-                 "skills_base": "."},
-    "cursor":   {"scope_base": ".cursor",   "skills_dir": "skills"},
-    "windsurf": {"scope_base": ".windsurf", "skills_dir": "skills"},
+    "gemini":   {"scope_base": ".gemini",   "skills_dir": "skills", "skills_base": ".gemini"},
+    "codex":    {"scope_base": ".agents",   "skills_dir": ".agents/skills", "skills_base": "."},
+    "cursor":   {"scope_base": ".cursor",   "skills_dir": "skills", "rule_ext": ".mdc"},
+    "opencode": {"scope_base": ".opencode", "skills_dir": "skills",
+                 "user_scope_base": ".config/opencode"},
     "copilot":  {"scope_base": ".github",   "skills_dir": "skills"},
 }
 ```
@@ -252,6 +253,8 @@ description: Browse, install, and manage coding agent governance packages.
 | uninstall <name> | aegis-uninstall.py <name> |
 | status | aegis-status.py |
 | detect-tool | detect_tool.py |
+| validate-install | aegis-validate-install.py |
+| *(no input)* | aegis-list.py (default) |
 
 ## Execution
 
@@ -287,7 +290,7 @@ If any script exits non-zero, print stderr verbatim. Do not improvise or retry.
 
 Runs in <5s total.
 
-### tests/test_aegis_lib.py (new, unit tests)
+### tests/unit/test_aegis_lib.py (new, unit tests)
 
 Test `aegis_lib.py` functions:
 - `parse_simple_yaml`, `parse_frontmatter`, `render_frontmatter`

@@ -29,9 +29,10 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 
 - **Hosting**: Private GitHub repository accessible to all engineering team members
 - **Claude Code**: Team has access to Claude Code with plugin support
-- **Cursor**: Organization has a Cursor Teams plan (enables Team Marketplace)
-- **Windsurf / Copilot**: TBD — bootstrap mechanisms to be designed later
-- **GitHub Enterprise App**: Required for Cursor private repo access
+- **Cursor**: Organization has a Cursor Teams plan (enables Team Marketplace); requires `cursor-cli` installed via Homebrew
+- **OpenCode / Codex / Gemini**: Supported via local skill copy or CLI skill management; no marketplace required
+- **Copilot**: TBD — bootstrap mechanism to be designed later
+- **GitHub Enterprise App**: Required for Cursor private repo access; also required for Codex (installs skills from GitHub)
 
 ## Backlog
 
@@ -44,6 +45,10 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 - [Tier system](docs/architecture/tier-system.md) — Governance tiers and promotion model
 - [Repository structure](docs/architecture/repository-structure.md) — Full directory layout
 - [coding-aegis skill](docs/architecture/coding-aegis.md) — Skill capabilities and interaction model
+- [coding-aegis skill behavior spec](docs/architecture/coding-aegis-skill-spec.md) — Detailed behavior contract
+- [Tool detection spec](docs/architecture/spec-tool-detection.md) — How the active coding tool is identified
+- [Deterministic CLI spec](docs/architecture/deterministic-cli-spec.md) — CLI script design and TOOL_PATHS reference
+- [OpenCode integration](docs/architecture/opencode-integration.md) — OpenCode-specific signals and paths
 
 ### Architecture Decisions
 - [AD-1: Package-based catalog](docs/architecture/AD-1-package-catalog.md)
@@ -58,6 +63,11 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 - [AD-10: Modular guidance files](docs/architecture/AD-10-modular-guidance-files.md)
 - [AD-11: Multi-tool repository support](docs/architecture/AD-11-multi-tool-repos.md) *(open question)*
 - [AD-12: External package references](docs/architecture/AD-12-external-package-references.md)
+- [AD-13: Cursor remote distribution](docs/architecture/AD-13-cursor-remote-distribution.md)
+- [AD-14: Cross-tool artifact model](docs/architecture/AD-14-cross-tool-artifact-model.md)
+- [AD-15: Single-source install adaptation](docs/architecture/AD-15-single-source-install-adaptation.md)
+- [AD-16: Deterministic CLI scripts](docs/architecture/AD-16-deterministic-skill-cli.md)
+- [AD-17: pytest integration test framework](docs/architecture/AD-17-qa-pytest-framework.md)
 
 ### Guides
 - [Install guide](docs/howto/install.md) — How to install and use coding-aegis across Claude Code, Codex, Cursor, OpenCode, and Gemini
@@ -69,6 +79,5 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 ## Key Directories
 
 - `pkgs/` — The package catalog, organized by tier
-- `quickstarts/` — Project scaffolding packages
 - `docs/architecture/` — ADRs and specifications
 - `docs/backlog/` — Phase planning and task tracking

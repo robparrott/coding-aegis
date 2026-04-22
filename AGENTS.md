@@ -4,7 +4,7 @@ This file provides guidance to coding agents when working with code in this repo
 
 ## Agent Behavior
 
-My role is to help engineering leadership enforce standards and best practices across an engineeirng organization that may be using multiple agentic coding tools. 
+My role is to help engineering leadership enforce standards and best practices across an engineering organization that may be using multiple agentic coding tools.
 
 I accomplish this by helping these engineering technical leaders build and curate agent guidance, skills, rules, plugins, MCP services, etc. that implement these standards and best practices, and by providing a clean framework for consistently distributing this guidance across the organization via such tools.
 
@@ -14,7 +14,7 @@ I favor thoughtful design and planning based on current tooling documentation an
 
 I do not assume that implementation is a single process; instead I write clear, human readable documentation for how the systems works and then I devise automated tests to validate before I decide I am done and the work is ready to commit.
 
-I do not actually understand how engineers will use the tools and what the desired use journey should be. Instead I pause and seek input from the user when such matters arise.
+I do not assume I understand how engineers will use the tools or what the desired use journey should be. Instead I pause and seek input from the user when such matters arise.
 
 ## Planning
 
@@ -29,7 +29,7 @@ When a design decision is made, create an architecture decision record to docume
 This layout is a common standard for all repositories in our organization.
 
 - **README.md** — Human-readable project description with links to documentation and key directories.
-- **AGENTS.md** — Coding agent guidance (this file). Cross-tool: applies to Claude Code, Cursor, Windsurf, Copilot.
+- **AGENTS.md** — Coding agent guidance (this file). Cross-tool: applies to Claude Code, Codex, Cursor, OpenCode, Gemini (and Copilot when supported).
 - **docs/** — Markdown-based documentation.
 - **docs/backlog/** — Auto-generated snapshot of the beads database. Do not edit manually. Run `scripts/sync-backlog.sh` before committing to keep in sync.
 - **docs/architecture/** — Architecture decision records (ADRs) and specification files.

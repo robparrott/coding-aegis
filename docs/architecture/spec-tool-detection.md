@@ -7,7 +7,7 @@
 
 ## Problem
 
-`aegis-catalog.py` needs to know which coding agent is running it so it can compute
+`aegis_lib.py` needs to know which coding agent is running it so it can compute
 correct install/uninstall paths. The current `_detect_tool()` function is unreliable:
 it mixes unvalidated assumptions with real signals and has no tests. When it misidentifies
 the tool, downstream path logic silently produces wrong results — causing the skill to
@@ -31,7 +31,8 @@ Confirmed by running `env` inside each tool's runtime or by reading tool source 
 | Codex CLI | `CODEX_THREAD_ID` | UUID string | Always injected per session | ✅ Confirmed (source) |
 | Codex CLI | `CODEX_SANDBOX` | `seatbelt` | Set on macOS when sandboxed | ✅ Confirmed (source) |
 | Cursor | `CURSOR_AGENT` | `1` | Injected by Cursor CLI in agent terminal | ✅ Confirmed (community + bug report) |
-| Windsurf | *(none)* | — | No `WINDSURF_*` vars documented or observed | ❌ No env signal |
+| OpenCode | `OPENCODE` | `1` | Injected by `opencode run` into all subprocesses | ✅ Confirmed (v1.4.7, 2026-04-17) |
+| OpenCode | `OPENCODE_PID` | server PID | Secondary signal, always present with `OPENCODE=1` | ✅ Confirmed (v1.4.7, 2026-04-17) |
 | Copilot | *(none)* | — | No Copilot-specific vars; runs in GitHub Actions (`GITHUB_ACTIONS=true`) | ❌ No reliable signal |
 
 **Notes:**
@@ -39,6 +40,8 @@ Confirmed by running `env` inside each tool's runtime or by reading tool source 
   subprocess regardless of sandbox mode. `CODEX_THREAD_ID` is also always present.
 - `CURSOR_AGENT=1` was accidentally removed in one Cursor release and restored; it is
   the intended mechanism. Treat as reliable but add `__file__` fallback.
+- `OPENCODE=1` and `OPENCODE_PID` are both confirmed live signals. Use `OPENCODE=1` as
+  the primary signal; check `OPENCODE_PID` as secondary.
 - An `AGENT=codex` convention (following Goose/Amp) was proposed in Codex issue #13416
   but not merged as of April 2026. Do not rely on it.
 - Copilot's cloud agent runs in a GitHub Actions runner. `GITHUB_ACTIONS=true` is present
@@ -46,16 +49,16 @@ Confirmed by running `env` inside each tool's runtime or by reading tool source 
 
 ### Script path (`__file__`)
 
-When `aegis-catalog.py` is invoked by an agent, `__file__` reflects the install location.
-Used as fallback when env vars are absent (e.g. Windsurf, Copilot, or degraded environments).
+When `aegis_lib.py` is invoked by an agent, `__file__` reflects the install location.
+Used as fallback when env vars are absent (e.g. Copilot or degraded environments).
 
 | Tool | Install path | `__file__` contains | Confidence |
 |------|-------------|----------------------|------------|
 | Claude Code | `~/.claude/skills/<name>/` | `.claude` | ✅ Confirmed (test output) |
 | Codex CLI | `.agents/skills/<name>/` (CWD-relative) | `.agents` | ✅ Confirmed (test output) |
-| Windsurf | `~/.codeium/windsurf/skills/<name>/` (global) or `.windsurf/skills/<name>/` (workspace) | `.codeium/windsurf` or `.windsurf` | ✅ From Windsurf docs |
+| OpenCode | `.opencode/skills/<name>/` (project) | `.opencode` | ✅ Confirmed (test output) |
 | Cursor | `~/.cursor/skills/<name>/` (assumed) | `.cursor` | ⚠️ Unverified |
-| Gemini CLI | `~/.gemini/skills/<name>/` (assumed) | `.gemini` | ⚠️ Unverified |
+| Gemini CLI | linked from source path | `.gemini` (if workspace-linked) | ⚠️ Unverified — env var is primary |
 | Copilot | N/A (no skill execution support) | N/A | — |
 
 ---
@@ -65,13 +68,10 @@ Used as fallback when env vars are absent (e.g. Windsurf, Copilot, or degraded e
 1. **Cursor `__file__` path** — `~/.cursor/skills/` is assumed but not confirmed by running
    the skill inside Cursor. `CURSOR_AGENT=1` is the primary signal; `__file__` is fallback.
 
-2. **Gemini `__file__` path** — Gemini's skill install location is not confirmed. Env var
-   `GEMINI_CLI=1` is reliable; `__file__` fallback is TBD.
+2. **Gemini `__file__` path** — Gemini links skills from the source path rather than copying
+   to a tool-specific directory. `GEMINI_CLI=1` env var is the primary signal.
 
-3. **Windsurf `__file__` on Windows** — Path is `C:\ProgramData\Windsurf\skills\` (system)
-   or `%APPDATA%\Windsurf\skills\` (user). Not a current concern (macOS-first).
-
-4. **`CURSOR_AGENT=1` reliability across Cursor versions** — It regressed once. The fallback
+3. **`CURSOR_AGENT=1` reliability across Cursor versions** — It regressed once. The fallback
    to `__file__` is important until this stabilises.
 
 ---
@@ -88,13 +88,14 @@ Env vars are checked first (process-intrinsic, unambiguous). `__file__` is fallb
 3.  CODEX_CI=1                → codex    (env, confirmed — always set by runtime)
 4.  CODEX_THREAD_ID present   → codex    (env, secondary codex signal)
 5.  CURSOR_AGENT=1            → cursor   (env, confirmed)
-6.  __file__ contains .codex  → codex    (path, confirmed)
-7.  __file__ contains .agents → codex    (path, confirmed — CWD-relative install)
-8.  __file__ contains .codeium/windsurf → windsurf  (path, from docs)
-9.  __file__ contains .windsurf         → windsurf  (path, workspace install)
-10. __file__ contains .cursor → cursor   (path, assumed)
-11. __file__ contains .gemini → gemini   (path, assumed)
-12. default                   → claude   (fallback)
+6.  OPENCODE=1                → opencode (env, confirmed v1.4.7)
+7.  OPENCODE_PID present      → opencode (env, secondary opencode signal)
+8.  __file__ contains .codex  → codex    (path, confirmed)
+9.  __file__ contains .agents → codex    (path, confirmed — CWD-relative install)
+10. __file__ contains .opencode → opencode (path, confirmed)
+11. __file__ contains .cursor → cursor   (path, assumed)
+12. __file__ contains .gemini → gemini   (path, assumed)
+13. default                   → UNKNOWN  (no match)
 ```
 
 ### Implementation contract
@@ -133,35 +134,31 @@ any scope assumption.
 
 ### Explicitly excluded
 
-- **Filesystem markers** (`.cursor/`, `.windsurf/` in CWD) — excluded because they fail
+- **Filesystem markers** (`.cursor/`, `.opencode/` in CWD) — excluded because they fail
   in multi-tool repos. Confirmed in AD-11.
 - **Parent process inspection** — fragile across shells and subprocess chains.
 - **Heuristics** — every signal used must be validated.
 
 ---
 
-## Proposed Tool Paths Update
+## Tool Paths
 
-Current `TOOL_PATHS` in `aegis-catalog.py` has errors. Updated based on research:
+`TOOL_PATHS` in `aegis_lib.py`:
 
 | Tool | `scope_base` | `skills_dir` | `skills_base` | Notes |
 |------|-------------|--------------|---------------|-------|
 | claude | `.claude` | `skills` | *(none)* | Relative to `~` (user) or CWD (project) |
-| codex | `.agents` | `skills` | `.` | CWD-relative; skills go in `.agents/skills/` |
-| cursor | `.cursor` | `skills` | *(none)* | Path unverified — confirm before implementing |
-| windsurf | `.codeium/windsurf` | `skills` | *(none)* | Global; workspace is `.windsurf/skills/` |
-| gemini | `.gemini` | `skills` | *(none)* | Path unverified |
+| codex | `.agents` | `.agents/skills` | `.` | CWD-relative; skills go in `.agents/skills/` |
+| cursor | `.cursor` | `skills` | *(none)* | `rule_ext: .mdc` |
+| opencode | `.opencode` | `skills` | *(none)* | `user_scope_base: .config/opencode` |
+| gemini | `.gemini` | `skills` | *(none)* | `skills_base: .gemini` |
 | copilot | `.github` | `skills` | *(none)* | No skill execution — rules delivery only |
 
 ---
 
-## Open Tasks Before Implementation
+## Open Tasks
 
 - [ ] Confirm Cursor `__file__` path by running a skill inside Cursor (task `coding-aegis-wpi.8`)
-- [ ] Confirm Gemini `__file__` path by running a skill inside Gemini
-- [ ] Add `gemini` to `TOOL_PATHS` in `aegis-catalog.py`
-- [ ] Write unit tests for `detect_tool()` covering all signals and fallbacks
-- [ ] Extract `detect_tool()` into `detect-tool.py` standalone module
 
 ---
 

@@ -218,7 +218,7 @@ $ rm -rf .cursor/skills/coding-aegis
 - Codex CLI installed and authenticated (`$ codex --version`)
 - The coding-aegis repo pushed to GitHub (Codex installs from GitHub, not local paths)
 
-### 1. Install the coding-aegis skill
+### Install
 
 From within your project directory, ask Codex to install the skill using its built-in `$skill-installer`:
 
@@ -228,7 +228,7 @@ $skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/co
 
 The skill installs to `~/.codex/skills/coding-aegis/`. Restart Codex to pick up the new skill.
 
-### 2. Browse the catalog
+### Verify
 
 ```
 $coding-aegis list
@@ -237,7 +237,7 @@ $coding-aegis show <package-name>
 
 The catalog is fetched automatically from GitHub on first use and cached locally in `.coding-aegis-catalog/`. No local clone needed.
 
-### 3. Install a package
+### Install a package
 
 ```
 $coding-aegis install <package-name>
@@ -247,7 +247,7 @@ Codex installs packages as:
 - **Rules**: appended to `AGENTS.md` as `<!-- aegis:begin -->` / `<!-- aegis:end -->` sections
 - **Skills**: copied to `.agents/skills/<name>/`
 
-### 4. Uninstall a package
+### Uninstall a package
 
 ```
 $coding-aegis uninstall <package-name>
@@ -265,7 +265,7 @@ $skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/co
 
 Restart Codex after updating.
 
-### 5. Remove coding-aegis
+### Removing
 
 ```
 $ rm -rf ~/.codex/skills/coding-aegis
@@ -358,52 +358,43 @@ $ rm -rf .opencode/skills/coding-aegis
 - Authenticated (`$ gemini auth login`)
 - `git init` in your target project directory (Gemini requires a git repo for workspace-scoped skills)
 
-### 1. Clone the coding-aegis repo
+### Install
 
-```
-$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
-```
+1. **Clone the repo**
 
-### 2. Install the coding-aegis skill
+   ```
+   $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+   ```
 
-Choose a scope:
+2. **Link the skill** — choose a scope:
 
-**User scope** (available in all projects):
-```
-$ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
-  --scope user --consent
-```
+   **User scope** (available in all projects):
+   ```
+   $ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+     --scope user --consent
+   ```
 
-**Workspace scope** (this project only, run from the project directory):
-```
-$ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
-  --scope workspace --consent
-```
+   **Workspace scope** (this project only, run from the project directory):
+   ```
+   $ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+     --scope workspace --consent
+   ```
 
-Verify:
+3. **Remove the clone** — the installed skill is self-contained:
+
+   ```
+   $ rm -rf /tmp/coding-aegis
+   ```
+
+### Verify
+
 ```
 $ gemini skills list
 ```
+
 Should show: `coding-aegis`
 
-### 3. Remove the clone
-
-The installed skill is self-contained. The clone is only needed during setup.
-
-```
-$ rm -rf /tmp/coding-aegis
-```
-
-### 4. Browse the catalog
-
-```
-/coding-aegis list
-/coding-aegis show <package-name>
-```
-
-The catalog is fetched automatically from GitHub on first use and cached locally in `.coding-aegis-catalog/`. No local clone of the catalog is needed.
-
-### 5. Install a package
+### Install a package
 
 ```
 /coding-aegis install <package-name>
@@ -413,7 +404,7 @@ Gemini installs packages as:
 - **Rules**: written to `.gemini/rules/aegis--<pkg>--<rule>.md`
 - **Skills**: copied to `.gemini/skills/<name>/`
 
-### 6. Uninstall a package
+### Uninstall a package
 
 ```
 /coding-aegis uninstall <package-name>
@@ -421,7 +412,7 @@ Gemini installs packages as:
 
 ### Updating
 
-Re-clone temporarily, relink the skill at the same scope, then remove the clone:
+Re-clone temporarily, relink at the same scope, then remove the clone:
 
 ```
 $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
@@ -432,7 +423,7 @@ $ rm -rf /tmp/coding-aegis
 
 Use `--scope workspace` instead if the skill was installed at workspace scope.
 
-### 7. Remove coding-aegis
+### Removing
 
 ```
 $ gemini skills uninstall coding-aegis --scope user
@@ -446,11 +437,6 @@ $ gemini skills uninstall coding-aegis --scope workspace
 
 ---
 
-## Windsurf
-
-*Stub — to be authored when Windsurf bootstrap mechanism is designed.*
-
----
 
 ## GitHub Copilot
 

@@ -8,19 +8,19 @@ Per-tool reference for engineers integrating coding-aegis. Covers marketplace/pl
 
 ## Quick Reference: Feature Support Matrix
 
-| Feature | Claude Code | Codex | Cursor | OpenCode | Gemini CLI | Windsurf | Copilot |
-|---------|:-----------:|:-----:|:------:|:--------:|:----------:|:--------:|:-------:|
-| Always-on rules | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| File-scoped rules | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| Invocable skills (`/skill-name`) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| MCP server config | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ |
-| Custom agents | ✅ | ❌ | ⚠️ built-in | ⚠️ built-in | ❌ | ⚠️ built-in | ⚠️ built-in |
-| Plugin/marketplace | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ⚠️ GitHub |
-| User scope install | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ VS Code |
-| Project scope install | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| coding-aegis supported | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ unverified | ⚠️ unverified |
+| Feature | Claude Code | Codex | Cursor | OpenCode | Gemini CLI | Copilot |
+|---------|:-----------:|:-----:|:------:|:--------:|:----------:|:-------:|
+| Always-on rules | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| File-scoped rules | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ |
+| Invocable skills (`/skill-name`) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| MCP server config | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Custom agents | ✅ | ❌ | ⚠️ built-in | ⚠️ built-in | ❌ | ⚠️ built-in |
+| Plugin/marketplace | ✅ | ✅ | ✅ | ❌ | ❌ | ⚠️ GitHub |
+| User scope install | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ VS Code |
+| Project scope install | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| coding-aegis supported | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ unverified |
 
-Notes on "Custom agents" row: Cursor, Windsurf, Copilot, and OpenCode have built-in agent modes but do not support user-defined `AGENT.md` artifacts in the same way Claude Code does. Copilot agent mode runs in GitHub Actions.
+Notes on "Custom agents" row: Cursor, Copilot, and OpenCode have built-in agent modes but do not support user-defined `AGENT.md` artifacts in the same way Claude Code does. Copilot agent mode runs in GitHub Actions.
 
 ---
 
@@ -187,7 +187,7 @@ Additional instruction files can be referenced via `opencode.json` `instructions
 
 ### coding-aegis install status
 
-- Supported (confirmed). Integration test spec ready; pytest not yet written (`yjy.5` open task).
+- Supported (confirmed). Integration tests written and passing (9/10).
 - Rules delivered as marked sections in `AGENTS.md` (same aegis:begin/end mechanism as Codex).
 - Detection signals: `OPENCODE=1` and `OPENCODE_PID=<server-pid>` both confirmed live (opencode v1.4.7, 2026-04-17).
 
@@ -229,39 +229,6 @@ Supported; uses `gemini skills link` for skill installation. All artifacts insta
 - Detection signal: `GEMINI_CLI=1` env var (confirmed live — user ran `env` in a Gemini session); `GEMINI_CLI_NO_RELAUNCH=true` also present.
 - Note: `__file__` path-based fallback detection is unverified for Gemini since skills are linked, not copied to a tool-specific directory.
 - Output filtering required in headless tests: Homebrew keytar warnings pollute stdout and must be filtered.
-
----
-
-## Windsurf
-
-Partially supported; rules and skills paths are known from docs but no live integration test exists.
-
-### Marketplace / Plugin installation
-
-- No plugin marketplace system for Windsurf (confirmed — AD-14).
-
-### Bootstrap skill installation
-
-- Mechanism: manual copy or Cascade Skills install (unverified live).
-- Project-scope skills: `.agents/skills/{name}/SKILL.md` (from Windsurf docs).
-- User-scope skills: `~/.codeium/windsurf/skills/{name}/SKILL.md` (from Windsurf docs).
-- Workspace-scope: `.windsurf/skills/{name}/SKILL.md` (unverified).
-
-### Feature support details
-
-| Feature | Path / config | Notes |
-|---------|--------------|-------|
-| Always-on rules | `.windsurf/rules/aegis--{pkg}--{rule}.md` | All files in `.windsurf/rules/` are always-on; no `alwaysApply` key |
-| File-scoped rules | `.windsurf/rules/aegis--{pkg}--{rule}.md` with `globs:` | Same `globs:` syntax |
-| Invocable skills | `.agents/skills/{name}/SKILL.md` | Cascade Skills |
-| MCP config | `.mcp.json` (project), `~/.codeium/windsurf/mcp_config.json` (user) | |
-| Custom agents | ⚠️ Cascade is built-in; no `AGENT.md` format | |
-
-### coding-aegis install status
-
-- Unverified (no live integration test). Paths are ADR-derived from Windsurf documentation.
-- Rules would be delivered as `.md` files in `.windsurf/rules/` — no `alwaysApply` injection needed (all rules in that directory are always active).
-- No env var detection signal for Windsurf (confirmed — no `WINDSURF_*` vars documented or observed). Detection falls back to `__file__` path containing `.codeium/windsurf` or `.windsurf`.
 
 ---
 
@@ -310,7 +277,6 @@ Limited support; no skill execution, no MCP. Rules delivered via a single instru
 | Cursor | `.cursor/rules/aegis--{pkg}--{rule}.mdc` | `.mdc` |
 | OpenCode | `AGENTS.md` (aegis:begin/end markers) | — |
 | Gemini CLI | `.gemini/rules/aegis--{pkg}--{rule}.md` | `.md` |
-| Windsurf | `.windsurf/rules/aegis--{pkg}--{rule}.md` | `.md` |
 | Copilot | `.github/instructions/aegis--{pkg}--{rule}.instructions.md` | `.instructions.md` |
 
 ### Skill install paths (project scope)
@@ -322,7 +288,6 @@ Limited support; no skill execution, no MCP. Rules delivered via a single instru
 | Cursor | `.cursor/skills/{name}/SKILL.md` |
 | OpenCode | `.opencode/skills/{name}/SKILL.md` |
 | Gemini CLI | `.gemini/skills/{name}/SKILL.md` |
-| Windsurf | `.agents/skills/{name}/SKILL.md` |
 | Copilot | Not supported |
 
 ### Detection signals
@@ -334,5 +299,4 @@ Limited support; no skill execution, no MCP. Rules delivered via a single instru
 | Cursor | `CURSOR_AGENT=1` | confirmed (with regression history) |
 | OpenCode | `OPENCODE=1` | confirmed |
 | Gemini CLI | `GEMINI_CLI=1` | confirmed |
-| Windsurf | none | no env signal; `__file__` fallback only |
 | Copilot | none | no env signal; no skill execution |

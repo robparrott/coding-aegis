@@ -15,9 +15,7 @@ The primary interface to the governance catalog. Lives in `pkgs/bootstrap/coding
 
 ## Tool-Specific Behavior
 
-When running inside Claude Code, the skill creates a `CLAUDE.md` shim (`@AGENTS.md` import) in the target location if one doesn't exist. This bridges Claude Code's lack of native AGENTS.md support. The shim is a runtime artifact, not a checked-in file.
-
-Other tools (Cursor, Windsurf, Copilot) receive rendered governance content in their native formats via the rendering pipeline.
+The skill detects the active coding tool at runtime via `detect_tool.py` and adapts its behavior accordingly — installing rules to the correct path, using the right artifact format, and selecting the appropriate scope directory. The detection and per-tool path mappings are specified in [AD-14: Cross-tool artifact model](AD-14-cross-tool-artifact-model.md).
 
 ## Interaction Model
 

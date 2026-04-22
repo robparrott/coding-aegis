@@ -64,7 +64,7 @@ Add the local repo as a marketplace, then install the plugin. Tests the full ins
 
 3. **Restart Claude Code** — exit and relaunch to load the plugin.
 
-5. **Verify the skill**
+4. **Verify the skill**
 
    ```
    /coding-aegis
@@ -72,7 +72,7 @@ Add the local repo as a marketplace, then install the plugin. Tests the full ins
 
    *Expect:* Skill responds.
 
-4. **Check install location**
+5. **Check install location**
 
    ```
    ls ~/.claude/plugins/cache/
@@ -80,7 +80,7 @@ Add the local repo as a marketplace, then install the plugin. Tests the full ins
 
    *Expect:* coding-aegis plugin listed.
 
-5. **Cleanup**
+6. **Cleanup**
 
    ```
    /plugin uninstall coding-aegis@coding-aegis
