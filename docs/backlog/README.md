@@ -19,7 +19,7 @@ Auto-generated from beads (`bd`). Do not edit manually.
 
 ## Standalone
 
-- [Standalone issues](standalone.md) — 44 issues
+- [Standalone issues](standalone.md) — 45 issues
 
 ## Views
 

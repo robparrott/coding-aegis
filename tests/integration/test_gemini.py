@@ -7,7 +7,7 @@ Uses Pattern 1: a single TestGeminiJourney class with a class-scoped journey
 fixture. Key Gemini differences from the Claude and Codex tests:
 
   - No marketplace (Phase 2 N/A) — Gemini uses ``gemini skills link`` directly.
-  - Skill install via ``gemini skills link <path> --scope user --consent``.
+  - Skill install via ``gemini skills link <path> --scope workspace --consent``.
   - Skill discovery via ``gemini skills list``.
   - Agent prompts via ``gemini -m gemini-3-flash-preview -o text --yolo`` with prompt
     passed via stdin.
@@ -88,7 +88,7 @@ class TestGeminiJourney:
           - Resolves the skill_dir from the repo root.
           - Creates a shared temporary test directory with git init.
           - Catalog fetched from GitHub by ensure_catalog() on first agent command.
-          - Links the coding-aegis skill via ``gemini skills link``.
+          - Links the coding-aegis skill via ``gemini skills link --scope workspace``.
           - Asserts "coding-aegis" appears in ``gemini skills list``.
           - Pre-creates .gemini/rules and .gemini/skills directories.
 
@@ -117,13 +117,15 @@ class TestGeminiJourney:
 
         # Phase 3: link the coding-aegis skill
         result = run_cli(
-            ["gemini", "skills", "link", str(skill_dir), "--scope", "user", "--consent"],
+            ["gemini", "skills", "link", str(skill_dir), "--scope", "workspace", "--consent"],
+            cwd=test_dir,
             env=clean_env,
         )
         assert_no_timeout(result, "skills link (setup)")
         # skills list to confirm coding-aegis is visible
         list_result = run_cli(
             ["gemini", "skills", "list"],
+            cwd=test_dir,
             env=clean_env,
         )
         assert "coding-aegis" in list_result.stdout, (
@@ -150,7 +152,8 @@ class TestGeminiJourney:
 
         # Best-effort coding-aegis skill unlink
         run_cli(
-            ["gemini", "skills", "uninstall", "coding-aegis", "--scope", "user"],
+            ["gemini", "skills", "uninstall", "coding-aegis", "--scope", "workspace"],
+            cwd=test_dir,
             env=clean_env,
         )
 

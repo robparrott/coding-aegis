@@ -1,5 +1,6 @@
 # Standalone Issues
 
+- [ ] `coding-aegis-2ap` [bug] Integration tests must clean up all tool-specific directories after each run
 - [x] `coding-aegis-drg` [task] Refactor test_claude.py to Pattern 1: class-scoped journey fixture
 - [x] `coding-aegis-rkq` [task] Fix Gemini test script to pass all 7 phases
 - [x] `coding-aegis-znk` [task] Fix show command: agent wraps output in code block instead of printing verbatim
