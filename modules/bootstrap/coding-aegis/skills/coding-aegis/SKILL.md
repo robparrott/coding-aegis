@@ -49,6 +49,8 @@ Usage:
 python3 "{skill-dir}/<script>" [args]
 ```
 
+**Always invoke scripts with `python3` as the interpreter prefix.** Never attempt to execute a script directly as a binary — this will fail with permission denied. The correct form is always `python3 /path/to/script.py [args]`, never `/path/to/script.py [args]`.
+
 **Run the script immediately.** Do not read the script source, do not run
 `--help`, do not list directories, do not verify the catalog path exists before
 running. The dispatch table above provides everything needed — any pre-flight

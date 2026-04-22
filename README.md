@@ -34,7 +34,7 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 | Cursor | **Fully supported** | Direct skill copy; `.cursor-plugin/marketplace.json` manifest | 10/10 passing |
 | OpenCode | **Fully supported** | File-copy into `.opencode/skills/`; auto-discovered | 9/10 passing (phase 2 skip) |
 | Gemini | **Supported** | `gemini skills link` from local clone | 10/10 passing on paid tier; quota-skip on free tier |
-| GitHub Copilot | **In progress** | `.github/copilot-instructions.md` | Pending validation on Copilot machine |
+| GitHub Copilot | **Fully supported** | File-copy into `.github/skills/`; auto-discovered | 10/10 passing |
 
 ## Assumptions
 

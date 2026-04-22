@@ -29,7 +29,7 @@ All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an 
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
 | Gemini | `test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** | Path bugs fixed 2026-04-22. Phases 1, 3, 4a pass. Phases 4b–6 skip on free-tier quota. Revival tracked in `97z.13`. |
-| Copilot | `test_copilot.py` | 10 | **Not yet validated** | Phases 1, 2, 3, 4a written and runnable. Phases 4b–6 skip (NEEDS_COPILOT_VALIDATION). No env var signal — path:.github fallback only. |
+| Copilot | `test_copilot.py` | 10 | **10/10 passing** | All phases validated 2026-04-22. Skill invocation confirmed. No env var signal — path:.github only. Natural language prompts required for catalog commands. |
 
 ---
 
@@ -44,7 +44,7 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
 | Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** — path bugs fixed 2026-04-22; phases 4b–6 quota-skip on free tier. Revival tracked in `97z.13`. |
-| Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **Not yet validated** — phases 1–4a runnable; phases 4b–6 skip pending Copilot machine validation. |
+| Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **10/10 passing** — all phases validated 2026-04-22. Natural language prompts used for catalog commands (slash-command syntax with `--catalog` flag causes Copilot to attempt binary execution). |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
 
@@ -192,7 +192,7 @@ pytest tests/unit/ -v
 | Gemini | `gemini` | Google account | **Deferred** — free-tier quota exhausts frequently, making tests unreliable for day-to-day dev. See [test-gemini.md](test-gemini.md). |
 | Cursor | `cursor-agent` | Cursor account | After `brew install cursor-cli`, run `xattr -rd com.apple.quarantine $(brew --prefix)/Caskroom/cursor-cli/<version>/` to clear macOS quarantine. See [test-cursor.md §12](test-cursor.md). |
 | OpenCode | `opencode` | Provider API key | `opencode run` requires `git init` in the working directory. |
-| Copilot | `copilot` | `COPILOT_GITHUB_TOKEN` or `GH_TOKEN` | From `github/copilot-cli`. No env var injected into subprocesses — path:.github signal only. Phases 4b–6 skip until skill invocation is confirmed. |
+| Copilot | `copilot` | `COPILOT_GITHUB_TOKEN` or `GH_TOKEN` | From `github/copilot-cli`. No env var injected into subprocesses — path:.github signal only. Catalog commands use natural language prompts (slash-command syntax with `--catalog` flag causes binary-not-found error). |
 
 ---
 
@@ -279,14 +279,14 @@ If a tool's install mechanism cannot be exercised (e.g. network unavailable, too
 
 | Phase | Claude | Codex | Gemini | Cursor | OpenCode | Copilot |
 |-------|--------|-------|--------|--------|----------|---------|
-| 1 Environment & Tool Validation | done | done | done (deferred) | done | done | written (unvalidated) |
+| 1 Environment & Tool Validation | done | done | done (deferred) | done | done | done |
 | 2 Marketplace / Registry Setup | done | N/A | N/A | N/A | N/A | N/A |
-| 3 Install coding-aegis Skill | done | done | done (deferred) | done | done | written (unvalidated) |
-| 4 Validate coding-aegis Skill | done | done | done (deferred) | done | done | 4a written; 4b–4d skip |
-| 5 Install helloworld Package | done | done | done (deferred) | done | done | written, skip |
-| 6 Uninstall helloworld Package | done | done | done (deferred) | done | done | written, skip |
-| 7 Full Cleanup | done | done | done (deferred) | done | done | written, skip |
-| Unit tests | done (31) | — | — | — | — | — |
+| 3 Install coding-aegis Skill | done | done | done (deferred) | done | done | done |
+| 4 Validate coding-aegis Skill | done | done | done (deferred) | done | done | done |
+| 5 Install helloworld Package | done | done | done (deferred) | done | done | done |
+| 6 Uninstall helloworld Package | done | done | done (deferred) | done | done | done |
+| 7 Full Cleanup | done | done | done (deferred) | done | done | done |
+| Unit tests | done (27) | — | — | — | — | — |
 
 ---
 
