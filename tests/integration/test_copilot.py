@@ -169,10 +169,7 @@ class TestCopilotJourney:
         # ── TEARDOWN ──────────────────────────────────────────────────────────
         if state.get("helloworld_installed") and _COPILOT_SKILL_INVOCATION_VALIDATED:
             run_cli(
-                _copilot_cmd(
-                    "Use the coding-aegis skill to uninstall the helloworld package."
-                    " The catalog is at modules"
-                ),
+                _copilot_cmd("/coding-aegis uninstall helloworld --catalog modules"),
                 cwd=test_dir,
                 timeout=TIMEOUT_LONG,
                 env=clean_env,
@@ -302,16 +299,9 @@ class TestCopilotJourney:
         reason=SKIP_REASON_SKILL,
     )
     def test_phase4c_list(self, journey):
-        """Phase 4c — list shows helloworld in catalog.
-
-        Natural language prompt confirmed working on live Copilot machine (April 2026).
-        Slash-command syntax caused Copilot to try to run /coding-aegis as a shell binary.
-        """
+        """Phase 4c — list shows helloworld in catalog."""
         result = run_cli(
-            _copilot_cmd(
-                "Use the coding-aegis skill to list available packages."
-                " The catalog is at modules"
-            ),
+            _copilot_cmd("/coding-aegis list --catalog modules"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -328,16 +318,9 @@ class TestCopilotJourney:
         reason=SKIP_REASON_SKILL,
     )
     def test_phase4d_show(self, journey):
-        """Phase 4d — show helloworld returns name, tier, version.
-
-        Natural language prompt used — slash-command syntax with --catalog flag
-        caused Copilot to misinterpret as a shell binary invocation.
-        """
+        """Phase 4d — show helloworld returns name, tier, version."""
         result = run_cli(
-            _copilot_cmd(
-                "Use the coding-aegis skill to show the helloworld package."
-                " The catalog is at modules"
-            ),
+            _copilot_cmd("/coding-aegis show helloworld --catalog modules"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -367,14 +350,9 @@ class TestCopilotJourney:
 
         Copilot delivers file-scoped rules to .github/instructions/*.instructions.md
         and skills to .github/skills/<name>/.
-
-        Natural language prompt confirmed working on live Copilot machine (April 2026).
         """
         result = run_cli(
-            _copilot_cmd(
-                "Use the coding-aegis skill to install the helloworld package to project scope."
-                " The catalog is at modules"
-            ),
+            _copilot_cmd("/coding-aegis install helloworld --catalog modules to project scope"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -412,7 +390,7 @@ class TestCopilotJourney:
         Output: "Hello, World! Governance is active."
         """
         result = run_cli(
-            _copilot_cmd("Use the coding-aegis skill to invoke the helloworld skill"),
+            _copilot_cmd("/helloworld"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
@@ -431,18 +409,9 @@ class TestCopilotJourney:
         reason=SKIP_REASON_SKILL,
     )
     def test_phase6_uninstall_helloworld(self, journey):
-        """Phase 6 — uninstall helloworld removes installed files.
-
-        Natural language prompt used. Confirmed removes:
-          - .github/instructions/aegis--helloworld--*.instructions.md (rules)
-          - .github/skills/helloworld/ (skill dir)
-          - .github/mcp/servers.json (MCP entry, if present)
-        """
+        """Phase 6 — uninstall helloworld removes installed files."""
         result = run_cli(
-            _copilot_cmd(
-                "Use the coding-aegis skill to uninstall the helloworld package."
-                " The catalog is at modules"
-            ),
+            _copilot_cmd("/coding-aegis uninstall helloworld --catalog modules"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
