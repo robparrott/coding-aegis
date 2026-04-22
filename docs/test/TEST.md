@@ -104,7 +104,7 @@ This centralises verification logic in the skill itself rather than duplicating 
 |-----------|-----------|-------------|
 | **1st** | Marketplace/registry | Tool has a plugin/skill marketplace (Claude) |
 | **2nd** | Built-in skill installer | Tool has an agent-mediated install mechanism (Codex `$skill-installer`) |
-| **3rd** | CLI skill management | Tool has a skills CLI (Gemini `skills link`) |
+| **3rd** | CLI skill management | Tool has a skills CLI (Gemini `skills install`) |
 | **4th** | Local file copy | Tool has NO install mechanism — last resort |
 
 ---
@@ -137,7 +137,7 @@ This centralises verification logic in the skill itself rather than duplicating 
 | | 7.5 | Remove test directory | `rm -rf $TEST_DIR` |
 | | 7.6 | Test directory gone | `assert not test_dir.exists()` |
 
-**Phase 3.1 — detection invocation method**: Tools whose skill is installed under a tool-specific path segment (`.claude/`, `.codex/`) use a direct bash invocation of `detect_tool.py` — no agent needed, the `path:` signal fires from `__file__`. Tools where the skill is linked to a local path with no tool-specific segment (Gemini via `skills link`) require an agent-mediated invocation so the tool's env var (`GEMINI_CLI=1`) is present. See the tool's detail file for the specific path and expected signal.
+**Phase 3.1 — detection invocation method**: Tools whose skill is installed under a tool-specific path segment (`.claude/`, `.codex/`, `.gemini/`) use a direct bash invocation of `detect_tool.py` — no agent needed, the `path:` signal fires from `__file__`. Exception: Gemini installs to `.gemini/skills/coding-aegis/` but the `GEMINI_CLI=1` env var is only set inside a live agent subprocess, so detect_tool.py run directly returns UNKNOWN. Phase 4b (agent-mediated) confirms the tool name. See the tool's detail file for the specific path and expected signal.
 
 **Phase 5.1 — headless install**: The install command's interactive scope picker (`AskUserQuestion`) cannot be used in headless mode. Include "to Project scope" in the prompt so the agent can complete the install without waiting for input.
 

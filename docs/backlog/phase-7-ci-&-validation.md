@@ -6,6 +6,6 @@
 
 - [ ] `coding-aegis-gmk.1` GitHub Actions workflow for catalog validation
 - [ ] `coding-aegis-gmk.2` Integration tests
-- [ ] `coding-aegis-gmk.3` Windsurf + Copilot bootstrap mechanisms
+- [x] `coding-aegis-gmk.3` Windsurf + Copilot bootstrap mechanisms
 
-**Progress**: 0/3 tasks complete
+**Progress**: 1/3 tasks complete

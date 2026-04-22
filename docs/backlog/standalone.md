@@ -13,6 +13,9 @@
 - [x] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
 - [x] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
 - [x] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
+- [ ] `coding-aegis-13a` [task] Cursor: add `scripts/install-cursor-skill.sh` bootstrap helper
+- [ ] `coding-aegis-1uz` [task] Codex: add `.agents/plugins/marketplace.json` for community registry listing
+- [ ] `coding-aegis-bga` [task] Gemini: update bootstrap to use `gemini skills install` from git URL
 - [x] `coding-aegis-ecy` [task] Update README.md to reflect current supported tools: Claude Code, Codex, Cursor, OpenCode, Gemini (remove Windsurf, update status table)
 - [x] `coding-aegis-nqx` [task] Refactor Phase 2 across all tools: rename marketplace step to bootstrap-mechanism; replace OpenCode and Gemini unconditional skips with meaningful checks; update tool test docs
 - [x] `coding-aegis-5ll` [task] Expand helloworld package to exercise all artifact types (rules, scoped rules, skill, MCP config)
@@ -36,7 +39,7 @@
 - [x] `coding-aegis-c1d` [bug] Suppress tool detection output on implicit runs
 - [x] `coding-aegis-gx0` [task] Add detect-tool command to coding-aegis skill
 - [ ] `coding-aegis-lw7` [task] Add tool detection assertion to every skill install test script
-- [ ] `coding-aegis-pnv` [task] Research Windsurf and Copilot tool detection signals
+- [x] `coding-aegis-pnv` [task] Research Windsurf and Copilot tool detection signals
 - [ ] `coding-aegis-ghv` [task] Create robust coding-agent tool detection utility
 - [ ] `coding-aegis-z61` [task] Design coding-aegis skill UX
 - [x] `coding-aegis-m5w` [task] Create bootstrapping HOWTO by coding-agent tool

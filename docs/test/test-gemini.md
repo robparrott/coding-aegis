@@ -4,16 +4,18 @@
 
 > Tool-specific details for the Gemini skill install test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md).
 
+> **NOTE**: `gemini skills install` fetches from GitHub, so changes must be pushed to the remote before running these tests — same requirement as Codex.
+
 ## Install Mechanisms
 
 ### Phase 2 — Bootstrap Mechanism
 
-Gemini has no plugin marketplace. The bootstrap mechanism is `gemini skills link` — the skill is registered directly from a local path. Phase 2 validates that `SKILL.md` exists at the skill source path and contains the required frontmatter (`name`, `description`) that `gemini skills link` reads.
+Gemini has no plugin marketplace. The bootstrap mechanism is `gemini skills install` from a GitHub URL — the skill is installed from the remote repo into `.gemini/skills/coding-aegis/` at workspace scope. Phase 2 validates that `SKILL.md` exists at the skill source path (in the repo) and contains the required frontmatter (`name`, `description`) that `gemini skills install` reads.
 
 ```bash
 python3 -c "
 from pathlib import Path
-skill_md = Path('$SKILL_DIR') / 'SKILL.md'
+skill_md = Path('$REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis') / 'SKILL.md'
 assert skill_md.exists()
 content = skill_md.read_text()
 assert 'name: coding-aegis' in content
@@ -25,16 +27,16 @@ print('PASS')
 ### Phase 3 — Install coding-aegis Skill
 
 ```bash
-gemini skills link "$SKILL_DIR" --scope workspace --consent
+gemini skills install https://github.com/robparrott/coding-aegis \
+  --path modules/bootstrap/coding-aegis/skills/coding-aegis \
+  --scope workspace --consent
 ```
 
-Where `$SKILL_DIR` is the local path to `modules/bootstrap/coding-aegis/skills/coding-aegis`.
-
-Assert: output contains `link\|success\|install`; `gemini skills list` shows `coding-aegis`.
+Assert: `gemini skills list` shows `coding-aegis`; skill files present at `$TEST_DIR/.gemini/skills/coding-aegis/`.
 
 Also requires `git init` in `$TEST_DIR` (Gemini requires a git repo in the working directory).
 
-**No modules/ copy needed** — the skill calls `ensure_catalog()` which fetches the catalog from GitHub on first use and caches it in `.coding-aegis-catalog/`. Catalog prompts (list/show/install) do not require a local copy.
+**No local clone needed** — `gemini skills install` fetches directly from GitHub. The skill calls `ensure_catalog()` which also fetches the catalog from GitHub on first use and caches it in `.coding-aegis-catalog/`.
 
 ## CLI Invocation Flags
 
@@ -57,7 +59,9 @@ Keytar warnings from Homebrew (`Keychain initialization`, `keytar.node`) appear 
 **Non-agent management commands** do not go through the model:
 
 ```bash
-gemini skills link "$SKILL_DIR" --scope workspace --consent
+gemini skills install https://github.com/robparrott/coding-aegis \
+  --path modules/bootstrap/coding-aegis/skills/coding-aegis \
+  --scope workspace --consent
 gemini skills list
 gemini skills uninstall coding-aegis --scope workspace
 ```
@@ -91,19 +95,19 @@ Assert: exit code 0.
 
 ## Tool Detection (Phase 4.2)
 
-Gemini links skills from local paths with no tool-specific directory segment. The `path:.claude` / `path:.codex` signals do not fire. Detection requires an agent-mediated invocation so the `GEMINI_CLI=1` env var is present.
+Gemini installs skills with no tool-specific directory segment other than `.gemini`. The `path:.claude` / `path:.codex` signals do not fire. Detection requires an agent-mediated invocation so the `GEMINI_CLI=1` env var is present.
 
 - **Method**: agent-mediated — `/coding-aegis detect-tool` (or direct bash with env var set)
 - **Expected `tool`**: `gemini`
 - **Expected signal**: `env:GEMINI_CLI=1`
 
-Note: Phase 3.3 (`detect_tool.py` present) is verified against the linked `$SKILL_DIR` path directly, since the skill is not copied to a tool-specific install directory.
+Note: Phase 4a (`detect_tool.py` direct run) uses the installed copy at `$TEST_DIR/.gemini/skills/coding-aegis/detect_tool.py`. Only JSON structural validity is asserted — `GEMINI_CLI=1` is only set when the Gemini agent invokes the script.
 
 ## Installed Paths
 
 | Artifact | Path |
 |----------|------|
-| Skill dir | `$SKILL_DIR` (linked repo path, not copied) |
+| Skill dir (coding-aegis) | `$TEST_DIR/.gemini/skills/coding-aegis/` (installed copy) |
 | Rules (project scope) | `$TEST_DIR/.gemini/rules/aegis--*` |
 | Skills (project scope) | `$TEST_DIR/.gemini/skills/helloworld/` |
 
@@ -112,6 +116,6 @@ Note: Phase 3.3 (`detect_tool.py` present) is verified against the linked `$SKIL
 | Phase | Step | Command | Assertion |
 |-------|------|---------|-----------|
 | 6.1 | Uninstall helloworld | `/coding-aegis uninstall helloworld` via agent | no `not installed\|error`; quota fallback removes files manually if needed |
-| 7.1 | Uninstall coding-aegis skill | `gemini skills uninstall coding-aegis --scope workspace` | `gemini skills list` no longer shows `coding-aegis` |
+| 7.1 | Uninstall coding-aegis skill | `gemini skills uninstall coding-aegis --scope workspace` | `gemini skills list` no longer shows `coding-aegis`; `.gemini/skills/coding-aegis/` removed |
 | 7.3 | Remove marketplace | N/A — no separate marketplace | — |
 | 7.5 | Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |

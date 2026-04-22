@@ -8,22 +8,24 @@ Human-runnable equivalent of `tests/integration/test_gemini.py`. Each step mirro
 
 - `gemini` on PATH and authenticated
 - Run from the repository root
+- Changes pushed to GitHub — `gemini skills install` fetches from the remote repo
 
 ---
 
 ## Setup
 
-Set variables, strip Claude Code env vars (so `detect_tool.py` does not return `"claude"`), create a temp git repo, and pre-create the `.gemini` directories the agent writes into.
+Set variables, strip Claude Code env vars (so `detect_tool.py` does not return `"claude"`), create a temp git repo, and pre-create the `.gemini/rules` directory the agent writes into.
 
 ```zsh
 export REPO_ROOT=$(pwd)
-export SKILL_DIR="$REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis"
+export GITHUB_REPO="https://github.com/robparrott/coding-aegis"
+export SKILL_PATH="modules/bootstrap/coding-aegis/skills/coding-aegis"
 export TEST_DIR=$(mktemp -d)
 export GEMINI_MODEL="gemini-3-flash-preview"
 unset CLAUDECODE CLAUDE_CODE_ENTRYPOINT
 git init -q "$TEST_DIR"
 cd "$TEST_DIR"
-mkdir -p .gemini/rules .gemini/skills
+mkdir -p .gemini/rules
 ```
 
 ---
@@ -64,14 +66,23 @@ Not applicable. Gemini has no plugin marketplace. Skip this phase.
 
 ## Phase 3 — Skill install
 
-Link the coding-aegis skill workspace-wide and confirm it is discoverable.
+Install the coding-aegis skill from GitHub at workspace scope and confirm it is discoverable.
+The skill is COPIED (not linked) to `.gemini/skills/coding-aegis/`.
 
 ```zsh
-gemini skills link "$SKILL_DIR" --scope workspace --consent
+gemini skills install "$GITHUB_REPO" \
+  --path "$SKILL_PATH" \
+  --scope workspace --consent
 gemini skills list
 ```
 
 **Pass:** `gemini skills list` output contains `coding-aegis`.
+
+After install, set `SKILL_DIR` to the installed copy for use in subsequent phases:
+
+```zsh
+export SKILL_DIR="$TEST_DIR/.gemini/skills/coding-aegis"
+```
 
 ---
 
@@ -227,7 +238,7 @@ test ! -d .gemini/skills/helloworld \
 
 ```zsh
 gemini skills uninstall coding-aegis --scope workspace
-gemini skills list | grep -v "coding-aegis" && echo "unlink: PASS" || echo "unlink: FAIL"
+gemini skills list | grep -v "coding-aegis" && echo "uninstall: PASS" || echo "uninstall: FAIL"
 cd "$REPO_ROOT"
 rm -rf "$TEST_DIR"
 ```
@@ -240,7 +251,7 @@ rm -rf "$TEST_DIR"
 |-------|-------------------|-----------|
 | 1 auth | PASS | PASS |
 | 2 marketplace | SKIP | SKIP |
-| 3 skill linked | PASS | PASS |
+| 3 skill installed | PASS | PASS |
 | 4a detect direct | PASS | PASS |
 | 4b detect skill | often quota-exhausted | PASS |
 | 4c list | often quota-exhausted | PASS |

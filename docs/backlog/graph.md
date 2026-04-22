@@ -4,7 +4,7 @@ Auto-generated from `bd graph --all --compact`.
 
 ```
 
-📊 Dependency graph for coding-aegis-b5z (31 issues, 5 layers)
+📊 Dependency graph for coding-aegis-b5z (30 issues, 5 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
@@ -53,11 +53,9 @@ Auto-generated from `bd graph --all --compact`.
   LAYER 3
   ├── ○ coding-aegis-gmk ● P2 Phase 7: CI & Validation
   │   ├── ○ coding-aegis-gmk.1 ● P2 GitHub Actions workflow for catalog validation
-  │   ├── ○ coding-aegis-gmk.2 ● P2 Integration tests
-  │   └── ○ coding-aegis-gmk.3 ● P2 Windsurf + Copilot bootstrap mechanisms
+  │   └── ○ coding-aegis-gmk.2 ● P2 Integration tests
   ├── ○ coding-aegis-gmk.1 ● P2 GitHub Actions workflow for catalog validation
-  ├── ○ coding-aegis-gmk.2 ● P2 Integration tests
-  └── ○ coding-aegis-gmk.3 ● P2 Windsurf + Copilot bootstrap mechanisms
+  └── ○ coding-aegis-gmk.2 ● P2 Integration tests
 
   LAYER 4
   ├── ○ coding-aegis-cdb ● P2 Phase 8: External Package References
@@ -76,57 +74,28 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-2sv (13 issues, 2 layers)
+📊 Dependency graph for coding-aegis-2sv (8 issues, 2 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   ├── ○ coding-aegis-2sv ● P1 Cross-tool artifact model refactor
-  │   ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
   │   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   │   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
-  │   ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   │   ├── ○ coding-aegis-2sv.5 ● P2 Claude Code rules delivery
-  │   ├── ○ coding-aegis-2sv.6 ● P2 Windsurf rules delivery
-  │   ├── ○ coding-aegis-2sv.7 ● P2 Copilot instructions delivery
-  │   ├── ○ coding-aegis-2sv.8 ● P2 Windsurf skills delivery
   │   ├── ○ coding-aegis-2sv.11 ● P3 Add MCP server stub to pirate-speak package
   │   ├── ○ coding-aegis-2sv.13 ● P3 Add AGENTS.md integration to pirate-speak package
   │   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   │   └── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
-  ├── ○ coding-aegis-2sv.1 ● P2 Spike: Research Windsurf sub-agent and agent swar…
   ├── ○ coding-aegis-2sv.10 ● P2 Create package authoring HOWTO with exemplar
   ├── ○ coding-aegis-2sv.11 ● P3 Add MCP server stub to pirate-speak package
   ├── ○ coding-aegis-2sv.12 ● P2 Design AGENTS.md management strategy for installe…
-  ├── ○ coding-aegis-2sv.2 ● P2 Spike: Research GitHub Copilot agent mode and sub…
   ├── ○ coding-aegis-2sv.3 ● P3 Add Codex tool support
   ├── ○ coding-aegis-2sv.4 ● P3 Add Gemini Code Assist support
-  ├── ○ coding-aegis-2sv.5 ● P2 Claude Code rules delivery
-  ├── ○ coding-aegis-2sv.6 ● P2 Windsurf rules delivery
-  ├── ○ coding-aegis-2sv.7 ● P2 Copilot instructions delivery
-  └── ○ coding-aegis-2sv.8 ● P2 Windsurf skills delivery
+  └── ○ coding-aegis-2sv.5 ● P2 Claude Code rules delivery
 
   LAYER 1
   └── ○ coding-aegis-2sv.13 ● P3 Add AGENTS.md integration to pirate-speak package
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-glm (6 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-glm ● P2 Research and implement marketplace alternatives f…
-  │   ├── ○ coding-aegis-glm.1 ● P2 Codex: research marketplace/registry alternative …
-  │   ├── ○ coding-aegis-glm.2 ● P2 Cursor: research marketplace alternative to manua…
-  │   ├── ○ coding-aegis-glm.3 ● P2 OpenCode: research distribution alternative to ma…
-  │   ├── ○ coding-aegis-glm.4 ● P2 Gemini: research distribution alternative to gemi…
-  │   └── ○ coding-aegis-glm.5 ● P2 Copilot: research bootstrap mechanism for coding-…
-  ├── ○ coding-aegis-glm.1 ● P2 Codex: research marketplace/registry alternative …
-  ├── ○ coding-aegis-glm.2 ● P2 Cursor: research marketplace alternative to manua…
-  ├── ○ coding-aegis-glm.3 ● P2 OpenCode: research distribution alternative to ma…
-  ├── ○ coding-aegis-glm.4 ● P2 Gemini: research distribution alternative to gemi…
-  └── ○ coding-aegis-glm.5 ● P2 Copilot: research bootstrap mechanism for coding-…
 
 ────────────────────────────────────────────────────────────
 
@@ -160,32 +129,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-97z (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-97z ● P1 pytest integration framework for coding-aegis e2e…
-  │   ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
-  │   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
-  ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
-  └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-lw7 (3 issues, 2 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
-
-  LAYER 1
-  ├── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
-  └── ○ coding-aegis-pnv ● P2 Research Windsurf and Copilot tool detection sign…
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-a0q (2 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -194,6 +137,27 @@ Auto-generated from `bd graph --all --compact`.
   ├── ○ coding-aegis-a0q ● P2 External dependency installation for packages
   │   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
   └── ○ coding-aegis-a0q.1 ● P2 Install sttts/beads-skill issue-tracking skill in…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-lw7 (2 issues, 2 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-ghv ● P2 Create robust coding-agent tool detection utility
+
+  LAYER 1
+  └── ○ coding-aegis-lw7 ● P2 Add tool detection assertion to every skill insta…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-bga (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-bga ● P2 Gemini: update bootstrap to use `gemini skills in…
 
 ────────────────────────────────────────────────────────────
 
@@ -221,6 +185,24 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-cda ● P2 Research and implement plugin support per tool
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-1uz (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-1uz ● P2 Codex: add `.agents/plugins/marketplace.json` for…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-13a (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-13a ● P2 Cursor: add `scripts/install-cursor-skill.sh` boo…
 
 ────────────────────────────────────────────────────────────
 
@@ -293,7 +275,6 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-gmk`](phase-7-ci-&-validation.md)
 - [`coding-aegis-gmk.1`](phase-7-ci-&-validation.md)
 - [`coding-aegis-gmk.2`](phase-7-ci-&-validation.md)
-- [`coding-aegis-gmk.3`](phase-7-ci-&-validation.md)
 - [`coding-aegis-cdb`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.1`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.2`](phase-8-external-package-references.md)
@@ -302,24 +283,13 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-cdb.5`](phase-8-external-package-references.md)
 - [`coding-aegis-cdb.6`](phase-8-external-package-references.md)
 - [`coding-aegis-2sv`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-2sv.1`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.10`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.12`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-2sv.2`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.5`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-2sv.6`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-2sv.7`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-2sv.8`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.11`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.13`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.3`](cross-tool-artifact-model-refactor.md)
 - [`coding-aegis-2sv.4`](cross-tool-artifact-model-refactor.md)
-- [`coding-aegis-glm`](research-and-implement-marketplace-alternatives-for.md)
-- [`coding-aegis-glm.1`](research-and-implement-marketplace-alternatives-for.md)
-- [`coding-aegis-glm.2`](research-and-implement-marketplace-alternatives-for.md)
-- [`coding-aegis-glm.3`](research-and-implement-marketplace-alternatives-for.md)
-- [`coding-aegis-glm.4`](research-and-implement-marketplace-alternatives-for.md)
-- [`coding-aegis-glm.5`](research-and-implement-marketplace-alternatives-for.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
@@ -328,17 +298,16 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-97z.13`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-97z.16`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-lw7`](standalone.md)
-- [`coding-aegis-ghv`](standalone.md)
-- [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
+- [`coding-aegis-lw7`](standalone.md)
+- [`coding-aegis-ghv`](standalone.md)
+- [`coding-aegis-bga`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
 - [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-cda`](standalone.md)
+- [`coding-aegis-1uz`](standalone.md)
+- [`coding-aegis-13a`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

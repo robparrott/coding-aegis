@@ -360,31 +360,21 @@ $ rm -rf .opencode/skills/coding-aegis
 
 ### Install
 
-1. **Clone the repo**
+**User scope** (available in all projects):
+```
+$ gemini skills install https://github.com/robparrott/coding-aegis \
+  --path modules/bootstrap/coding-aegis/skills/coding-aegis \
+  --scope user --consent
+```
 
-   ```
-   $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
-   ```
+**Workspace scope** (this project only, run from the project directory):
+```
+$ gemini skills install https://github.com/robparrott/coding-aegis \
+  --path modules/bootstrap/coding-aegis/skills/coding-aegis \
+  --scope workspace --consent
+```
 
-2. **Link the skill** — choose a scope:
-
-   **User scope** (available in all projects):
-   ```
-   $ gemini skills link /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis \
-     --scope user --consent
-   ```
-
-   **Workspace scope** (this project only, run from the project directory):
-   ```
-   $ gemini skills link /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis \
-     --scope workspace --consent
-   ```
-
-3. **Remove the clone** — the installed skill is self-contained:
-
-   ```
-   $ rm -rf /tmp/coding-aegis
-   ```
+No local clone needed — `gemini skills install` fetches directly from GitHub.
 
 ### Verify
 
@@ -412,16 +402,13 @@ Gemini installs packages as:
 
 ### Updating
 
-Re-clone temporarily, relink at the same scope, then remove the clone:
+Re-run the install command at the same scope to pick up the latest version:
 
 ```
-$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
-$ gemini skills link /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis \
+$ gemini skills install https://github.com/robparrott/coding-aegis \
+  --path modules/bootstrap/coding-aegis/skills/coding-aegis \
   --scope user --consent
-$ rm -rf /tmp/coding-aegis
 ```
-
-Use `--scope workspace` instead if the skill was installed at workspace scope.
 
 ### Removing
 

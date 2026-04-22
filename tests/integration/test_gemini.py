@@ -6,8 +6,9 @@ Ports tests/test-gemini-skill-install.sh to pytest.
 Uses Pattern 1: a single TestGeminiJourney class with a class-scoped journey
 fixture. Key Gemini differences from the Claude and Codex tests:
 
-  - No marketplace (Phase 2 N/A) — Gemini uses ``gemini skills link`` directly.
-  - Skill install via ``gemini skills link <path> --scope workspace --consent``.
+  - No marketplace (Phase 2 N/A) — Gemini uses ``gemini skills install`` from GitHub.
+  - Skill install via ``gemini skills install <git-url> --path <path> --scope workspace --consent``.
+  - The skill is COPIED (not linked) to .gemini/skills/coding-aegis/ in the test dir.
   - Skill discovery via ``gemini skills list``.
   - Agent prompts via ``gemini -m gemini-3-flash-preview -o text --yolo`` with prompt
     passed via stdin.
@@ -17,6 +18,9 @@ fixture. Key Gemini differences from the Claude and Codex tests:
   - Quota errors trigger pytest.skip (not fail) via assert_no_quota_error.
   - TIMEOUT_LONG = 120s — Gemini retries internally; steps can take 60-90s
     under quota pressure.
+
+IMPORTANT: ``gemini skills install`` fetches from GitHub, so changes must be pushed
+to the remote before running these tests (same requirement as Codex).
 
 Phase 4a (detect_tool.py direct run) does NOT assert tool=="gemini" because the
 GEMINI_CLI=1 env var is only set when the Gemini agent invokes the script. When
@@ -56,6 +60,7 @@ pytestmark = pytest.mark.skipif(
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 GEMINI_MODEL = "gemini-3-flash-preview"
+GITHUB_REPO = "https://github.com/robparrott/coding-aegis"
 SKILL_PATH = "modules/bootstrap/coding-aegis/skills/coding-aegis"
 TIMEOUT_LONG = 120  # Gemini retries internally; each step can take 60-90s
 
@@ -85,16 +90,19 @@ class TestGeminiJourney:
 
         SETUP:
           - Builds a clean env without Claude Code vars leaking in.
-          - Resolves the skill_dir from the repo root.
           - Creates a shared temporary test directory with git init.
+          - Installs coding-aegis from GitHub via ``gemini skills install`` at workspace scope.
+          - skill_dir points to the installed copy: test_dir/.gemini/skills/coding-aegis/.
           - Catalog fetched from GitHub by ensure_catalog() on first agent command.
-          - Links the coding-aegis skill via ``gemini skills link --scope workspace``.
           - Asserts "coding-aegis" appears in ``gemini skills list``.
-          - Pre-creates .gemini/rules and .gemini/skills directories.
+          - Pre-creates .gemini/rules directory.
+
+        NOTE: ``gemini skills install`` fetches from GitHub, so changes must be
+        pushed to the remote before running these tests.
 
         TEARDOWN:
           - Best-effort helloworld uninstall (if helloworld_installed is True).
-          - Best-effort coding-aegis skill unlink.
+          - Best-effort coding-aegis skill uninstall.
           - Temp dir cleanup handled automatically by tmp_path_factory.
         """
         # Build a clean env without Claude Code vars leaking in
@@ -102,26 +110,33 @@ class TestGeminiJourney:
         clean_env.pop("CLAUDECODE", None)
         clean_env.pop("CLAUDE_CODE_ENTRYPOINT", None)
 
+        test_dir: Path = tmp_path_factory.mktemp("gemini-journey")
+
         state = {}
         state["repo_root"] = repo_root
-        state["skill_dir"] = repo_root / SKILL_PATH
-        state["test_dir"] = tmp_path_factory.mktemp("gemini-journey")
+        state["test_dir"] = test_dir
         state["clean_env"] = clean_env
         state["helloworld_installed"] = False
 
-        test_dir: Path = state["test_dir"]
-        skill_dir: Path = state["skill_dir"]
-
-        # git init the test directory
+        # git init the test directory (Gemini requires a git repo)
         run_cli(["git", "init", "-q"], cwd=test_dir)
 
-        # Phase 3: link the coding-aegis skill
+        # Phase 3: install coding-aegis from GitHub at workspace scope
         result = run_cli(
-            ["gemini", "skills", "link", str(skill_dir), "--scope", "workspace", "--consent"],
+            [
+                "gemini", "skills", "install", GITHUB_REPO,
+                "--path", SKILL_PATH,
+                "--scope", "workspace",
+                "--consent",
+            ],
             cwd=test_dir,
             env=clean_env,
         )
-        assert_no_timeout(result, "skills link (setup)")
+        assert_no_timeout(result, "skills install (setup)")
+
+        # skill_dir is the workspace-scope install path (copied, not linked)
+        state["skill_dir"] = test_dir / ".gemini" / "skills" / "coding-aegis"
+
         # skills list to confirm coding-aegis is visible
         list_result = run_cli(
             ["gemini", "skills", "list"],
@@ -129,13 +144,11 @@ class TestGeminiJourney:
             env=clean_env,
         )
         assert "coding-aegis" in list_result.stdout, (
-            f"coding-aegis not found in skills list after link:\n{list_result.stdout[:2000]}"
+            f"coding-aegis not found in skills list after install:\n{list_result.stdout[:2000]}"
         )
 
-        # Pre-create .gemini directories so the agent can write to them
-        scope_dir = test_dir / ".gemini"
-        (scope_dir / "rules").mkdir(parents=True, exist_ok=True)
-        (scope_dir / "skills").mkdir(parents=True, exist_ok=True)
+        # Pre-create .gemini/rules so the agent can write rules there
+        (test_dir / ".gemini" / "rules").mkdir(parents=True, exist_ok=True)
 
         yield state
 
@@ -150,20 +163,20 @@ class TestGeminiJourney:
                 env=clean_env,
             )
 
-        # Best-effort coding-aegis skill unlink
+        # Best-effort coding-aegis skill uninstall
         run_cli(
             ["gemini", "skills", "uninstall", "coding-aegis", "--scope", "workspace"],
             cwd=test_dir,
             env=clean_env,
         )
-        # Verify skill was unlinked (workspace-scoped state).
+        # Verify skill was removed (workspace-scoped state).
         list_result = run_cli(
             ["gemini", "skills", "list"],
             cwd=test_dir,
             env=clean_env,
         )
         assert "coding-aegis" not in list_result.stdout, (
-            f"coding-aegis skill still linked after teardown — "
+            f"coding-aegis skill still present after teardown — "
             f"workspace state leak.\n{list_result.stdout[:500]}"
         )
 
@@ -194,13 +207,13 @@ class TestGeminiJourney:
     # ── Phase 2: Bootstrap mechanism (no marketplace) ────────────────────
 
     def test_phase2_bootstrap_mechanism(self, journey):
-        """Phase 2 — Gemini uses ``gemini skills link``; no manifest file required.
+        """Phase 2 — Gemini uses ``gemini skills install`` from GitHub; no manifest file required.
 
-        Validates SKILL.md exists at the skill source path and contains the
-        required frontmatter fields (name, description). SKILL.md is the entry
-        point that ``gemini skills link`` reads to register the skill.
+        Validates SKILL.md exists at the skill source path (in the repo) and contains
+        the required frontmatter fields (name, description). SKILL.md is the entry
+        point that ``gemini skills install`` reads when installing from the remote repo.
         """
-        skill_md = journey["skill_dir"] / "SKILL.md"
+        skill_md = journey["repo_root"] / SKILL_PATH / "SKILL.md"
         assert skill_md.exists(), f"SKILL.md not found at {skill_md}"
         content = skill_md.read_text()
         assert "name: coding-aegis" in content, (
