@@ -189,6 +189,7 @@ class TestGeminiJourney:
         """Phase 3 — coding-aegis appears in gemini skills list."""
         result = run_cli(
             ["gemini", "skills", "list"],
+            cwd=journey["test_dir"],
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "skills list")
