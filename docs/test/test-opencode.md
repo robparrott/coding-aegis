@@ -95,7 +95,7 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 | 4b | `/coding-aegis detect-tool` via agent | Assert "opencode" in output |
 | 4c | `/coding-aegis list --catalog pkgs` | Assert "helloworld" in output |
 | 4d | `/coding-aegis show helloworld --catalog pkgs` | Assert name, tier, version |
-| 5 | `/coding-aegis install helloworld` | Assert AGENTS.md updated + `.opencode/skills/helloworld/` created |
+| 5 | `/coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` | Assert AGENTS.md updated + `.opencode/skills/helloworld/` created; then run `aegis-validate.py` |
 | 5b | `/helloworld` | Assert "Hello, World" in output |
 | 6 | `/coding-aegis uninstall helloworld` | Assert AGENTS.md section removed + skill dir deleted |
 
@@ -112,8 +112,15 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 
 ---
 
-## 9. Known Unknowns
+## 9. Output Handling
 
-| Question | Status |
-|----------|--------|
-| What does opencode output look like — ANSI stripped or raw? | Unverified — may need output cleaning like Gemini |
+OpenCode emits ANSI colour codes in output. The test strips them before assertions:
+
+```python
+_ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[mK]")
+_clean(result.stdout)  # strip ANSI before asserting
+```
+
+## 10. Known Unknowns
+
+None outstanding.

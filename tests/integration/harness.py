@@ -21,6 +21,12 @@ QUOTA_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# Gemini CLI emits "Attempt N failed: ... Retrying after Xms..." for transient
+# quota errors it retries internally.  These lines contain quota-matching text
+# but do NOT indicate a terminal failure — the call may still succeed.
+# We strip them before quota-checking so transient retries don't cause false skips.
+_RETRY_LINE = re.compile(r"Retrying after \d+ms", re.IGNORECASE)
+
 
 @dataclass
 class CLIResult:
@@ -117,12 +123,21 @@ def warn_if_slow(result: CLIResult, budget_seconds: float = 15.0, label: str = "
 
 
 def assert_no_quota_error(result: CLIResult, tool: str = "agent") -> None:
-    """Skip (not fail) if the output contains a quota / rate-limit error.
+    """Skip (not fail) if the output contains a terminal quota / rate-limit error.
 
     Uses pytest.skip so the report reflects an infrastructure constraint,
     not a code defect.
+
+    Transient retry lines emitted by the Gemini CLI
+    ("Attempt N failed: ... Retrying after Xms...") are stripped before
+    checking, so a step that eventually succeeded despite internal retries
+    is not incorrectly skipped.
     """
     import pytest  # imported here to avoid hard dependency outside pytest
 
-    if QUOTA_PATTERN.search(result.stdout):
+    terminal_output = "\n".join(
+        line for line in result.stdout.splitlines()
+        if not _RETRY_LINE.search(line)
+    )
+    if QUOTA_PATTERN.search(terminal_output):
         pytest.skip(f"{tool} API quota exhausted — skipping remaining tests")

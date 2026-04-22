@@ -13,6 +13,9 @@
 - [x] `coding-aegis-i6j` [task] Make detect-tool, list, show skill commands lightning fast
 - [x] `coding-aegis-lf6` [bug] Investigate and fix Codex uninstall timeout (60s) in Phase 6
 - [x] `coding-aegis-1rg` [task] Codex test: push changes to GitHub so -installer picks up updated aegis-catalog.py
+- [ ] `coding-aegis-5ll` [task] Expand helloworld package to exercise all artifact types (rules, scoped rules, skill, MCP config)
+- [ ] `coding-aegis-cda` [task] Research and implement plugin support per tool
+- [ ] `coding-aegis-eko` [task] Rename pkgs/ to modules/ across all code, tests, skills, and docs
 - [x] `coding-aegis-lcj` [task] Documentation review: readability and clarity pass across all docs
 - [x] `coding-aegis-5k6` [task] Create coding-agent-feature-comparison.md
 - [x] `coding-aegis-8yl` [task] Refactor Cursor test script with Codex test improvements

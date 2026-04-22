@@ -132,6 +132,25 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
+📊 Dependency graph for coding-aegis-glm (6 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-glm ● P2 Research and implement marketplace alternatives f…
+  │   ├── ○ coding-aegis-glm.1 ● P2 Codex: research marketplace/registry alternative …
+  │   ├── ○ coding-aegis-glm.2 ● P2 Cursor: research marketplace alternative to manua…
+  │   ├── ○ coding-aegis-glm.3 ● P2 OpenCode: research distribution alternative to ma…
+  │   ├── ○ coding-aegis-glm.4 ● P2 Gemini: research distribution alternative to gemi…
+  │   └── ○ coding-aegis-glm.5 ● P2 Copilot: research bootstrap mechanism for coding-…
+  ├── ○ coding-aegis-glm.1 ● P2 Codex: research marketplace/registry alternative …
+  ├── ○ coding-aegis-glm.2 ● P2 Cursor: research marketplace alternative to manua…
+  ├── ○ coding-aegis-glm.3 ● P2 OpenCode: research distribution alternative to ma…
+  ├── ○ coding-aegis-glm.4 ● P2 Gemini: research distribution alternative to gemi…
+  └── ○ coding-aegis-glm.5 ● P2 Copilot: research bootstrap mechanism for coding-…
+
+────────────────────────────────────────────────────────────
+
 📊 Dependency graph for coding-aegis-bg5 (5 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -149,19 +168,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
-  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
-  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-97z (3 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -172,6 +178,19 @@ Auto-generated from `bd graph --all --compact`.
   │   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
   ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-wpi ● P1 Phase 3: Cursor Bootstrap
+  │   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+  ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
+  └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
 
 ────────────────────────────────────────────────────────────
 
@@ -214,6 +233,42 @@ Auto-generated from `bd graph --all --compact`.
 
   LAYER 0 (ready)
   └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-9c9 (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-9c9 ● P2 Validate docs-to-test consistency per tool
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-eko (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-eko ● P2 Rename pkgs/ to modules/ across all code, tests, …
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-cda (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-cda ● P2 Research and implement plugin support per tool
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-5ll (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-5ll ● P2 Expand helloworld package to exercise all artifac…
 
 ────────────────────────────────────────────────────────────
 
@@ -314,17 +369,23 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-9m0.5`](phase-4-copilot-support.md)
 - [`coding-aegis-9m0.4`](phase-4-copilot-support.md)
 - [`coding-aegis-9m0.6`](phase-4-copilot-support.md)
+- [`coding-aegis-glm`](research-and-implement-marketplace-alternatives-for.md)
+- [`coding-aegis-glm.1`](research-and-implement-marketplace-alternatives-for.md)
+- [`coding-aegis-glm.2`](research-and-implement-marketplace-alternatives-for.md)
+- [`coding-aegis-glm.3`](research-and-implement-marketplace-alternatives-for.md)
+- [`coding-aegis-glm.4`](research-and-implement-marketplace-alternatives-for.md)
+- [`coding-aegis-glm.5`](research-and-implement-marketplace-alternatives-for.md)
 - [`coding-aegis-bg5`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.1`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
 - [`coding-aegis-z61`](standalone.md)
-- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
-- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.13`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-97z.16`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
@@ -332,6 +393,10 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-6pp`](standalone.md)
 - [`coding-aegis-gua`](standalone.md)
+- [`coding-aegis-9c9`](validate-docs-to-test-consistency-per.md)
+- [`coding-aegis-eko`](standalone.md)
+- [`coding-aegis-cda`](standalone.md)
+- [`coding-aegis-5ll`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)

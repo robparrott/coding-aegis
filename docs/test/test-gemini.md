@@ -13,46 +13,41 @@ Gemini has no separate marketplace registration step. Skip Phase 2 and proceed d
 ### Phase 3 — Install coding-aegis Skill
 
 ```bash
-gemini_quiet skills link "$SKILL_DIR" --scope workspace --consent
+gemini skills link "$SKILL_DIR" --scope workspace --consent
 ```
 
 Where `$SKILL_DIR` is the local path to `pkgs/bootstrap/coding-aegis/skills/coding-aegis`.
 
 Assert: output contains `link\|success\|install`; `gemini skills list` shows `coding-aegis`.
 
-After Phase 3, copy the `pkgs/` catalog into `$TEST_DIR`:
-
-```bash
-cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
-```
-
 Also requires `git init` in `$TEST_DIR` (Gemini requires a git repo in the working directory).
+
+**No pkgs/ copy needed** — the skill calls `ensure_catalog()` which fetches the catalog from GitHub on first use and caches it in `.coding-aegis-catalog/`. Catalog prompts (list/show/install) do not require a local copy.
 
 ## CLI Invocation Flags
 
 **Agent-mediated calls** (phases 4–6):
 
 ```bash
-gemini_quiet -o text --yolo
+gemini -m gemini-3-flash-preview -o text --yolo
 ```
 
-- `-o text` — plain text output
-- `--yolo` — auto-approve tool use; without this Gemini prompts for approval which hangs in headless mode
+| Flag | Meaning |
+|------|---------|
+| `-m gemini-3-flash-preview` | Model override (use a fast model for tests) |
+| `-o text` | Plain text output (no JSON event stream) |
+| `--yolo` | Auto-approve tool use; without this Gemini prompts for approval which hangs in headless mode |
 
-**`gemini_quiet` wrapper** filters Homebrew keytar warnings that pollute output:
+Prompt is passed via stdin by the harness (`run_cli(..., prompt=...)`).
+
+Keytar warnings from Homebrew (`Keychain initialization`, `keytar.node`) appear on stderr. The pytest harness captures stdout and stderr separately — warnings do not pollute assertions.
+
+**Non-agent management commands** do not go through the model:
 
 ```bash
-gemini_quiet() {
-  gemini "$@" 2>&1 | grep -v -E "Keychain initialization|keytar\.node|keytar\.js|FileKeychain fallback|Loaded cached credentials\.|^Require stack:"
-}
-```
-
-**Non-agent management commands** do not use `CLI_PROMPT`:
-
-```bash
-run_cli "skills link"      gemini_quiet skills link "$SKILL_DIR" --scope workspace --consent
-run_cli "skills list"      gemini_quiet skills list
-run_cli "skills uninstall" gemini_quiet skills uninstall coding-aegis --scope workspace
+gemini skills link "$SKILL_DIR" --scope workspace --consent
+gemini skills list
+gemini skills uninstall coding-aegis --scope workspace
 ```
 
 ## Quota Handling
@@ -63,14 +58,24 @@ Phase 6.1 (uninstall helloworld) includes a quota fallback: if the agent call re
 
 ## Prompts (phases 4–6)
 
-| Phase | Step | Prompt |
-|-------|------|--------|
+| Phase | Step | Prompt / command |
+|-------|------|-----------------|
+| 4a | detect_tool direct (bash) | `python3 $SKILL_DIR/detect_tool.py` — validates JSON structure only (GEMINI_CLI=1 not set in test process) |
 | 4.2 | detect-tool skill command | `/coding-aegis detect-tool` |
 | 4.3 | list | `/coding-aegis list` |
 | 4.4 | show | `/coding-aegis show helloworld` |
 | 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope` |
 | 5.5 | invoke helloworld | `/helloworld` |
 | 6.1 | uninstall helloworld | `/coding-aegis uninstall helloworld` |
+
+After Phase 5.1, the test also runs `aegis-validate.py` directly to confirm artifacts:
+
+```bash
+python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
+  helloworld --catalog $REPO_ROOT/pkgs --tool gemini
+```
+
+Assert: exit code 0.
 
 ## Tool Detection (Phase 4.2)
 
@@ -95,6 +100,6 @@ Note: Phase 3.3 (`detect_tool.py` present) is verified against the linked `$SKIL
 | Phase | Step | Command | Assertion |
 |-------|------|---------|-----------|
 | 6.1 | Uninstall helloworld | `/coding-aegis uninstall helloworld` via agent | no `not installed\|error`; quota fallback removes files manually if needed |
-| 7.1 | Uninstall coding-aegis skill | `gemini_quiet skills uninstall coding-aegis --scope workspace` | `gemini skills list` no longer shows `coding-aegis` |
+| 7.1 | Uninstall coding-aegis skill | `gemini skills uninstall coding-aegis --scope workspace` | `gemini skills list` no longer shows `coding-aegis` |
 | 7.3 | Remove marketplace | N/A — no separate marketplace | — |
 | 7.5 | Remove test dir | `rm -rf "$TEST_DIR"` | `assert_dir_not_exists "$TEST_DIR"` |

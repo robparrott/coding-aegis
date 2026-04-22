@@ -14,12 +14,14 @@ Auto-generated from beads (`bd`). Do not edit manually.
 - [ ] [Phase 6: Seed Packages & Quickstarts](phase-6-seed-packages-&-quickstarts.md) — 0/3 tasks
 - [ ] [Phase 7: CI & Validation](phase-7-ci-&-validation.md) — 0/3 tasks
 - [ ] [Phase 8: External Package References](phase-8-external-package-references.md) — 0/6 tasks
+- [ ] [Research and implement marketplace alternatives for bootstrap install](research-and-implement-marketplace-alternatives-for.md) — 0/5 tasks
+- [ ] [Validate docs-to-test consistency per tool](validate-docs-to-test-consistency-per.md) — 5/5 tasks
 - [ ] [coding-aegis Skill UX](coding-aegis-skill-ux.md) — 1/5 tasks
 - [ ] [pytest integration framework for coding-aegis e2e tests](pytest-integration-framework-for-coding-aegis.md) — 14/16 tasks
 
 ## Standalone
 
-- [Standalone issues](standalone.md) — 49 issues
+- [Standalone issues](standalone.md) — 52 issues
 
 ## Views
 

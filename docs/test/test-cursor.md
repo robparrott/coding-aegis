@@ -192,7 +192,26 @@ The pytest Phase 2 test validates the manifest file structure only — no CLI ma
 
 ## 8. CLI Prompts
 
-Expected to use `/coding-aegis ...` syntax (same as Claude and Gemini).
+| Phase | Step | Prompt | Flags |
+|-------|------|--------|-------|
+| 4.1 | detect_tool direct | `python3 .cursor/skills/coding-aegis/detect_tool.py` | (bash, not agent) |
+| 4.2 | detect-tool skill | `/coding-aegis detect-tool` | base flags |
+| 4.3 | list | `/coding-aegis list --catalog pkgs` | base flags |
+| 4.4 | show | `/coding-aegis show helloworld --catalog pkgs` | base flags |
+| 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` | `--force` |
+| 5.5 | invoke helloworld | `/helloworld` | base flags |
+| 6.1 | uninstall helloworld | `/coding-aegis uninstall helloworld` | `--force` |
+
+Base flags: `cursor-agent -p --output-format text --trust`
+
+After Phase 5.1, the test also runs `aegis-validate.py` directly (not via agent) to confirm artifacts were written:
+
+```bash
+python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
+  helloworld --catalog $REPO_ROOT/pkgs --tool cursor
+```
+
+Assert: exit code 0.
 
 ---
 

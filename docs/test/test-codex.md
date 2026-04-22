@@ -29,11 +29,9 @@ export AEGIS_TEST_TIMEOUT_LONG=60
 
 ### Phase 2 — Marketplace / Registry Setup
 
-Codex discovers plugin manifests from `.codex-plugin/plugin.json` relative to the working directory. The test must fetch this from the remote GitHub repo (not the local working copy) into `$TEST_DIR/.codex-plugin/` so the user journey — starting from a fresh directory — is faithfully exercised.
+The test validates `.codex-plugin/plugin.json` from the local repo root (not the test dir), confirming the manifest is present and correctly formed.
 
-Assert: `$TEST_DIR/.codex-plugin/plugin.json` exists and contains `"name": "coding-aegis"` and `"skills"`.
-
-Tracked in coding-aegis-gua (fetch manifest from remote in test setup).
+Assert: `$REPO_ROOT/.codex-plugin/plugin.json` exists and contains `"name": "coding-aegis"` and `"skills"`.
 
 ### Phase 3 — Install coding-aegis Skill
 
@@ -76,19 +74,30 @@ codex exec --ephemeral -s <sandbox> -o /dev/stdout
 |-------|------|--------|
 | 4.1 | tool detection (direct bash) | `python3 ~/.codex/skills/coding-aegis/detect_tool.py` |
 | 4.2 | detect-tool skill command | `$coding-aegis detect-tool` |
-| 4.3 | list | `$coding-aegis list` |
-| 4.4 | show | `$coding-aegis show helloworld` |
+| 4.3 | list | `$coding-aegis list --catalog pkgs` |
+| 4.4 | show | `$coding-aegis show helloworld --catalog pkgs` |
 | 5.1 | install helloworld | `$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` |
 | 5.5 | invoke helloworld | `$helloworld` |
 | 6.1 | uninstall helloworld | `$coding-aegis uninstall helloworld` |
 
-Pass `--catalog $TEST_DIR/pkgs` in phases 5.1 and 6.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `pkgs/` tree instead of dispatching to the installed skill.
+Pass `--catalog` in phases 4.3, 4.4, and 5.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `pkgs/` tree instead of dispatching to the installed skill.
 
 ## Tool Detection (Phase 3.3 / 4.1)
 
 - **Method**: direct bash — `python3 ~/.codex/skills/coding-aegis/detect_tool.py`
 - **Expected `tool`**: `codex`
 - **Expected signal**: `path:.codex` (install path contains `.codex`)
+
+## Phase 5 — Validate install
+
+After the agent completes Phase 5.1, the test runs `aegis-validate.py` directly:
+
+```bash
+python3 ~/.codex/skills/coding-aegis/aegis-validate.py \
+  helloworld --catalog $REPO_ROOT/pkgs --tool codex
+```
+
+Assert: exit code 0.
 
 ## Installed Paths
 
