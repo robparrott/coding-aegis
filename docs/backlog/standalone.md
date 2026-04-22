@@ -1,5 +1,6 @@
 # Standalone Issues
 
+- [x] `coding-aegis-nui` [task] Add install/uninstall instructions for bootstrap skill to HOWTO
 - [x] `coding-aegis-2ap` [bug] Integration tests must clean up all tool-specific directories after each run
 - [x] `coding-aegis-drg` [task] Refactor test_claude.py to Pattern 1: class-scoped journey fixture
 - [x] `coding-aegis-rkq` [task] Fix Gemini test script to pass all 7 phases
@@ -24,7 +25,7 @@
 - [x] `coding-aegis-jdj` [task] Reconcile Test Plan and Test Sequence in testing-spec.md
 - [ ] `coding-aegis-gua` [task] Codex T1: actively register marketplace in test dir, unregister in teardown
 - [ ] `coding-aegis-6pp` [task] Codex T6/T9: replace local pkgs/ catalog with remote-based install
-- [ ] `coding-aegis-c1d` [bug] Suppress tool detection output on implicit runs
+- [x] `coding-aegis-c1d` [bug] Suppress tool detection output on implicit runs
 - [x] `coding-aegis-gx0` [task] Add detect-tool command to coding-aegis skill
 - [ ] `coding-aegis-lw7` [task] Add tool detection assertion to every skill install test script
 - [ ] `coding-aegis-pnv` [task] Research Windsurf and Copilot tool detection signals

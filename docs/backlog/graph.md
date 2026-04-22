@@ -149,19 +149,6 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-97z (3 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  ├── ○ coding-aegis-97z ● P1 pytest integration framework for coding-aegis e2e…
-  │   ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
-  │   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
-  ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
-  └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-wpi (3 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
@@ -172,6 +159,19 @@ Auto-generated from `bd graph --all --compact`.
   │   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
   ├── ○ coding-aegis-wpi.8 ● P2 Test Cursor Remote Rules (Option D) with current …
   └── ○ coding-aegis-wpi.9 ● P2 Simplify Cursor local installation process
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-97z (3 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  ├── ○ coding-aegis-97z ● P1 pytest integration framework for coding-aegis e2e…
+  │   ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
+  │   └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
+  ├── ○ coding-aegis-97z.13 ● P3 Revive Gemini testing when paid quota or quota-re…
+  └── ○ coding-aegis-97z.16 ● P3 Simplify integration test layout
 
 ────────────────────────────────────────────────────────────
 
@@ -199,30 +199,21 @@ Auto-generated from `bd graph --all --compact`.
 
 ────────────────────────────────────────────────────────────
 
-📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
-
-────────────────────────────────────────────────────────────
-
-📊 Dependency graph for coding-aegis-c1d (1 issues, 1 layers)
-
-  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
-
-  LAYER 0 (ready)
-  └── ○ coding-aegis-c1d ● P2 Suppress tool detection output on implicit runs
-
-────────────────────────────────────────────────────────────
-
 📊 Dependency graph for coding-aegis-6pp (1 issues, 1 layers)
 
   Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
 
   LAYER 0 (ready)
   └── ○ coding-aegis-6pp ● P2 Codex T6/T9: replace local pkgs/ catalog with rem…
+
+────────────────────────────────────────────────────────────
+
+📊 Dependency graph for coding-aegis-gua (1 issues, 1 layers)
+
+  Status: ○ open  ◐ in_progress  ● blocked  ✓ closed  ❄ deferred
+
+  LAYER 0 (ready)
+  └── ○ coding-aegis-gua ● P2 Codex T1: actively register marketplace in test d…
 
 ────────────────────────────────────────────────────────────
 
@@ -328,20 +319,19 @@ Auto-generated from `bd graph --all --compact`.
 - [`coding-aegis-bg5.2`](coding-aegis-skill-ux.md)
 - [`coding-aegis-bg5.3`](coding-aegis-skill-ux.md)
 - [`coding-aegis-z61`](standalone.md)
-- [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-97z.13`](pytest-integration-framework-for-coding-aegis.md)
-- [`coding-aegis-97z.16`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-wpi`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.8`](phase-3-cursor-bootstrap.md)
 - [`coding-aegis-wpi.9`](phase-3-cursor-bootstrap.md)
+- [`coding-aegis-97z`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.13`](pytest-integration-framework-for-coding-aegis.md)
+- [`coding-aegis-97z.16`](pytest-integration-framework-for-coding-aegis.md)
 - [`coding-aegis-lw7`](standalone.md)
 - [`coding-aegis-ghv`](standalone.md)
 - [`coding-aegis-pnv`](standalone.md)
 - [`coding-aegis-a0q`](external-dependency-installation-for-packages.md)
 - [`coding-aegis-a0q.1`](external-dependency-installation-for-packages.md)
-- [`coding-aegis-gua`](standalone.md)
-- [`coding-aegis-c1d`](standalone.md)
 - [`coding-aegis-6pp`](standalone.md)
+- [`coding-aegis-gua`](standalone.md)
 - [`coding-aegis-avj`](standalone.md)
 - [`coding-aegis-3m9`](standalone.md)
 - [`coding-aegis-135`](standalone.md)
