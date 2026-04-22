@@ -61,7 +61,7 @@ The only steps that genuinely require an LLM are Phase 3 (`$skill-installer` —
 
 ## File layout
 
-All files in `pkgs/bootstrap/coding-aegis/skills/coding-aegis/`:
+All files in `modules/bootstrap/coding-aegis/skills/coding-aegis/`:
 
 ```
 aegis_lib.py          # Shared library
@@ -103,15 +103,15 @@ TOOL_PATHS = {
 
 1. If `catalog_override` is set, return `Path(catalog_override)` directly.
 2. Check `CWD/.coding-aegis-catalog/.cache_ts`:
-   - If exists and `time.time() - float(contents) < CACHE_TTL` → return `CWD/.coding-aegis-catalog/pkgs`
+   - If exists and `time.time() - float(contents) < CACHE_TTL` → return `CWD/.coding-aegis-catalog/modules`
 3. If `.coding-aegis-catalog/` exists but stale:
    - `subprocess.run(["git", "-C", cache_dir, "pull", "--ff-only"], ...)`
    - Write current timestamp to `.cache_ts`
 4. If no cache dir:
    - `subprocess.run(["git", "clone", "--depth", "1", "--filter=blob:none", "--sparse", GITHUB_REPO, cache_dir], ...)`
-   - `subprocess.run(["git", "-C", cache_dir, "sparse-checkout", "set", "pkgs/"], ...)`
+   - `subprocess.run(["git", "-C", cache_dir, "sparse-checkout", "set", "modules/"], ...)`
    - Write current timestamp to `.cache_ts`
-5. Return `Path(cache_dir) / "pkgs"`
+5. Return `Path(cache_dir) / "modules"`
 
 ### Carried over from aegis-catalog.py
 

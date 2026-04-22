@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 
 # Add skill dir to path
-SKILL_DIR = Path(__file__).parent.parent.parent / "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+SKILL_DIR = Path(__file__).parent.parent.parent / "modules/bootstrap/coding-aegis/skills/coding-aegis"
 sys.path.insert(0, str(SKILL_DIR))
 
 import aegis_lib as lib
@@ -116,7 +116,7 @@ class TestResolveScope(unittest.TestCase):
 
 class TestFindPackage(unittest.TestCase):
     def setUp(self):
-        self.catalog = Path(__file__).parent.parent.parent / "pkgs"
+        self.catalog = Path(__file__).parent.parent.parent / "modules"
 
     def test_finds_helloworld(self):
         pkg, pkg_dir = lib.find_package(self.catalog, "helloworld")
@@ -133,7 +133,7 @@ class TestFindPackage(unittest.TestCase):
 
 class TestEnsureCatalog(unittest.TestCase):
     def test_catalog_override(self):
-        catalog = Path(__file__).parent.parent.parent / "pkgs"
+        catalog = Path(__file__).parent.parent.parent / "modules"
         result = lib.ensure_catalog(str(catalog))
         self.assertEqual(result, catalog)
         self.assertTrue(result.is_dir())

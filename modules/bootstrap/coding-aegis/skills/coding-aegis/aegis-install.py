@@ -27,7 +27,7 @@ def main():
     parser.add_argument("package", help="Package name")
     parser.add_argument("--scope", default="project", choices=["project", "user"],
                         help="Install scope (default: project)")
-    parser.add_argument("--catalog", help="Path to pkgs/ directory (skips git clone)")
+    parser.add_argument("--catalog", help="Path to modules/ directory (skips git clone)")
     parser.add_argument("--tool", default=None,
                         choices=["claude", "codex", "cursor", "gemini", "windsurf", "copilot", "opencode"],
                         help="Override auto-detected tool")

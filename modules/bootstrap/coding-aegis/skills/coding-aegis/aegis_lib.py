@@ -42,7 +42,15 @@ TOOL_PATHS = {
                   "skills_base": "."},  # skills install relative to CWD, not scope_base
     "cursor":    {"scope_base": ".cursor",   "skills_dir": "skills", "rule_ext": ".mdc"},
     "windsurf":  {"scope_base": ".windsurf", "skills_dir": "skills"},
-    "copilot":   {"scope_base": ".github",   "skills_dir": "skills"},
+    # Copilot: project skills → .github/skills/<name>/SKILL.md
+    #          user skills   → ~/.copilot/skills/<name>/SKILL.md
+    #          rules (always-on) → .github/copilot-instructions.md (single global file)
+    #          rules (file-scoped) → .github/instructions/aegis--<pkg>--<rule>.instructions.md
+    # No invocable skill execution in Copilot CLI today (rules-only delivery confirmed).
+    # > NEEDS VALIDATION ON COPILOT MACHINE
+    "copilot":   {"scope_base": ".github",   "skills_dir": "skills",
+                  "user_scope_base": ".copilot",
+                  "rule_ext": ".instructions.md"},
     "opencode":  {"scope_base": ".opencode", "skills_dir": "skills",
                   "user_scope_base": ".config/opencode"},
 }
@@ -62,10 +70,10 @@ def detect_tool():
 # ---------------------------------------------------------------------------
 
 def ensure_catalog(catalog_override=None):
-    """Return Path to pkgs/ catalog, cloning/refreshing from GitHub as needed.
+    """Return Path to modules/ catalog, cloning/refreshing from GitHub as needed.
 
     If catalog_override is set, return it directly (for dev/testing).
-    Otherwise, maintain a sparse clone of just pkgs/ in .coding-aegis-catalog/
+    Otherwise, maintain a sparse clone of just modules/ in .coding-aegis-catalog/
     in the current working directory, refreshing if the 30-second TTL has expired.
     """
     if catalog_override:
@@ -82,7 +90,7 @@ def ensure_catalog(catalog_override=None):
         try:
             age = time.time() - float(ts_file.read_text().strip())
             if age < CACHE_TTL:
-                pkgs = cache_root / "pkgs"
+                pkgs = cache_root / "modules"
                 if pkgs.is_dir():
                     return pkgs
         except (ValueError, OSError):
@@ -104,14 +112,14 @@ def ensure_catalog(catalog_override=None):
         _clone_catalog(cache_root)
 
     ts_file.write_text(str(time.time()))
-    pkgs = cache_root / "pkgs"
+    pkgs = cache_root / "modules"
     if not pkgs.is_dir():
-        _die("Catalog clone succeeded but pkgs/ directory not found.")
+        _die("Catalog clone succeeded but modules/ directory not found.")
     return pkgs
 
 
 def _clone_catalog(cache_root):
-    """Perform a sparse shallow clone of just pkgs/ into cache_root."""
+    """Perform a sparse shallow clone of just modules/ into cache_root."""
     print("Fetching catalog from GitHub...", file=sys.stderr)
     r1 = subprocess.run(
         ["git", "clone", "--depth", "1", "--filter=blob:none", "--sparse",
@@ -121,7 +129,7 @@ def _clone_catalog(cache_root):
     if r1.returncode != 0:
         _die(f"git clone failed:\n{r1.stderr.strip()}")
     r2 = subprocess.run(
-        ["git", "-C", str(cache_root), "sparse-checkout", "set", "pkgs/"],
+        ["git", "-C", str(cache_root), "sparse-checkout", "set", "modules/"],
         capture_output=True, text=True
     )
     if r2.returncode != 0:

@@ -20,10 +20,10 @@ claude plugin install "coding-aegis@${MARKETPLACE_NAME}" --scope project
 
 Assert: output contains `install`; `claude plugin list` shows `coding-aegis`.
 
-After Phase 3, symlink the `pkgs/` catalog into `$TEST_DIR`:
+After Phase 3, symlink the `modules/` catalog into `$TEST_DIR`:
 
 ```bash
-ln -s "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
+ln -s "$REPO_ROOT/modules" "$TEST_DIR/modules"
 ```
 
 ## CLI Invocation Flags
@@ -63,11 +63,11 @@ run_cli "marketplace list"   claude plugin marketplace list
 
 | Phase | Step | Prompt |
 |-------|------|--------|
-| 4.1 | tool detection (direct bash) | `python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/detect_tool.py` |
+| 4.1 | tool detection (direct bash) | `python3 $REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis/detect_tool.py` |
 | 4.2 | detect-tool skill command | `/coding-aegis detect-tool` |
-| 4.3 | list | `/coding-aegis list --catalog pkgs` |
-| 4.4 | show | `/coding-aegis show helloworld --catalog pkgs` |
-| 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope --catalog pkgs` |
+| 4.3 | list | `/coding-aegis list --catalog modules` |
+| 4.4 | show | `/coding-aegis show helloworld --catalog modules` |
+| 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope --catalog modules` |
 | 5.5 | invoke helloworld | `/helloworld` |
 | 6.1 | uninstall helloworld | `/coding-aegis uninstall helloworld` |
 
@@ -75,7 +75,7 @@ run_cli "marketplace list"   claude plugin marketplace list
 
 Claude's plugin system loads skill files from the marketplace source dynamically — it does not copy them into the project directory. Phase 4.1 runs `detect_tool.py` from the **repo source path** (not an installed location) to validate the detection logic in isolation.
 
-- **Phase 4.1 (direct bash)**: `python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/detect_tool.py`
+- **Phase 4.1 (direct bash)**: `python3 $REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis/detect_tool.py`
   - Relies on `CLAUDECODE=1` already being set in the Claude Code process env.
   - **Expected `tool`**: `claude`
 - **Phase 4.2 (agent-mediated)**: `/coding-aegis detect-tool`
@@ -94,8 +94,8 @@ Claude's plugin system loads skill files from the marketplace source dynamically
 After the agent completes Phase 5.1, the test runs `aegis-validate.py` directly to confirm artifacts were written correctly:
 
 ```bash
-python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
-  helloworld --catalog $REPO_ROOT/pkgs --tool claude
+python3 $REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
+  helloworld --catalog $REPO_ROOT/modules --tool claude
 ```
 
 Assert: exit code 0.

@@ -49,12 +49,12 @@ pytestmark = pytest.mark.skipif(
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 GITHUB_REPO = "robparrott/coding-aegis"
-SKILL_PATH = "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+SKILL_PATH = "modules/bootstrap/coding-aegis/skills/coding-aegis"
 CODEX_SKILL_DIR = Path.home() / ".codex" / "skills" / "coding-aegis"
 TIMEOUT_LONG = 60  # install/uninstall via workspace-write are slower
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
+VALIDATE_SCRIPT = REPO_ROOT / "modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 
 def _codex_exec(*sandbox_flags, extra_flags=()) -> list:
@@ -79,7 +79,7 @@ class TestCodexJourney:
         SETUP (phases 1-3):
           - Creates a shared temporary test directory with git init.
           - Installs coding-aegis skill via $skill-installer (danger-full-access).
-          - Copies pkgs/ catalog into test_dir so read-only sandbox can reach it.
+          - Copies modules/ catalog into test_dir so read-only sandbox can reach it.
 
         TEARDOWN (phases 6-7):
           - Best-effort helloworld uninstall (if helloworld_installed is still True).
@@ -118,10 +118,10 @@ class TestCodexJourney:
             f"coding-aegis not installed to {CODEX_SKILL_DIR} after skill-installer"
         )
 
-        # Copy pkgs/ catalog into test_dir so read-only sandbox can access it
-        pkgs_dest = test_dir / "pkgs"
+        # Copy modules/ catalog into test_dir so read-only sandbox can access it
+        pkgs_dest = test_dir / "modules"
         if not pkgs_dest.exists():
-            shutil.copytree(str(repo_root / "pkgs"), str(pkgs_dest))
+            shutil.copytree(str(repo_root / "modules"), str(pkgs_dest))
 
         yield state
 
@@ -229,7 +229,7 @@ class TestCodexJourney:
         """Phase 4c — $coding-aegis list shows helloworld."""
         result = run_cli(
             _codex_exec("-s", "read-only"),
-            prompt="$coding-aegis list --catalog pkgs",
+            prompt="$coding-aegis list --catalog modules",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
             env=journey["clean_env"],
@@ -244,7 +244,7 @@ class TestCodexJourney:
         """Phase 4d — $coding-aegis show helloworld returns name, tier, version."""
         result = run_cli(
             _codex_exec("-s", "read-only"),
-            prompt="$coding-aegis show helloworld --catalog pkgs",
+            prompt="$coding-aegis show helloworld --catalog modules",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
             env=journey["clean_env"],
@@ -265,7 +265,7 @@ class TestCodexJourney:
 
     def test_phase5_install_helloworld(self, journey):
         """Phase 5 — $coding-aegis install helloworld writes AGENTS.md and skill file."""
-        catalog_arg = str(journey["test_dir"] / "pkgs")
+        catalog_arg = str(journey["test_dir"] / "modules")
         result = run_cli(
             _codex_exec("-s", "workspace-write"),
             prompt=f"$coding-aegis install helloworld to Project scope --catalog {catalog_arg}",
@@ -282,7 +282,7 @@ class TestCodexJourney:
         # Verify installation via validate-install
         v = subprocess.run(
             [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
-             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "codex"],
+             "--catalog", str(REPO_ROOT / "modules"), "--tool", "codex"],
             capture_output=True, text=True,
             cwd=str(journey["test_dir"]),
         )

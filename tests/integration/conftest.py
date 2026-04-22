@@ -3,7 +3,7 @@ conftest.py — shared pytest fixtures for coding-aegis integration tests.
 
 Fixtures provided:
   repo_root          — Path to the repository root (session scope)
-  catalog_path       — Path to pkgs/ in the repo (session scope)
+  catalog_path       — Path to modules/ in the repo (session scope)
   test_dir           — Fresh temp directory per test function, auto-cleaned up
   clean_env          — os.environ copy with Claude Code vars stripped
   run_cli            — The harness run_cli function (for convenience)
@@ -38,8 +38,8 @@ def repo_root() -> Path:
 
 @pytest.fixture(scope="session")
 def catalog_path(repo_root: Path) -> Path:
-    """Absolute path to the pkgs/ catalog directory."""
-    return repo_root / "pkgs"
+    """Absolute path to the modules/ catalog directory."""
+    return repo_root / "modules"
 
 
 @pytest.fixture(scope="session")

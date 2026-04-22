@@ -84,7 +84,7 @@ pytestmark = pytest.mark.skipif(
 TIMEOUT_LONG = 60  # install/uninstall operations may be slower
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
+VALIDATE_SCRIPT = REPO_ROOT / "modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 
 def _cursor_p(*extra_flags) -> list:
@@ -105,7 +105,7 @@ class TestCursorJourney:
       - Creates a shared temp directory with git init.
       - Manually bootstraps the coding-aegis skill into .cursor/skills/coding-aegis/
         (simulating a plugin install, since no CLI plugin install exists yet).
-      - Copies pkgs/ catalog into test_dir so the skill can access it.
+      - Copies modules/ catalog into test_dir so the skill can access it.
       - Runs teardown (best-effort helloworld uninstall) after all tests.
     """
 
@@ -119,7 +119,7 @@ class TestCursorJourney:
             CURSOR_AGENT=1 injected for detect_tool detection).
           - Manually installs coding-aegis skill into .cursor/skills/coding-aegis/
             (workaround for absent CLI plugin install).
-          - Copies pkgs/ catalog into test_dir.
+          - Copies modules/ catalog into test_dir.
           - Pre-creates .cursor/rules and .cursor/skills directories.
 
         TEARDOWN (phase 6):
@@ -150,7 +150,7 @@ class TestCursorJourney:
         cursor_skill_dir.mkdir(parents=True, exist_ok=True)
         skill_src = (
             repo_root
-            / "pkgs"
+            / "modules"
             / "bootstrap"
             / "coding-aegis"
             / "skills"
@@ -161,10 +161,10 @@ class TestCursorJourney:
         # Pre-create .cursor/rules so the agent can write rule files
         (test_dir / ".cursor" / "rules").mkdir(parents=True, exist_ok=True)
 
-        # Copy pkgs/ catalog into test_dir so the skill can access it
-        pkgs_dest = test_dir / "pkgs"
+        # Copy modules/ catalog into test_dir so the skill can access it
+        pkgs_dest = test_dir / "modules"
         if not pkgs_dest.exists():
-            shutil.copytree(str(repo_root / "pkgs"), str(pkgs_dest))
+            shutil.copytree(str(repo_root / "modules"), str(pkgs_dest))
 
         state["cursor_skill_dir"] = cursor_skill_dir
 
@@ -282,7 +282,7 @@ class TestCursorJourney:
         """Phase 4c — /coding-aegis list shows helloworld."""
         result = run_cli(
             _cursor_p(),
-            prompt="/coding-aegis list --catalog pkgs",
+            prompt="/coding-aegis list --catalog modules",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
             env=journey["clean_env"],
@@ -298,7 +298,7 @@ class TestCursorJourney:
         """Phase 4d — /coding-aegis show helloworld returns name, tier, version."""
         result = run_cli(
             _cursor_p(),
-            prompt="/coding-aegis show helloworld --catalog pkgs",
+            prompt="/coding-aegis show helloworld --catalog modules",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
             env=journey["clean_env"],
@@ -326,7 +326,7 @@ class TestCursorJourney:
         frontmatter (same layout as Claude but under .cursor/, not .claude/).
         Skills install to .cursor/skills/<name>/.
         """
-        catalog_arg = str(journey["test_dir"] / "pkgs")
+        catalog_arg = str(journey["test_dir"] / "modules")
         result = run_cli(
             _cursor_p("--force"),
             prompt=f"/coding-aegis install helloworld to Project scope --catalog {catalog_arg}",
@@ -348,7 +348,7 @@ class TestCursorJourney:
         # Verify installation via validate-install
         v = subprocess.run(
             [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
-             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "cursor"],
+             "--catalog", str(REPO_ROOT / "modules"), "--tool", "cursor"],
             capture_output=True, text=True,
             cwd=str(journey["test_dir"]),
         )

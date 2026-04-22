@@ -68,7 +68,7 @@ The `AEGIS_TEST_FAIL_FAST=1` env var is a manual mechanism that must be document
 
 **The decision is pytest.** The reasoning:
 
-1. **The codebase is already Python.** Every script in `pkgs/bootstrap/coding-aegis/skills/coding-aegis/` is Python. `tests/test_aegis_catalog.py` is already `unittest`, which runs under pytest with zero changes. There is no new runtime dependency — Python 3 is already required. Adding `pytest` is one line in a `requirements-dev.txt`.
+1. **The codebase is already Python.** Every script in `modules/bootstrap/coding-aegis/skills/coding-aegis/` is Python. `tests/test_aegis_catalog.py` is already `unittest`, which runs under pytest with zero changes. There is no new runtime dependency — Python 3 is already required. Adding `pytest` is one line in a `requirements-dev.txt`.
 
 2. **`subprocess` is the right abstraction for CLI testing.** The integration tests are fundamentally "run a command, check its output." Python's `subprocess.run` with `timeout=`, `input=`, and `capture_output=True` is a direct, typed replacement for `run_cli`. There is no framework overhead — it is stdlib.
 

@@ -18,7 +18,7 @@ from aegis_lib import (
 
 def main():
     parser = argparse.ArgumentParser(description="Show coding-aegis install status")
-    parser.add_argument("--catalog", help="Path to pkgs/ directory (skips git clone)")
+    parser.add_argument("--catalog", help="Path to modules/ directory (skips git clone)")
     parser.add_argument("--scope", nargs="*", help="Scope base paths to scan")
     args = parser.parse_args()
 

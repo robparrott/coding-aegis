@@ -13,7 +13,7 @@ coding-aegis/
 ├── .claude/
 │   └── settings.json
 │
-├── pkgs/                                  # THE CATALOG
+├── modules/                                  # THE CATALOG
 │   ├── bootstrap/
 │   │   └── coding-aegis/                  # The entry point skill
 │   │       ├── pkg.yaml

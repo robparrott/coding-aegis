@@ -15,7 +15,7 @@ from aegis_lib import ensure_catalog, scan_tier, TIERS, _die
 
 def main():
     parser = argparse.ArgumentParser(description="List coding-aegis packages")
-    parser.add_argument("--catalog", help="Path to pkgs/ directory (skips git clone)")
+    parser.add_argument("--catalog", help="Path to modules/ directory (skips git clone)")
     args = parser.parse_args()
 
     catalog = ensure_catalog(args.catalog)

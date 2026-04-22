@@ -6,7 +6,7 @@
 
 Two distinct components serve different purposes:
 
-- **`coding-aegis`** — the rich, full-featured skill that lives in `pkgs/bootstrap/`. It is the primary interface for developers to browse the catalog, install packages, check status, and manage governance. Each coding agent gets this skill in its native format.
+- **`coding-aegis`** — the rich, full-featured skill that lives in `modules/bootstrap/`. It is the primary interface for developers to browse the catalog, install packages, check status, and manage governance. Each coding agent gets this skill in its native format.
 - **`coding-aegis-bootstrap`** — the minimal mechanism to get `coding-aegis` installed. Uses each tool's native distribution path.
 
 ## Bootstrap Mechanisms Per Tool

@@ -35,7 +35,7 @@ This layout is a common standard for all repositories in our organization.
 - **docs/architecture/** — Architecture decision records (ADRs) and specification files.
 - **docs/build/BUILD.md** — How to build this project.
 - **docs/test/TEST.md** — How to run various tests.
-- **pkgs/** — The package catalog, organized by tier (`required`, `best-practices`, `optional`, `goodies`, `bootstrap`).
+- **modules/** — The package catalog, organized by tier (`required`, `best-practices`, `optional`, `goodies`, `bootstrap`).
 - **.claude-plugin/** — Claude Code plugin marketplace manifest. Required at repo root by Claude Code's plugin discovery. See [AD-4](docs/architecture/AD-4-dual-marketplace.md).
 - **.cursor-plugin/** — Cursor Team Marketplace manifest. Required at repo root by Cursor's plugin discovery. See [AD-4](docs/architecture/AD-4-dual-marketplace.md).
 
@@ -51,4 +51,4 @@ When modifying or running tests, reference [docs/test/TEST.md](docs/test/TEST.md
 
 ## Package Authoring Rules
 
-When authoring or modifying packages under `pkgs/`, follow the [Package Format Specification](docs/architecture/package-format.md).
+When authoring or modifying packages under `modules/`, follow the [Package Format Specification](docs/architecture/package-format.md).

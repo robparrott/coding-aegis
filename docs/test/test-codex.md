@@ -38,15 +38,15 @@ Assert: `$REPO_ROOT/.codex-plugin/plugin.json` exists and contains `"name": "cod
 Agent-mediated via `$skill-installer` with `danger-full-access` sandbox (needs GitHub network access):
 
 ```
-$skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/coding-aegis/skills/coding-aegis
+$skill-installer install --repo robparrott/coding-aegis --path modules/bootstrap/coding-aegis/skills/coding-aegis
 ```
 
 Assert: output contains `install\|success\|done\|copied\|coding-aegis`; `SKILL.md`, `aegis_lib.py`, `aegis-install.py`, `aegis-uninstall.py`, and `detect_tool.py` present in `~/.codex/skills/coding-aegis/`.
 
-After Phase 3, copy the `pkgs/` catalog into `$TEST_DIR`:
+After Phase 3, copy the `modules/` catalog into `$TEST_DIR`:
 
 ```bash
-cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
+cp -R "$REPO_ROOT/modules" "$TEST_DIR/modules"
 ```
 
 Note: this local copy is a temporary workaround. Tracked in coding-aegis-6pp to replace with remote-based catalog sourcing.
@@ -74,13 +74,13 @@ codex exec --ephemeral -s <sandbox> -o /dev/stdout
 |-------|------|--------|
 | 4.1 | tool detection (direct bash) | `python3 ~/.codex/skills/coding-aegis/detect_tool.py` |
 | 4.2 | detect-tool skill command | `$coding-aegis detect-tool` |
-| 4.3 | list | `$coding-aegis list --catalog pkgs` |
-| 4.4 | show | `$coding-aegis show helloworld --catalog pkgs` |
-| 5.1 | install helloworld | `$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` |
+| 4.3 | list | `$coding-aegis list --catalog modules` |
+| 4.4 | show | `$coding-aegis show helloworld --catalog modules` |
+| 5.1 | install helloworld | `$coding-aegis install helloworld to Project scope --catalog $TEST_DIR/modules` |
 | 5.5 | invoke helloworld | `$helloworld` |
 | 6.1 | uninstall helloworld | `$coding-aegis uninstall helloworld` |
 
-Pass `--catalog` in phases 4.3, 4.4, and 5.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `pkgs/` tree instead of dispatching to the installed skill.
+Pass `--catalog` in phases 4.3, 4.4, and 5.1 to prevent the agent from scanning the workspace and loading the wrong SKILL.md from the `modules/` tree instead of dispatching to the installed skill.
 
 ## Tool Detection (Phase 3.3 / 4.1)
 
@@ -94,7 +94,7 @@ After the agent completes Phase 5.1, the test runs `aegis-validate.py` directly:
 
 ```bash
 python3 ~/.codex/skills/coding-aegis/aegis-validate.py \
-  helloworld --catalog $REPO_ROOT/pkgs --tool codex
+  helloworld --catalog $REPO_ROOT/modules --tool codex
 ```
 
 Assert: exit code 0.

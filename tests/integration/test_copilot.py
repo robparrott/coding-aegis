@@ -1,28 +1,32 @@
 """
-test_opencode.py — Full integration test for OpenCode CLI.
+test_copilot.py — Full integration test for GitHub Copilot CLI.
 
-Follows the same class-scoped journey pattern as test_cursor.py and
-test_gemini.py. Key OpenCode differences:
+Follows the same class-scoped journey pattern as test_opencode.py and
+test_cursor.py. Key Copilot differences:
 
-  - Headless invocation: ``opencode run '<prompt>'`` where the prompt is
-    a positional argument (not stdin). No --quiet flag exists.
-  - Detection: OPENCODE=1 and OPENCODE_PID are injected by ``opencode run``
-    into all subprocesses. Confirmed live against opencode v1.4.7.
-  - Skill bootstrap: auto-discovered from .opencode/skills/ in the project
-    directory. No install command needed — fixture copies files directly.
-  - Rule delivery: via AGENTS.md aegis:begin/end sections (same as Codex).
-    There is no .opencode/rules/ path.
-  - Skills install to <test_dir>/.opencode/skills/<name>/.
-  - Output contains ANSI escape codes; use _clean() for assertions.
-  - No marketplace (phase 2 is omitted).
-  - git init is required in the working directory.
+  - Binary: ``copilot`` (from github/copilot-cli, not ``gh copilot``).
+  - Headless invocation: ``copilot --prompt '<prompt>' --allow-all-tools --silent``
+    where the prompt is passed as a flag value (not stdin).
+  - Detection: NO env var is injected by copilot into subprocesses (confirmed:
+    GitHub docs, April 2026). Detection falls back to path:.github signal.
+  - Skill bootstrap: auto-discovered from .github/skills/ in the project directory.
+    No install command needed — fixture copies files directly.
+  - Rule delivery: file-scoped rules → .github/instructions/*.instructions.md;
+    always-on rules → .github/copilot-instructions.md.
+  - Skills install to <test_dir>/.github/skills/<name>/.
+  - Copilot has no confirmed invocable skill execution today (rules-only delivery
+    is the primary use case). Phases 4b–6 are conditionally skipped pending
+    validation on a live Copilot machine.
+
+> NEEDS VALIDATION ON COPILOT MACHINE for phases 4b, 4c, 4d, 5, 5b, 6.
 
 Run:
-    pytest tests/integration/test_opencode.py -v
-    pytest tests/integration/test_opencode.py -v -s    # stream agent output
-    pytest tests/integration/test_opencode.py -v -x    # stop at first failure
+    pytest tests/integration/test_copilot.py -v
+    pytest tests/integration/test_copilot.py -v -s    # stream agent output
+    pytest tests/integration/test_copilot.py -v -x    # stop at first failure
 """
 
+import json as _json
 import os
 import re
 import shutil
@@ -40,11 +44,11 @@ from .harness import (
     warn_if_slow,
 )
 
-# ── Skip entire module if opencode is not on PATH ────────────────────────────
+# ── Skip entire module if copilot is not on PATH ──────────────────────────────
 
 pytestmark = pytest.mark.skipif(
-    not shutil.which("opencode"),
-    reason="opencode not installed / not on PATH",
+    not shutil.which("copilot"),
+    reason="copilot CLI not installed / not on PATH",
 )
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -54,39 +58,56 @@ TIMEOUT_LONG = 120  # agent-mediated operations may be slow
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 VALIDATE_SCRIPT = REPO_ROOT / "modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
-# ANSI escape code pattern (opencode emits coloured output by default)
+# Phase flags: set to True once live-validated on a Copilot machine.
+# Until then, agent-mediated phases are skipped with a clear reason.
+# > NEEDS VALIDATION ON COPILOT MACHINE
+_COPILOT_SKILL_INVOCATION_VALIDATED = False
+SKIP_REASON_SKILL = (
+    "NEEDS VALIDATION ON COPILOT MACHINE: "
+    "Copilot CLI skill invocation (/skill-name) is unconfirmed. "
+    "Set _COPILOT_SKILL_INVOCATION_VALIDATED=True once confirmed live."
+)
+
+# ANSI escape code pattern (precaution — unknown whether copilot emits them in --silent mode)
 _ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[mK]")
 
 
 def _clean(text: str) -> str:
-    """Strip ANSI escape codes from opencode output for reliable assertions."""
+    """Strip ANSI escape codes from output for reliable assertions."""
     return _ANSI_ESCAPE.sub("", text)
 
 
-def _opencode_run(*args) -> list:
-    """Return an ``opencode run <prompt>`` command list.
+def _copilot_run(*args) -> list:
+    """Return a ``copilot --prompt '<prompt>' --allow-all-tools --silent`` command list.
 
-    Prompt is passed as a positional argument, not via stdin.
-    Additional args (flags) are inserted before the prompt.
+    Prompt is passed as a flag value. Additional args (flags) are appended.
+
+    > NEEDS VALIDATION ON COPILOT MACHINE: confirm that --allow-all-tools --silent
+    > suppress all interactive prompts and extra output.
     """
-    return ["opencode", "run"] + list(args)
+    cmd = ["copilot", "--allow-all-tools", "--silent"]
+    if args:
+        cmd += ["--prompt"] + list(args)
+    return cmd
 
 
 # ── Test class ────────────────────────────────────────────────────────────────
 
 
-class TestOpenCodeJourney:
+class TestCopilotJourney:
     """
-    Single class covering all phases of the OpenCode integration journey.
+    Single class covering all phases of the GitHub Copilot CLI integration journey.
 
     The class-scoped journey fixture:
-      - Creates a shared temp directory with git init.
-      - Builds clean_env (CLAUDECODE / CLAUDE_CODE_ENTRYPOINT stripped,
-        OPENCODE=1 injected for detect_tool detection in direct invocations).
+      - Creates a shared temp directory (with git init — unknown if required).
+      - Builds clean_env (CLAUDECODE / CLAUDE_CODE_ENTRYPOINT stripped).
+        NOTE: No COPILOT-specific env var is injected — no env var signal exists.
       - Manually bootstraps the coding-aegis skill into
-        .opencode/skills/coding-aegis/ (auto-discovered by opencode).
+        .github/skills/coding-aegis/ (auto-discovered by copilot).
       - Copies modules/ catalog into test_dir so the skill can access it.
       - Runs teardown (best-effort helloworld uninstall) after all tests.
+
+    Phases 4b–6 skip with SKIP_REASON_SKILL until confirmed on a Copilot machine.
     """
 
     @pytest.fixture(autouse=True, scope="class")
@@ -95,35 +116,36 @@ class TestOpenCodeJourney:
 
         SETUP:
           - Creates a shared temporary test directory with git init.
-          - Builds clean_env: strips Claude Code vars, injects OPENCODE=1.
-          - Copies coding-aegis skill into .opencode/skills/coding-aegis/.
+          - Builds clean_env: strips Claude Code vars. No Copilot env var to inject.
+          - Copies coding-aegis skill into .github/skills/coding-aegis/.
           - Copies modules/ catalog into test_dir.
 
         TEARDOWN:
           - Best-effort helloworld uninstall (if helloworld_installed is True).
           - Temp dir cleanup handled automatically by tmp_path_factory.
         """
-        # Build a clean env: strip Claude Code vars, inject OpenCode signal
+        # Build a clean env: strip Claude Code vars.
+        # No Copilot-specific env var to inject — detection uses path:.github signal.
         clean_env = os.environ.copy()
         clean_env.pop("CLAUDECODE", None)
         clean_env.pop("CLAUDE_CODE_ENTRYPOINT", None)
-        clean_env["OPENCODE"] = "1"
 
         state = {}
         state["repo_root"] = repo_root
-        state["test_dir"] = tmp_path_factory.mktemp("opencode-journey")
+        state["test_dir"] = tmp_path_factory.mktemp("copilot-journey")
         state["clean_env"] = clean_env
         state["helloworld_installed"] = False
 
         test_dir: Path = state["test_dir"]
 
-        # git init required by opencode
+        # git init (unknown if required by copilot — precautionary)
+        # > NEEDS VALIDATION ON COPILOT MACHINE: confirm git init requirement
         run_cli(["git", "init", "-q"], cwd=test_dir)
 
-        # Bootstrap: copy coding-aegis skill into .opencode/skills/coding-aegis/
-        # opencode auto-discovers skills from this path — no install command needed.
-        opencode_skill_dir = test_dir / ".opencode" / "skills" / "coding-aegis"
-        opencode_skill_dir.mkdir(parents=True, exist_ok=True)
+        # Bootstrap: copy coding-aegis skill into .github/skills/coding-aegis/
+        # copilot auto-discovers skills from this path — no install command needed.
+        copilot_skill_dir = test_dir / ".github" / "skills" / "coding-aegis"
+        copilot_skill_dir.mkdir(parents=True, exist_ok=True)
         skill_src = (
             repo_root
             / "modules"
@@ -132,45 +154,48 @@ class TestOpenCodeJourney:
             / "skills"
             / "coding-aegis"
         )
-        shutil.copytree(str(skill_src), str(opencode_skill_dir), dirs_exist_ok=True)
+        shutil.copytree(str(skill_src), str(copilot_skill_dir), dirs_exist_ok=True)
 
         # Copy modules/ catalog so the skill can resolve package paths
         pkgs_dest = test_dir / "modules"
         if not pkgs_dest.exists():
             shutil.copytree(str(repo_root / "modules"), str(pkgs_dest))
 
-        state["opencode_skill_dir"] = opencode_skill_dir
+        state["copilot_skill_dir"] = copilot_skill_dir
 
         yield state
 
         # ── TEARDOWN ──────────────────────────────────────────────────────────
-        if state.get("helloworld_installed"):
+        if state.get("helloworld_installed") and _COPILOT_SKILL_INVOCATION_VALIDATED:
             run_cli(
-                _opencode_run("/coding-aegis uninstall helloworld"),
+                _copilot_run("/coding-aegis uninstall helloworld"),
                 cwd=test_dir,
                 timeout=TIMEOUT_LONG,
                 env=clean_env,
             )
 
-        # Explicit cleanup of tool-specific directories so pytest's retained
-        # temp dirs don't pollute subsequent test runs.
-        shutil.rmtree(test_dir / ".opencode", ignore_errors=True)
+        # Explicit cleanup of tool-specific directories.
+        shutil.rmtree(test_dir / ".github", ignore_errors=True)
         (test_dir / "AGENTS.md").unlink(missing_ok=True)
         # Temp dir is cleaned automatically by tmp_path_factory.
 
     # ── Phase 1: Environment & Tool Validation ────────────────────────────
 
     def test_phase1_auth(self, journey):
-        """Phase 1 — opencode run responds and is authenticated."""
+        """Phase 1 — copilot CLI responds and is authenticated.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE: confirm invocation flags and
+        > that AUTH_OK appears in the output.
+        """
         result = run_cli(
-            _opencode_run("Reply with exactly: AUTH_OK"),
+            _copilot_run("Reply with exactly: AUTH_OK"),
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "auth check")
         warn_if_slow(result, label="auth check")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         assert "AUTH_OK" in _clean(result.stdout), (
             f"Expected AUTH_OK in output, got:\n{result.stdout[:2000]}"
         )
@@ -178,11 +203,11 @@ class TestOpenCodeJourney:
     # ── Phase 2: Bootstrap mechanism (no marketplace) ────────────────────
 
     def test_phase2_bootstrap_mechanism(self, journey):
-        """Phase 2 — OpenCode uses file-copy auto-discovery; no manifest required.
+        """Phase 2 — Copilot uses file-copy auto-discovery; no manifest required.
 
         Validates SKILL.md exists at the skill source path and contains the
         required frontmatter fields (name, description). SKILL.md is the entry
-        point that gets copied into .opencode/skills/ for auto-discovery.
+        point that gets copied into .github/skills/ for auto-discovery.
         """
         skill_src = (
             journey["repo_root"]
@@ -201,8 +226,8 @@ class TestOpenCodeJourney:
     # ── Phase 3: Skill discoverability ────────────────────────────────────
 
     def test_phase3_skill_files_present(self, journey):
-        """Phase 3 — expected files present in .opencode/skills/coding-aegis/."""
-        skill_dir: Path = journey["opencode_skill_dir"]
+        """Phase 3 — expected files present in .github/skills/coding-aegis/."""
+        skill_dir: Path = journey["copilot_skill_dir"]
         for filename in (
             "SKILL.md",
             "aegis_lib.py",
@@ -217,10 +242,16 @@ class TestOpenCodeJourney:
     # ── Phase 4: Validate coding-aegis skill ──────────────────────────────
 
     def test_phase4a_detect_tool_direct(self, journey):
-        """Phase 4a — detect_tool.py run directly returns tool=opencode."""
-        import json as _json
+        """Phase 4a — detect_tool.py run directly returns tool=copilot via path:.github.
 
-        skill_dir: Path = journey["opencode_skill_dir"]
+        NOTE: No env var signal exists for Copilot. Detection relies on the
+        path:.github signal — the script must be located under a .github/ directory.
+        The fixture copies the skill to .github/skills/coding-aegis/, so this signal
+        should fire when the script is run from that installed path.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE: confirm path signal fires correctly.
+        """
+        skill_dir: Path = journey["copilot_skill_dir"]
         result = run_cli(
             ["python3", str(skill_dir / "detect_tool.py")],
             env=journey["clean_env"],
@@ -231,55 +262,79 @@ class TestOpenCodeJourney:
             f"No JSON in detect_tool.py output:\n{result.stdout}"
         )
         data = _json.loads(result.stdout[json_start:])
-        assert data.get("tool") == "opencode", (
-            f"detect_tool.py: expected tool='opencode', got {data}"
+        assert data.get("tool") == "copilot", (
+            f"detect_tool.py: expected tool='copilot', got {data}. "
+            f"The path:.github signal requires the script to be inside a .github/ directory."
         )
-        assert len(data.get("signals", [])) > 0, (
-            f"detect_tool.py: expected non-empty signals, got {data}"
+        assert "path:.github" in data.get("signals", []), (
+            f"detect_tool.py: expected 'path:.github' in signals, got {data}"
         )
 
+    @pytest.mark.skipif(
+        not _COPILOT_SKILL_INVOCATION_VALIDATED,
+        reason=SKIP_REASON_SKILL,
+    )
     def test_phase4b_detect_tool_skill(self, journey):
-        """Phase 4b — /coding-aegis detect-tool via agent reports opencode."""
+        """Phase 4b — /coding-aegis detect-tool via agent reports copilot.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE: Copilot skill invocation
+        > (/skill-name syntax) is unconfirmed. Set
+        > _COPILOT_SKILL_INVOCATION_VALIDATED=True once confirmed live.
+        """
         result = run_cli(
-            _opencode_run("/coding-aegis detect-tool"),
+            _copilot_run("/coding-aegis detect-tool"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "detect-tool skill")
         warn_if_slow(result, label="detect-tool skill")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         cleaned = _clean(result.stdout).lower()
-        assert "opencode" in cleaned, (
-            f"detect-tool: expected 'opencode' in output:\n{result.stdout[:2000]}"
+        assert "copilot" in cleaned, (
+            f"detect-tool: expected 'copilot' in output:\n{result.stdout[:2000]}"
         )
 
+    @pytest.mark.skipif(
+        not _COPILOT_SKILL_INVOCATION_VALIDATED,
+        reason=SKIP_REASON_SKILL,
+    )
     def test_phase4c_list(self, journey):
-        """Phase 4c — /coding-aegis list shows helloworld in catalog."""
+        """Phase 4c — /coding-aegis list shows helloworld in catalog.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE
+        """
         result = run_cli(
-            _opencode_run("/coding-aegis list --catalog modules"),
+            _copilot_run("/coding-aegis list --catalog modules"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "skill list")
         warn_if_slow(result, label="skill list")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         assert "helloworld" in _clean(result.stdout).lower(), (
             f"list: expected 'helloworld' in output:\n{result.stdout[:2000]}"
         )
 
+    @pytest.mark.skipif(
+        not _COPILOT_SKILL_INVOCATION_VALIDATED,
+        reason=SKIP_REASON_SKILL,
+    )
     def test_phase4d_show(self, journey):
-        """Phase 4d — /coding-aegis show helloworld returns name, tier, version."""
+        """Phase 4d — /coding-aegis show helloworld returns name, tier, version.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE
+        """
         result = run_cli(
-            _opencode_run("/coding-aegis show helloworld --catalog modules"),
+            _copilot_run("/coding-aegis show helloworld --catalog modules"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "skill show")
         warn_if_slow(result, label="skill show")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         cleaned = _clean(result.stdout).lower()
         assert "helloworld" in cleaned, (
             f"show: expected 'helloworld' in output:\n{result.stdout[:2000]}"
@@ -293,16 +348,21 @@ class TestOpenCodeJourney:
 
     # ── Phase 5: Install & verify helloworld ──────────────────────────────
 
+    @pytest.mark.skipif(
+        not _COPILOT_SKILL_INVOCATION_VALIDATED,
+        reason=SKIP_REASON_SKILL,
+    )
     def test_phase5_install_helloworld(self, journey):
-        """Phase 5 — /coding-aegis install helloworld writes AGENTS.md section
-        and skill directory.
+        """Phase 5 — /coding-aegis install helloworld writes rule and skill files.
 
-        OpenCode delivers rules via AGENTS.md aegis:begin/end markers (same as
-        Codex). Skills install to .opencode/skills/<name>/.
+        Copilot delivers file-scoped rules to .github/instructions/*.instructions.md
+        and skills to .github/skills/<name>/.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE: confirm rule and skill install paths.
         """
         catalog_arg = str(journey["test_dir"] / "modules")
         result = run_cli(
-            _opencode_run(
+            _copilot_run(
                 f"/coding-aegis install helloworld to Project scope --catalog {catalog_arg}"
             ),
             cwd=journey["test_dir"],
@@ -311,16 +371,16 @@ class TestOpenCodeJourney:
         )
         assert_no_timeout(result, "install helloworld")
         warn_if_slow(result, budget_seconds=TIMEOUT_LONG, label="install helloworld")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         cleaned_lower = _clean(result.stdout).lower()
         assert any(kw in cleaned_lower for kw in (
-            "install", "helloworld", "wrote", "created", "agents.md"
+            "install", "helloworld", "wrote", "created"
         )), f"install: expected activity in output:\n{result.stdout[:2000]}"
 
         # Verify installation via validate-install
         v = subprocess.run(
             [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
-             "--catalog", str(REPO_ROOT / "modules"), "--tool", "opencode"],
+             "--catalog", str(REPO_ROOT / "modules"), "--tool", "copilot"],
             capture_output=True, text=True,
             cwd=str(journey["test_dir"]),
         )
@@ -330,51 +390,65 @@ class TestOpenCodeJourney:
 
         journey["helloworld_installed"] = True
 
+    @pytest.mark.skipif(
+        not _COPILOT_SKILL_INVOCATION_VALIDATED,
+        reason=SKIP_REASON_SKILL,
+    )
     def test_phase5b_helloworld_responds(self, journey):
-        """Phase 5b — /helloworld skill returns 'Hello, World'."""
+        """Phase 5b — /helloworld skill returns 'Hello, World'.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE: Copilot skill invocation
+        > syntax (/helloworld) is unconfirmed.
+        """
         result = run_cli(
-            _opencode_run("/helloworld"),
+            _copilot_run("/helloworld"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "invoke helloworld")
         warn_if_slow(result, label="invoke helloworld")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         assert "Hello, World" in _clean(result.stdout), (
             f"helloworld skill: expected 'Hello, World' in output:\n{result.stdout[:2000]}"
         )
 
     # ── Phase 6: Uninstall helloworld ─────────────────────────────────────
 
+    @pytest.mark.skipif(
+        not _COPILOT_SKILL_INVOCATION_VALIDATED,
+        reason=SKIP_REASON_SKILL,
+    )
     def test_phase6_uninstall_helloworld(self, journey):
-        """Phase 6 — /coding-aegis uninstall helloworld removes AGENTS.md
-        section and skill directory.
+        """Phase 6 — /coding-aegis uninstall helloworld removes installed files.
+
+        > NEEDS VALIDATION ON COPILOT MACHINE: confirm uninstall removes both
+        > .github/instructions/ rule files and .github/skills/helloworld/.
         """
         result = run_cli(
-            _opencode_run("/coding-aegis uninstall helloworld"),
+            _copilot_run("/coding-aegis uninstall helloworld"),
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
             env=journey["clean_env"],
         )
         assert_no_timeout(result, "uninstall helloworld")
         warn_if_slow(result, budget_seconds=TIMEOUT_LONG, label="uninstall helloworld")
-        assert_no_quota_error(result, "opencode")
+        assert_no_quota_error(result, "copilot")
         cleaned = _clean(result.stdout)
         assert not any(kw in cleaned for kw in ("not installed", "not found", "Error")), (
             f"uninstall: unexpected error in output:\n{result.stdout[:2000]}"
         )
 
-        # Verify AGENTS.md aegis section is removed
-        agents_md = journey["test_dir"] / "AGENTS.md"
-        if agents_md.exists():
-            text = agents_md.read_text()
-            assert "aegis:begin" not in text or "helloworld" not in text, (
-                f"AGENTS.md still contains helloworld aegis section after uninstall:\n{text[:1000]}"
+        # Verify rule file is removed
+        instructions_dir = journey["test_dir"] / ".github" / "instructions"
+        if instructions_dir.exists():
+            leftover_rules = list(instructions_dir.glob("aegis--helloworld--*"))
+            assert len(leftover_rules) == 0, (
+                f"Rule files still present after uninstall: {leftover_rules}"
             )
 
         # Verify skill directory is removed
-        skill_dir = journey["test_dir"] / ".opencode" / "skills" / "helloworld"
+        skill_dir = journey["test_dir"] / ".github" / "skills" / "helloworld"
         assert not skill_dir.exists(), (
             f"Skill dir still present after uninstall: {skill_dir}"
         )

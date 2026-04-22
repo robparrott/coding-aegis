@@ -13,8 +13,8 @@ Match on the **first word** of the user input after `/coding-aegis`.
 
 **CRITICAL**: The first word is consumed by this dispatch table. Do **NOT** pass it
 as an argument to the script. Only the words/flags that follow the first word are
-forwarded (e.g. `/coding-aegis list --catalog pkgs` → run `aegis-list.py --catalog pkgs`,
-NOT `aegis-list.py list --catalog pkgs`).
+forwarded (e.g. `/coding-aegis list --catalog modules` → run `aegis-list.py --catalog modules`,
+NOT `aegis-list.py list --catalog modules`).
 
 | First word | Script | Required args | Extra args |
 |------------|--------|---------------|------------|
@@ -84,7 +84,7 @@ Where should this package be installed?
 python3 "{skill-dir}/aegis-install.py" <name> --scope <project|user> [extra-args]
 ```
 
-Include any extra args from the user's input (e.g. `--catalog pkgs`).
+Include any extra args from the user's input (e.g. `--catalog modules`).
 Print stdout verbatim. If the script exits non-zero, print stderr verbatim and stop.
 
 ## detect-tool output format

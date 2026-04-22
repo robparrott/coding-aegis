@@ -148,7 +148,7 @@ Rule files use `.mdc` extension for Cursor (not `.md`). Fixed in `coding-aegis-w
   "plugins": [
     {
       "name": "coding-aegis",
-      "path": "./pkgs/bootstrap/coding-aegis"
+      "path": "./modules/bootstrap/coding-aegis"
     }
   ]
 }
@@ -196,9 +196,9 @@ The pytest Phase 2 test validates the manifest file structure only — no CLI ma
 |-------|------|--------|-------|
 | 4.1 | detect_tool direct | `python3 .cursor/skills/coding-aegis/detect_tool.py` | (bash, not agent) |
 | 4.2 | detect-tool skill | `/coding-aegis detect-tool` | base flags |
-| 4.3 | list | `/coding-aegis list --catalog pkgs` | base flags |
-| 4.4 | show | `/coding-aegis show helloworld --catalog pkgs` | base flags |
-| 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` | `--force` |
+| 4.3 | list | `/coding-aegis list --catalog modules` | base flags |
+| 4.4 | show | `/coding-aegis show helloworld --catalog modules` | base flags |
+| 5.1 | install helloworld | `/coding-aegis install helloworld to Project scope --catalog $TEST_DIR/modules` | `--force` |
 | 5.5 | invoke helloworld | `/helloworld` | base flags |
 | 6.1 | uninstall helloworld | `/coding-aegis uninstall helloworld` | `--force` |
 
@@ -207,8 +207,8 @@ Base flags: `cursor-agent -p --output-format text --trust`
 After Phase 5.1, the test also runs `aegis-validate.py` directly (not via agent) to confirm artifacts were written:
 
 ```bash
-python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
-  helloworld --catalog $REPO_ROOT/pkgs --tool cursor
+python3 $REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
+  helloworld --catalog $REPO_ROOT/modules --tool cursor
 ```
 
 Assert: exit code 0.

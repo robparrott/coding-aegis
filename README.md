@@ -4,7 +4,7 @@ Coding agent governance repository — the central catalog and distribution poin
 
 ## Problem
 
-Engineering organizations adopting AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot) need a centralized way to distribute and enforce coding standards, skills, MCP configurations, and governance policies across repositories. Without this, each repo independently configures its tools, leading to inconsistency, duplicated effort, and no mechanism for org-wide governance.
+Engineering organizations adopting AI coding agents (Claude Code, Codex, Cursor, OpenCode, Gemini, GitHub Copilot) need a centralized way to distribute and enforce coding standards, skills, MCP configurations, and governance policies across repositories. Without this, each repo independently configures its tools, leading to inconsistency, duplicated effort, and no mechanism for org-wide governance.
 
 ## Solution
 
@@ -12,7 +12,7 @@ This repository is the catalog and distribution point for coding agent packages 
 
 ## Architecture
 
-Packages are the unit of distribution, organized by [tier](docs/architecture/tier-system.md) in the `pkgs/` directory following a yum/rpm repository model. Tier = directory location; promotion is a directory move via PR.
+Packages are the unit of distribution, organized by [tier](docs/architecture/tier-system.md) in the `modules/` directory following a yum/rpm repository model. Tier = directory location; promotion is a directory move via PR.
 
 | Tier | Enforcement | Behavior |
 |------|-------------|----------|
@@ -25,14 +25,25 @@ The [coding-aegis skill](docs/architecture/coding-aegis.md) is the primary inter
 
 All tools receive equivalent governance via [AGENTS.md as the single source of truth](docs/architecture/AD-9-agents-md-source-of-truth.md), with [modular rule files](docs/architecture/AD-10-modular-guidance-files.md) installed per-package into each tool's native rules directory.
 
+## Supported Tools
+
+| Tool | Status | Bootstrap | Tests |
+|------|--------|-----------|-------|
+| Claude Code | **Fully supported** | Plugin marketplace (`claude plugin marketplace add`) | 10/10 passing |
+| Codex | **Fully supported** | `$skill-installer` from GitHub; `.codex-plugin/plugin.json` manifest | 10/10 passing |
+| Cursor | **Fully supported** | Direct skill copy; `.cursor-plugin/marketplace.json` manifest | 10/10 passing |
+| OpenCode | **Fully supported** | File-copy into `.opencode/skills/`; auto-discovered | 9/10 passing (phase 2 skip) |
+| Gemini | **Supported** | `gemini skills link` from local clone | 10/10 passing on paid tier; quota-skip on free tier |
+| GitHub Copilot | **In progress** | `.github/copilot-instructions.md` | Pending validation on Copilot machine |
+
 ## Assumptions
 
 - **Hosting**: Private GitHub repository accessible to all engineering team members
 - **Claude Code**: Team has access to Claude Code with plugin support
 - **Cursor**: Organization has a Cursor Teams plan (enables Team Marketplace); requires `cursor-cli` installed via Homebrew
-- **OpenCode / Codex / Gemini**: Supported via local skill copy or CLI skill management; no marketplace required
-- **Copilot**: TBD — bootstrap mechanism to be designed later
-- **GitHub Enterprise App**: Required for Cursor private repo access; also required for Codex (installs skills from GitHub)
+- **Codex**: Requires GitHub Enterprise App for private repo skill install via `$skill-installer`
+- **OpenCode / Gemini**: Supported via local skill copy or CLI skill management; no marketplace required
+- **GitHub Enterprise App**: Required for Cursor private repo access; also required for Codex
 
 ## Backlog
 
@@ -78,6 +89,6 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 
 ## Key Directories
 
-- `pkgs/` — The package catalog, organized by tier
+- `modules/` — The package catalog, organized by tier
 - `docs/architecture/` — ADRs and specifications
 - `docs/backlog/` — Phase planning and task tracking

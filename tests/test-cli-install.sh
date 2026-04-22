@@ -8,8 +8,8 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$(dirname "$0")/lib-test-harness.sh"
 
-SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
-CATALOG="$REPO_ROOT/pkgs"
+SKILL_DIR="$REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis"
+CATALOG="$REPO_ROOT/modules"
 TEST_DIR="$(mktemp -d)"
 
 run_py() {

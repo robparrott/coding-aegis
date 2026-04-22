@@ -88,7 +88,7 @@ See [AD-12](AD-12-external-package-references.md) for the full decision.
 
 ### Rules
 
-- Tier is determined by directory location under `pkgs/` — never specified in `pkg.yaml` (see [AD-1](AD-1-package-catalog.md))
+- Tier is determined by directory location under `modules/` — never specified in `pkg.yaml` (see [AD-1](AD-1-package-catalog.md))
 - Skills follow the [Agent Skills Specification](https://agentskills.io/specification): SKILL.md with YAML frontmatter (`name` 1-64 chars lowercase/hyphens, `description` 1-1024 chars)
 
 ## Artifact Types

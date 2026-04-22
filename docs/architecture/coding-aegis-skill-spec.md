@@ -15,10 +15,10 @@ The coding-aegis skill is the primary interface for browsing, installing, and ma
 
 #### Behavior
 
-1. Resolve catalog root: locate the `pkgs/` directory (4 dirs up from skill base directory).
+1. Resolve catalog root: locate the `modules/` directory (4 dirs up from skill base directory).
 2. Scan tier directories in fixed order: `required`, `best-practices`, `optional`, `goodies`.
 3. Skip `bootstrap/` — it is internal infrastructure.
-4. For each tier, Glob for `pkgs/{tier}/*/pkg.yaml`.
+4. For each tier, Glob for `modules/{tier}/*/pkg.yaml`.
 5. Read each `pkg.yaml`. Extract `name`, `version`, `description`; count `artifacts` by type.
 6. Display a table per tier. Empty tiers show "(none)".
 
@@ -49,7 +49,7 @@ Count by type, comma-separated: "2 rules, 1 skill".
 
 #### Behavior
 
-1. Glob for `pkgs/*/{name}/pkg.yaml` across all tier dirs.
+1. Glob for `modules/*/{name}/pkg.yaml` across all tier dirs.
 2. If not found → error: "Package '{name}' not found in the catalog."
 3. Read `pkg.yaml`. Determine tier from path segment.
 4. Check for `README.md` in package directory.

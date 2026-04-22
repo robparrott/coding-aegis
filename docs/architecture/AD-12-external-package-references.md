@@ -4,7 +4,7 @@
 
 ## Context
 
-The catalog currently requires all package content to live physically within `pkgs/<tier>/<name>/`. Teams maintaining skills in their own repos have no way to register them in the governance catalog without duplicating content. This limits adoption — teams want to maintain skills in their own repos with their own CI, versioning, and release lifecycle.
+The catalog currently requires all package content to live physically within `modules/<tier>/<name>/`. Teams maintaining skills in their own repos have no way to register them in the governance catalog without duplicating content. This limits adoption — teams want to maintain skills in their own repos with their own CI, versioning, and release lifecycle.
 
 ## Decision
 
@@ -41,10 +41,10 @@ artifacts:
 
 ### Local directory contents
 
-For an external package, the `pkgs/<tier>/<name>/` directory contains ONLY:
+For an external package, the `modules/<tier>/<name>/` directory contains ONLY:
 
 ```
-pkgs/optional/superlinter-skill/
+modules/optional/superlinter-skill/
 ├── pkg.yaml          # The pointer manifest (with source field)
 └── README.md         # Optional: rationale, review notes
 ```
@@ -57,7 +57,7 @@ Artifact paths in the `artifacts` list are relative to the resolved package root
 
 **Fetch at install time, no persistent cache.**
 
-1. Skill reads `pkg.yaml` from `pkgs/<tier>/<name>/`
+1. Skill reads `pkg.yaml` from `modules/<tier>/<name>/`
 2. Extracts `source.repo`, `source.ref`, `source.path`
 3. Fetches content via GitHub archive API (preferred) or shallow clone (fallback)
 4. Validates that all declared artifact paths exist in the fetched content
@@ -70,7 +70,7 @@ Artifact paths in the `artifacts` list are relative to the resolved package root
 
 ## Governance
 
-The pointer `pkg.yaml` lives in `pkgs/<tier>/<name>/`. Existing CODEOWNERS gates apply:
+The pointer `pkg.yaml` lives in `modules/<tier>/<name>/`. Existing CODEOWNERS gates apply:
 
 - **Adding** an external package requires CODEOWNERS approval for that tier
 - **Promoting** is a directory move PR, gated by the higher tier's CODEOWNERS

@@ -17,7 +17,7 @@ Set variables, strip Claude Code env vars (so `detect_tool.py` does not return `
 
 ```zsh
 export REPO_ROOT=$(pwd)
-export SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+export SKILL_DIR="$REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis"
 export TEST_DIR=$(mktemp -d)
 export GEMINI_MODEL="gemini-3-flash-preview"
 unset CLAUDECODE CLAUDE_CODE_ENTRYPOINT
@@ -171,7 +171,7 @@ echo "$OUTPUT" | grep -iE "install|aegis--helloworld|wrote|created" && echo "PAS
 **Pass (artifacts):** Run from `$TEST_DIR`:
 
 ```zsh
-python3 "$SKILL_DIR/aegis-validate.py" helloworld --catalog "$REPO_ROOT/pkgs" --tool gemini
+python3 "$SKILL_DIR/aegis-validate.py" helloworld --catalog "$REPO_ROOT/modules" --tool gemini
 echo "validate-install exit: $?"
 ```
 

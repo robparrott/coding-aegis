@@ -1,6 +1,6 @@
 # coding-aegis Skill Specification
 
-The primary interface to the governance catalog. Lives in `pkgs/bootstrap/coding-aegis/`.
+The primary interface to the governance catalog. Lives in `modules/bootstrap/coding-aegis/`.
 
 ## Capabilities
 

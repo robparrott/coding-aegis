@@ -86,7 +86,7 @@ tests/integration/
 - Timing: `warn_if_slow` emits a warning at 15s; it does not fail the test.
 - The `claude_ctx` fixture is module-scoped so all phases share one temp directory.
   Fixture teardown handles cleanup even when tests fail.
-- `--catalog pkgs` is passed explicitly to list/show/install prompts to prevent workspace scan.
+- `--catalog modules` is passed explicitly to list/show/install prompts to prevent workspace scan.
 - `--dangerously-skip-permissions` is passed only for write operations (Phases 5–6).
 
 ## Equivalent pytest flags for bash harness variables

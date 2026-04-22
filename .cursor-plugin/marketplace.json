@@ -2,7 +2,7 @@
   "plugins": [
     {
       "name": "coding-aegis",
-      "path": "./pkgs/bootstrap/coding-aegis"
+      "path": "./modules/bootstrap/coding-aegis"
     }
   ]
 }

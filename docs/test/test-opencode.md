@@ -36,7 +36,7 @@ OpenCode auto-discovers skills from `.opencode/skills/` in the project directory
 The test fixture copies the coding-aegis skill into the test dir:
 
 ```python
-skill_src = repo_root / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis"
+skill_src = repo_root / "modules" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis"
 opencode_skill_dir = test_dir / ".opencode" / "skills" / "coding-aegis"
 opencode_skill_dir.mkdir(parents=True, exist_ok=True)
 shutil.copytree(str(skill_src), str(opencode_skill_dir), dirs_exist_ok=True)
@@ -93,9 +93,9 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 | 3 | Skill files present in `.opencode/skills/coding-aegis/` | Fixture-created; assert SKILL.md, aegis_lib.py, etc. |
 | 4a | `detect_tool.py` direct — confirm tool=opencode | Depends on confirmed signal (see §4) |
 | 4b | `/coding-aegis detect-tool` via agent | Assert "opencode" in output |
-| 4c | `/coding-aegis list --catalog pkgs` | Assert "helloworld" in output |
-| 4d | `/coding-aegis show helloworld --catalog pkgs` | Assert name, tier, version |
-| 5 | `/coding-aegis install helloworld to Project scope --catalog $TEST_DIR/pkgs` | Assert AGENTS.md updated + `.opencode/skills/helloworld/` created; then run `aegis-validate.py` |
+| 4c | `/coding-aegis list --catalog modules` | Assert "helloworld" in output |
+| 4d | `/coding-aegis show helloworld --catalog modules` | Assert name, tier, version |
+| 5 | `/coding-aegis install helloworld to Project scope --catalog $TEST_DIR/modules` | Assert AGENTS.md updated + `.opencode/skills/helloworld/` created; then run `aegis-validate.py` |
 | 5b | `/helloworld` | Assert "Hello, World" in output |
 | 6 | `/coding-aegis uninstall helloworld` | Assert AGENTS.md section removed + skill dir deleted |
 

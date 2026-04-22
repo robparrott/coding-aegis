@@ -35,11 +35,11 @@ Replace the monolithic `aegis-catalog.py` with dedicated Python scripts — one 
 
 ### Catalog resolution
 
-The skill is installed remotely (e.g. `~/.codex/skills/coding-aegis/`). The `pkgs/` catalog is not at the script's location. Scripts that need catalog data perform a sparse `git clone` of just `pkgs/` into `.coding-aegis-catalog/` in the current working directory, reused until a 30-second TTL expires.
+The skill is installed remotely (e.g. `~/.codex/skills/coding-aegis/`). The `modules/` catalog is not at the script's location. Scripts that need catalog data perform a sparse `git clone` of just `modules/` into `.coding-aegis-catalog/` in the current working directory, reused until a 30-second TTL expires.
 
 ```
 git clone --depth 1 --filter=blob:none --sparse <repo> .coding-aegis-catalog
-git -C .coding-aegis-catalog sparse-checkout set pkgs/
+git -C .coding-aegis-catalog sparse-checkout set modules/
 ```
 
 A `--catalog PATH` flag overrides this for development and testing.

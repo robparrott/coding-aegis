@@ -15,7 +15,7 @@ Use `--plugin-dir` to load the skill directly from the working tree. Fastest loo
 1. **Launch Claude Code with the plugin directory**
 
    ```
-   claude --plugin-dir ./pkgs/bootstrap/coding-aegis
+   claude --plugin-dir ./modules/bootstrap/coding-aegis
    ```
 
    *Expect:* Claude Code starts with the coding-aegis skill loaded.

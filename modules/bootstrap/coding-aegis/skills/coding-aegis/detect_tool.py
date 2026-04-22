@@ -98,6 +98,15 @@ _SIGNALS = [
     ("path:.opencode",
      lambda env, fp: ".opencode" in fp.parts,
      "opencode"),
+
+    # Copilot CLI: no env var is injected into subprocesses (confirmed: docs + AD research).
+    # Path signal only — .github/skills/<name>/ is the Copilot project-scope install path.
+    # NOTE: Copilot has no invocable skill execution, so this fires only in direct invocations
+    #       or future Copilot CLI versions that gain skill support.
+    # > NEEDS VALIDATION ON COPILOT MACHINE
+    ("path:.github",
+     lambda env, fp: ".github" in fp.parts,
+     "copilot"),
 ]
 
 _DEFAULT_TOOL = "UNKNOWN"

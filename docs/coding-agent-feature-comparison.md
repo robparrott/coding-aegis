@@ -82,7 +82,7 @@ Full coding-aegis support; rules delivered via `AGENTS.md` sections rather than 
 
 - Mechanism: `$skill-installer` built-in skill, invoked agent-mediated:
   ```
-  $skill-installer install --repo {org}/coding-aegis --path pkgs/bootstrap/coding-aegis/skills/coding-aegis
+  $skill-installer install --repo {org}/coding-aegis --path modules/bootstrap/coding-aegis/skills/coding-aegis
   ```
 - Requires GitHub network access (`danger-full-access` sandbox) (confirmed).
 - Only installs from GitHub sources — local filesystem paths are not supported (confirmed).
@@ -259,10 +259,11 @@ Limited support; no skill execution, no MCP. Rules delivered via a single instru
 
 ### coding-aegis install status
 
-- Unverified (no live integration test). Rules-only delivery.
-- Always-on guidance via `AGENTS.md` content rendered into `.github/copilot-instructions.md`.
-- File-scoped instructions via `.github/instructions/` use `applyTo:` (translated from `globs:` in canonical source).
-- No env var detection signal (confirmed — no Copilot-specific vars injected by the runtime). Detection falls back to `__file__` path; Copilot has no skill execution so the script would not run agent-mediated in any case.
+- Integration test written (`tests/integration/test_copilot.py`). Phases 1–4a runnable; phases 4b–6 skip pending validation on a Copilot machine.
+- Rules delivered via `.github/instructions/aegis--{pkg}--{rule}.instructions.md` (file-scoped, `applyTo:` frontmatter) or `.github/copilot-instructions.md` (always-on).
+- No env var detection signal (confirmed — no Copilot-specific vars injected into subprocesses, April 2026). Detection falls back to `path:.github` signal (`__file__` contains `.github`). This is low-confidence; Copilot has no confirmed invocable skill execution today.
+- `rule_ext` is `.instructions.md`; `user_scope_base` is `.copilot`.
+- See [test-copilot.md](../test/test-copilot.md) for known unknowns and validation checklist.
 
 ---
 

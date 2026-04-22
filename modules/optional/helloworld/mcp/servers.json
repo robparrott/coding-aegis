@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "helloworld-demo": {
+      "command": "echo",
+      "args": ["helloworld-mcp-ok"],
+      "description": "Demo MCP server entry for helloworld package validation"
+    }
+  }
+}

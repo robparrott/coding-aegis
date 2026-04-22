@@ -54,7 +54,7 @@ pytestmark = pytest.mark.skipif(
 TIMEOUT_LONG = 60  # install/uninstall/write operations
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
+VALIDATE_SCRIPT = REPO_ROOT / "modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 CLAUDE_COMMON_FLAGS = [
     "--strict-mcp-config",
@@ -94,7 +94,7 @@ class TestClaudeJourney:
           - Creates the shared temporary test directory.
           - Registers the local repo as a Claude plugin marketplace.
           - Installs the coding-aegis plugin into the test project scope.
-          - Creates a pkgs/ symlink so the agent can locate the catalog.
+          - Creates a modules/ symlink so the agent can locate the catalog.
           - Pre-creates .claude/rules and .claude/skills directories.
 
         TEARDOWN (phases 6-7):
@@ -142,9 +142,9 @@ class TestClaudeJourney:
         )
 
         # Catalog symlink so agent can find packages
-        pkgs_link = test_dir / "pkgs"
+        pkgs_link = test_dir / "modules"
         if not pkgs_link.exists():
-            pkgs_link.symlink_to(repo_root / "pkgs")
+            pkgs_link.symlink_to(repo_root / "modules")
 
         # Pre-create .claude directories so the agent can write to them
         scope_dir = test_dir / ".claude"
@@ -245,7 +245,7 @@ class TestClaudeJourney:
         import json as _json
         skill_dir = (
             journey["repo_root"]
-            / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis"
+            / "modules" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis"
         )
         result = run_cli(
             ["python3", str(skill_dir / "detect_tool.py")],
@@ -286,7 +286,7 @@ class TestClaudeJourney:
         """Phase 4c — /coding-aegis list shows helloworld."""
         result = run_cli(
             _claude_p(ALLOWED_TOOLS_RO),
-            prompt="/coding-aegis list --catalog pkgs",
+            prompt="/coding-aegis list --catalog modules",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
         )
@@ -301,7 +301,7 @@ class TestClaudeJourney:
         """Phase 4d — /coding-aegis show helloworld returns name, tier, version."""
         result = run_cli(
             _claude_p(ALLOWED_TOOLS_RO),
-            prompt="/coding-aegis show helloworld --catalog pkgs",
+            prompt="/coding-aegis show helloworld --catalog modules",
             cwd=journey["test_dir"],
             timeout=DEFAULT_TIMEOUT,
         )
@@ -325,7 +325,7 @@ class TestClaudeJourney:
         """Phase 5 — /coding-aegis install helloworld writes rule and skill files."""
         result = run_cli(
             _claude_p("--dangerously-skip-permissions", allowed_tools=ALLOWED_TOOLS_RW),
-            prompt="/coding-aegis install helloworld to Project scope --catalog pkgs",
+            prompt="/coding-aegis install helloworld to Project scope --catalog modules",
             cwd=journey["test_dir"],
             timeout=TIMEOUT_LONG,
         )
@@ -345,7 +345,7 @@ class TestClaudeJourney:
         # Verify installation via validate-install
         v = subprocess.run(
             [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
-             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "claude"],
+             "--catalog", str(REPO_ROOT / "modules"), "--tool", "claude"],
             capture_output=True, text=True,
             cwd=str(journey["test_dir"]),
         )

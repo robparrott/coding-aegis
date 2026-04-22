@@ -13,7 +13,7 @@
       "description": "Browse, install, and manage coding agent governance packages",
       "source": "./",
       "skills": [
-        "./pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+        "./modules/bootstrap/coding-aegis/skills/coding-aegis"
       ]
     }
   ]

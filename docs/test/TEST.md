@@ -29,6 +29,7 @@ All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an 
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
 | Gemini | `test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** | Path bugs fixed 2026-04-22. Phases 1, 3, 4a pass. Phases 4b–6 skip on free-tier quota. Revival tracked in `97z.13`. |
+| Copilot | `test_copilot.py` | 10 | **Not yet validated** | Phases 1, 2, 3, 4a written and runnable. Phases 4b–6 skip (NEEDS_COPILOT_VALIDATION). No env var signal — path:.github fallback only. |
 
 ---
 
@@ -43,6 +44,7 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
 | Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** — path bugs fixed 2026-04-22; phases 4b–6 quota-skip on free tier. Revival tracked in `97z.13`. |
+| Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **Not yet validated** — phases 1–4a runnable; phases 4b–6 skip pending Copilot machine validation. |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
 
@@ -59,8 +61,8 @@ Every tool's pytest class implements exactly these 10 phases. Tools without a ma
 | 3 | skill_files_present / skill_discoverable | coding-aegis skill is installed and its key files are accessible |
 | 4a | detect_tool_direct | `detect_tool.py` run directly (outside the agent) returns the correct tool name and at least one signal |
 | 4b | detect_tool_skill | `/coding-aegis detect-tool` via the agent returns the correct tool name |
-| 4c | list | `/coding-aegis list --catalog pkgs` returns helloworld |
-| 4d | show | `/coding-aegis show helloworld --catalog pkgs` returns name, tier, version |
+| 4c | list | `/coding-aegis list --catalog modules` returns helloworld |
+| 4d | show | `/coding-aegis show helloworld --catalog modules` returns name, tier, version |
 | 5 | install_helloworld | `/coding-aegis install helloworld` writes rule and skill files; verified by `aegis-validate.py` (see below) |
 | 5b | helloworld_responds | `/helloworld` skill responds with `Hello, World` |
 | 6 | uninstall_helloworld | `/coding-aegis uninstall helloworld` removes all installed files cleanly |
@@ -82,7 +84,7 @@ After the agent runs `/coding-aegis install helloworld`, the test verifies the r
 ```python
 v = subprocess.run(
     [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
-     "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "<tool>"],
+     "--catalog", str(REPO_ROOT / "modules"), "--tool", "<tool>"],
     capture_output=True, text=True,
     cwd=str(journey["test_dir"]),
 )
@@ -190,6 +192,7 @@ pytest tests/unit/ -v
 | Gemini | `gemini` | Google account | **Deferred** — free-tier quota exhausts frequently, making tests unreliable for day-to-day dev. See [test-gemini.md](test-gemini.md). |
 | Cursor | `cursor-agent` | Cursor account | After `brew install cursor-cli`, run `xattr -rd com.apple.quarantine $(brew --prefix)/Caskroom/cursor-cli/<version>/` to clear macOS quarantine. See [test-cursor.md §12](test-cursor.md). |
 | OpenCode | `opencode` | Provider API key | `opencode run` requires `git init` in the working directory. |
+| Copilot | `copilot` | `COPILOT_GITHUB_TOKEN` or `GH_TOKEN` | From `github/copilot-cli`. No env var injected into subprocesses — path:.github signal only. Phases 4b–6 skip until skill invocation is confirmed. |
 
 ---
 
@@ -243,7 +246,7 @@ pytest tests/integration/test_codex.py -v --tb=long 2>&1 | tee /tmp/aegis-test.l
 
 ### Test Package
 
-`helloworld` from `pkgs/optional/helloworld/`:
+`helloworld` from `modules/optional/helloworld/`:
 - 1 rule + 1 skill (both artifact types)
 - In the real catalog (available after push for remote tests)
 - No side effects
@@ -274,16 +277,16 @@ If a tool's install mechanism cannot be exercised (e.g. network unavailable, too
 
 ## Coverage Matrix
 
-| Phase | Claude | Codex | Gemini | Cursor | OpenCode |
-|-------|--------|-------|--------|--------|----------|
-| 1 Environment & Tool Validation | done | done | done (deferred) | done | done |
-| 2 Marketplace / Registry Setup | done | N/A | N/A | N/A | N/A |
-| 3 Install coding-aegis Skill | done | done | done (deferred) | done | done |
-| 4 Validate coding-aegis Skill | done | done | done (deferred) | done | done |
-| 5 Install helloworld Package | done | done | done (deferred) | done | done |
-| 6 Uninstall helloworld Package | done | done | done (deferred) | done | done |
-| 7 Full Cleanup | done | done | done (deferred) | done | done |
-| Unit tests | done (31) | — | — | — | — |
+| Phase | Claude | Codex | Gemini | Cursor | OpenCode | Copilot |
+|-------|--------|-------|--------|--------|----------|---------|
+| 1 Environment & Tool Validation | done | done | done (deferred) | done | done | written (unvalidated) |
+| 2 Marketplace / Registry Setup | done | N/A | N/A | N/A | N/A | N/A |
+| 3 Install coding-aegis Skill | done | done | done (deferred) | done | done | written (unvalidated) |
+| 4 Validate coding-aegis Skill | done | done | done (deferred) | done | done | 4a written; 4b–4d skip |
+| 5 Install helloworld Package | done | done | done (deferred) | done | done | written, skip |
+| 6 Uninstall helloworld Package | done | done | done (deferred) | done | done | written, skip |
+| 7 Full Cleanup | done | done | done (deferred) | done | done | written, skip |
+| Unit tests | done (31) | — | — | — | — | — |
 
 ---
 

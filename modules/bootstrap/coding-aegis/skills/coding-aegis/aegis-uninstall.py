@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """coding-aegis uninstall <name> -- remove a package and print markdown summary.
 
-Usage: aegis-uninstall.py <name> [--scope PATH] [--tool TOOL]
+Usage: aegis-uninstall.py <name> [--scope PATH] [--tool TOOL] [--catalog PATH]
 
 Removes all installed artifacts directly. No LLM file-deletion needed.
-Does not need catalog access.
+When --catalog is supplied, reads pkg.yaml to remove all artifact types
+(including mcp, plugin, etc.). Without --catalog, removes rules and skill
+only (backward-compatible behaviour).
 """
 import argparse
 import os
@@ -16,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from aegis_lib import (
     detect_tool, resolve_scope_base, skill_install_dir,
     strip_agents_md_section, rebuild_governance_table,
+    find_package,
     TOOL_PATHS, _die,
 )
 
@@ -28,6 +31,8 @@ def main():
     parser.add_argument("--tool", default=None,
                         choices=["claude", "codex", "cursor", "gemini", "windsurf", "copilot", "opencode"],
                         help="Override auto-detected tool")
+    parser.add_argument("--catalog", default=None,
+                        help="Path to modules/ directory; when provided, removes all artifact types")
     args = parser.parse_args()
 
     name = args.package
@@ -68,6 +73,26 @@ def main():
                 f"  The directory may need manual removal or danger-full-access sandbox mode.",
                 file=sys.stderr,
             )
+
+    # Catalog-based removal: remove non-rule/non-skill artifact types (e.g. mcp)
+    # Only runs when --catalog is supplied to avoid unintended git clones.
+    if args.catalog:
+        pkg, pkg_dir = find_package(Path(args.catalog), name)
+        if pkg is not None:
+            for artifact in pkg.get("artifacts", []):
+                a_type = artifact.get("type")
+                a_path = artifact.get("path")
+                if a_type in ("rule", "agent", "skill") or not a_path:
+                    continue
+                target = scope_base / a_type / Path(a_path).name
+                if target.is_file():
+                    target.unlink()
+                    files_removed.append(str(target))
+                    # Remove parent dir if now empty
+                    try:
+                        target.parent.rmdir()
+                    except OSError:
+                        pass
 
     # Codex + OpenCode: strip aegis:begin/end sections from AGENTS.md
     if tool in ("codex", "opencode"):

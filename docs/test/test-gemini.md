@@ -28,13 +28,13 @@ print('PASS')
 gemini skills link "$SKILL_DIR" --scope workspace --consent
 ```
 
-Where `$SKILL_DIR` is the local path to `pkgs/bootstrap/coding-aegis/skills/coding-aegis`.
+Where `$SKILL_DIR` is the local path to `modules/bootstrap/coding-aegis/skills/coding-aegis`.
 
 Assert: output contains `link\|success\|install`; `gemini skills list` shows `coding-aegis`.
 
 Also requires `git init` in `$TEST_DIR` (Gemini requires a git repo in the working directory).
 
-**No pkgs/ copy needed** — the skill calls `ensure_catalog()` which fetches the catalog from GitHub on first use and caches it in `.coding-aegis-catalog/`. Catalog prompts (list/show/install) do not require a local copy.
+**No modules/ copy needed** — the skill calls `ensure_catalog()` which fetches the catalog from GitHub on first use and caches it in `.coding-aegis-catalog/`. Catalog prompts (list/show/install) do not require a local copy.
 
 ## CLI Invocation Flags
 
@@ -83,8 +83,8 @@ Phase 6.1 (uninstall helloworld) includes a quota fallback: if the agent call re
 After Phase 5.1, the test also runs `aegis-validate.py` directly to confirm artifacts:
 
 ```bash
-python3 $REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
-  helloworld --catalog $REPO_ROOT/pkgs --tool gemini
+python3 $REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py \
+  helloworld --catalog $REPO_ROOT/modules --tool gemini
 ```
 
 Assert: exit code 0.

@@ -154,7 +154,7 @@ $ claude plugin marketplace remove robparrott-coding-aegis
 2. **Copy the skill into your target project**
 
    ```
-   $ SKILL_SRC=/tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis
+   $ SKILL_SRC=/tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis
    $ mkdir -p .cursor/skills
    $ cp -r "$SKILL_SRC" .cursor/skills/coding-aegis
    ```
@@ -199,7 +199,7 @@ Re-clone temporarily, copy the updated skill over the existing one, then remove 
 
 ```
 $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
-$ cp -r /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis .cursor/skills/coding-aegis
+$ cp -r /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis .cursor/skills/coding-aegis
 $ rm -rf /tmp/coding-aegis
 ```
 
@@ -223,7 +223,7 @@ $ rm -rf .cursor/skills/coding-aegis
 From within your project directory, ask Codex to install the skill using its built-in `$skill-installer`:
 
 ```
-$skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/coding-aegis/skills/coding-aegis
+$skill-installer install --repo robparrott/coding-aegis --path modules/bootstrap/coding-aegis/skills/coding-aegis
 ```
 
 The skill installs to `~/.codex/skills/coding-aegis/`. Restart Codex to pick up the new skill.
@@ -260,7 +260,7 @@ Removes the `AGENTS.md` section and skill directory.
 Reinstall the skill from GitHub to pick up updates:
 
 ```
-$skill-installer install --repo robparrott/coding-aegis --path pkgs/bootstrap/coding-aegis/skills/coding-aegis
+$skill-installer install --repo robparrott/coding-aegis --path modules/bootstrap/coding-aegis/skills/coding-aegis
 ```
 
 Restart Codex after updating.
@@ -293,7 +293,7 @@ Restart Codex to unload.
 2. **Copy the skill into your target project**
 
    ```
-   $ SKILL_SRC=/tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis
+   $ SKILL_SRC=/tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis
    $ mkdir -p .opencode/skills
    $ cp -r "$SKILL_SRC" .opencode/skills/coding-aegis
    ```
@@ -338,7 +338,7 @@ Re-clone temporarily, copy the updated skill over the existing one, then remove 
 
 ```
 $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
-$ cp -r /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis .opencode/skills/coding-aegis
+$ cp -r /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis .opencode/skills/coding-aegis
 $ rm -rf /tmp/coding-aegis
 ```
 
@@ -370,13 +370,13 @@ $ rm -rf .opencode/skills/coding-aegis
 
    **User scope** (available in all projects):
    ```
-   $ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+   $ gemini skills link /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis \
      --scope user --consent
    ```
 
    **Workspace scope** (this project only, run from the project directory):
    ```
-   $ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+   $ gemini skills link /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis \
      --scope workspace --consent
    ```
 
@@ -416,7 +416,7 @@ Re-clone temporarily, relink at the same scope, then remove the clone:
 
 ```
 $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
-$ gemini skills link /tmp/coding-aegis/pkgs/bootstrap/coding-aegis/skills/coding-aegis \
+$ gemini skills link /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis \
   --scope user --consent
 $ rm -rf /tmp/coding-aegis
 ```

@@ -5,5 +5,9 @@ author: platform-team
 artifacts:
   - type: rule
     path: rules/helloworld.md
+  - type: rule
+    path: rules/helloworld-scoped.md
   - type: skill
     path: skills/helloworld/SKILL.md
+  - type: mcp
+    path: mcp/servers.json

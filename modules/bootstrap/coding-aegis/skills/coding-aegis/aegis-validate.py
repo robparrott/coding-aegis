@@ -67,7 +67,7 @@ def main():
                         choices=["claude", "codex", "cursor", "gemini", "windsurf",
                                  "copilot", "opencode"],
                         help="Override auto-detected tool")
-    parser.add_argument("--catalog", help="Path to pkgs/ directory (skips git clone)")
+    parser.add_argument("--catalog", help="Path to modules/ directory (skips git clone)")
     args = parser.parse_args()
 
     name = args.package

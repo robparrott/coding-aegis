@@ -35,7 +35,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "$(dirname "$0")/lib-test-harness.sh"
 
 PLUGIN_DIR="$REPO_ROOT/.cursor-plugin"
-SKILL_DIR="$REPO_ROOT/pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+SKILL_DIR="$REPO_ROOT/modules/bootstrap/coding-aegis/skills/coding-aegis"
 TEST_DIR="$(mktemp -d)"
 
 # Cursor installs rules to .cursor/rules/, skills to .cursor/skills/
@@ -111,14 +111,14 @@ test_header "TBD — Cursor plugin CLI install not yet available"
 pass "SKIP: awaiting Cursor CLI plugin install research (wpi.8, wpi.9)"
 
 # Make catalog accessible in test directory
-cp -R "$REPO_ROOT/pkgs" "$TEST_DIR/pkgs"
+cp -R "$REPO_ROOT/modules" "$TEST_DIR/modules"
 
 # ── T3: Use skill — list ─────────────────────────────────────
 section "T3: Use skill — list packages"
 
 test_header "coding-aegis list"
 # Pass local catalog — avoids git clone and is explicit about which catalog to use
-CLI_PROMPT="/coding-aegis list --catalog pkgs"
+CLI_PROMPT="/coding-aegis list --catalog modules"
 RUN_DIR="$TEST_DIR" run_cli "skill list" cursor-agent -p --output-format text
 assert_contains "$LAST_OUTPUT" "helloworld" "list — helloworld found"
 
@@ -127,7 +127,7 @@ section "T4: Use skill — show helloworld"
 
 test_header "coding-aegis show helloworld"
 # Pass local catalog — avoids git clone and is explicit about which catalog to use
-CLI_PROMPT="/coding-aegis show helloworld --catalog pkgs"
+CLI_PROMPT="/coding-aegis show helloworld --catalog modules"
 RUN_DIR="$TEST_DIR" run_cli "skill show" cursor-agent -p --output-format text
 assert_contains "$LAST_OUTPUT" "helloworld" "show — name present"
 assert_contains "$LAST_OUTPUT" "optional" "show — tier present"
@@ -138,7 +138,7 @@ section "T5: Use skill — install helloworld"
 
 test_header "coding-aegis install helloworld"
 # Scope specified in prompt — scope picker can't run in headless mode.
-CLI_PROMPT="/coding-aegis install helloworld to Project scope --catalog pkgs"
+CLI_PROMPT="/coding-aegis install helloworld to Project scope --catalog modules"
 RUN_DIR="$TEST_DIR" run_cli "skill install" cursor-agent -p --output-format text --force
 assert_contains "$LAST_OUTPUT" "install\|aegis--helloworld\|wrote\|created" "install — activity reported"
 

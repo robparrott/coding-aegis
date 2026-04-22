@@ -14,7 +14,7 @@
 | 2 | (no Phase 2 in spec) | — | |
 | 3 | `gemini skills link` installs coding-aegis | PASSED | |
 | 4a | `detect-tool` returns `gemini` + signals | PASSED after fix | See fix #1 below |
-| 4b | `list` returns helloworld within time budget | PASSED (28s) | `--catalog pkgs` required |
+| 4b | `list` returns helloworld within time budget | PASSED (28s) | `--catalog modules` required |
 | 4c | `show helloworld` returns name/tier/version | PASSED (2m34s) | 4 rate-limit retries; output correct |
 | 5 | Install helloworld, verify files + SKILL.md | NOT TESTED | Walkthrough halted — quota exhausted |
 | 5b | helloworld skill responds with Hello World | NOT TESTED | Walkthrough halted — quota exhausted |
@@ -49,9 +49,9 @@ gemini -m "$GEMINI_MODEL" ...
 
 `gemini-2.0-flash` returns HTTP 404 on this account. `gemini-2.5-flash` is the only available model. Pinning prevents the CLI from attempting unavailable models and makes quota burn predictable.
 
-### Fix 4: `--catalog pkgs` added to list/show/install prompts
+### Fix 4: `--catalog modules` added to list/show/install prompts
 
-Required to scope catalog operations to the `pkgs/` directory. Without this, the Gemini CLI scans the entire workspace and times out or returns unexpected results.
+Required to scope catalog operations to the `modules/` directory. Without this, the Gemini CLI scans the entire workspace and times out or returns unexpected results.
 
 ### Fix 5: `assert_not_contains` added for uninstall errors
 

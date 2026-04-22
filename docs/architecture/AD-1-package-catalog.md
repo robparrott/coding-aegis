@@ -4,12 +4,12 @@
 
 ## Decision
 
-Packages are the unit of distribution. The `pkgs/` directory is organized by subdirectories, following the yum/rpm repository model. Each package is a self-contained, named, versioned collection of artifacts (skills, agents, rules, MCP configs, etc.) authored by teams or individuals and curated into this repo via PR.
+Packages are the unit of distribution. The `modules/` directory is organized by subdirectories, following the yum/rpm repository model. Each package is a self-contained, named, versioned collection of artifacts (skills, agents, rules, MCP configs, etc.) authored by teams or individuals and curated into this repo via PR.
 
 ## Structure
 
 ```
-pkgs/
+modules/
 ├── bootstrap/             # entry point — the coding-aegis skill
 │   └── coding-aegis/
 ├── required/              # non-negotiable, auto-installed

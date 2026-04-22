@@ -56,11 +56,11 @@ pytestmark = pytest.mark.skipif(
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 GEMINI_MODEL = "gemini-3-flash-preview"
-SKILL_PATH = "pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+SKILL_PATH = "modules/bootstrap/coding-aegis/skills/coding-aegis"
 TIMEOUT_LONG = 120  # Gemini retries internally; each step can take 60-90s
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-VALIDATE_SCRIPT = REPO_ROOT / "pkgs/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
+VALIDATE_SCRIPT = REPO_ROOT / "modules/bootstrap/coding-aegis/skills/coding-aegis/aegis-validate.py"
 
 
 def _gemini_prompt(*extra_flags) -> list:
@@ -335,7 +335,7 @@ class TestGeminiJourney:
         # Verify installation via validate-install
         v = subprocess.run(
             [sys.executable, str(VALIDATE_SCRIPT), "helloworld",
-             "--catalog", str(REPO_ROOT / "pkgs"), "--tool", "gemini"],
+             "--catalog", str(REPO_ROOT / "modules"), "--tool", "gemini"],
             capture_output=True, text=True,
             cwd=str(journey["test_dir"]),
         )

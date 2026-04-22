@@ -33,7 +33,7 @@ Confirmed by running `env` inside each tool's runtime or by reading tool source 
 | Cursor | `CURSOR_AGENT` | `1` | Injected by Cursor CLI in agent terminal | ✅ Confirmed (community + bug report) |
 | OpenCode | `OPENCODE` | `1` | Injected by `opencode run` into all subprocesses | ✅ Confirmed (v1.4.7, 2026-04-17) |
 | OpenCode | `OPENCODE_PID` | server PID | Secondary signal, always present with `OPENCODE=1` | ✅ Confirmed (v1.4.7, 2026-04-17) |
-| Copilot | *(none)* | — | No Copilot-specific vars; runs in GitHub Actions (`GITHUB_ACTIONS=true`) | ❌ No reliable signal |
+| Copilot | *(none)* | — | No Copilot-specific vars injected into subprocesses (confirmed: GitHub docs Apr 2026). Auth vars (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN`) are config, not agent signals. | ❌ No reliable env signal |
 
 **Notes:**
 - `CODEX_CI=1` is the most reliable Codex signal — it is force-set by the runtime on every
@@ -59,7 +59,7 @@ Used as fallback when env vars are absent (e.g. Copilot or degraded environments
 | OpenCode | `.opencode/skills/<name>/` (project) | `.opencode` | ✅ Confirmed (test output) |
 | Cursor | `~/.cursor/skills/<name>/` (assumed) | `.cursor` | ⚠️ Unverified |
 | Gemini CLI | linked from source path | `.gemini` (if workspace-linked) | ⚠️ Unverified — env var is primary |
-| Copilot | N/A (no skill execution support) | N/A | — |
+| Copilot | `.github/skills/<name>/` (project) | `.github` | ⚠️ Low-confidence — no env var; path signal only. Copilot has no confirmed skill execution. > NEEDS VALIDATION |
 
 ---
 
@@ -95,7 +95,8 @@ Env vars are checked first (process-intrinsic, unambiguous). `__file__` is fallb
 10. __file__ contains .opencode → opencode (path, confirmed)
 11. __file__ contains .cursor → cursor   (path, assumed)
 12. __file__ contains .gemini → gemini   (path, assumed)
-13. default                   → UNKNOWN  (no match)
+13. __file__ contains .github → copilot  (path, low-confidence fallback — no env var exists)
+14. default                   → UNKNOWN  (no match)
 ```
 
 ### Implementation contract
@@ -125,7 +126,7 @@ env CODEX_CI=1 python3 detect_tool.py    # → {"tool":"codex","signals":["env:C
 # Gemini — agent-mediated only (GEMINI_CLI=1 is set by the Gemini runtime)
 ```
 
-Run `detect_tool.py` from the repo source path (`pkgs/bootstrap/coding-aegis/skills/coding-aegis/`),
+Run `detect_tool.py` from the repo source path (`modules/bootstrap/coding-aegis/skills/coding-aegis/`),
 not from an installed location. This makes the test scope-independent.
 
 **Integration detection (T2c) runs inside the actual agent** (`claude -p`, `codex exec`, etc.),
@@ -152,7 +153,7 @@ any scope assumption.
 | cursor | `.cursor` | `skills` | *(none)* | `rule_ext: .mdc` |
 | opencode | `.opencode` | `skills` | *(none)* | `user_scope_base: .config/opencode` |
 | gemini | `.gemini` | `skills` | *(none)* | `skills_base: .gemini` |
-| copilot | `.github` | `skills` | *(none)* | No skill execution — rules delivery only |
+| copilot | `.github` | `skills` | *(none)* | `user_scope_base: .copilot`; `rule_ext: .instructions.md`; file-scoped rules → `.github/instructions/`; always-on → `.github/copilot-instructions.md` |
 
 ---
 

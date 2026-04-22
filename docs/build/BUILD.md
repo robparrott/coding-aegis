@@ -28,7 +28,7 @@ TBD — no tooling implemented yet. Planned commands:
 
 See [Package Format Specification](architecture/package-format.md) for the full `pkg.yaml` schema and artifact types.
 
-1. Create a directory under the appropriate tier in `pkgs/`
+1. Create a directory under the appropriate tier in `modules/`
 2. Add a `pkg.yaml` manifest
 3. Add artifacts (skills, agents, rules, MCP configs)
 4. Validate structure (tooling TBD)

@@ -23,7 +23,7 @@ This repo simultaneously serves as a **Claude Code plugin marketplace**, a **Cur
       "description": "Browse, install, and manage coding agent governance packages",
       "source": "./",
       "skills": [
-        "./pkgs/bootstrap/coding-aegis/skills/coding-aegis"
+        "./modules/bootstrap/coding-aegis/skills/coding-aegis"
       ]
     }
   ]
@@ -45,7 +45,7 @@ This repo simultaneously serves as a **Claude Code plugin marketplace**, a **Cur
 .cursor-plugin/
 └── marketplace.json          # Lists plugins available in this repo
 
-pkgs/bootstrap/coding-aegis/
+modules/bootstrap/coding-aegis/
 ├── .cursor-plugin/
 │   └── plugin.json           # Cursor plugin metadata for coding-aegis
 ├── rules/
@@ -59,13 +59,13 @@ pkgs/bootstrap/coding-aegis/
   "plugins": [
     {
       "name": "coding-aegis",
-      "path": "./pkgs/bootstrap/coding-aegis"
+      "path": "./modules/bootstrap/coding-aegis"
     }
   ]
 }
 ```
 
-`pkgs/bootstrap/coding-aegis/.cursor-plugin/plugin.json`:
+`modules/bootstrap/coding-aegis/.cursor-plugin/plugin.json`:
 ```json
 {
   "name": "coding-aegis",
@@ -101,7 +101,7 @@ pkgs/bootstrap/coding-aegis/
   "version": "1.0.0",
   "description": "Browse, install, and manage coding agent governance packages",
   "author": { "name": "platform-team" },
-  "skills": "./pkgs/bootstrap/coding-aegis/skills/"
+  "skills": "./modules/bootstrap/coding-aegis/skills/"
 }
 ```
 
