@@ -175,11 +175,28 @@ class TestOpenCodeJourney:
             f"Expected AUTH_OK in output, got:\n{result.stdout[:2000]}"
         )
 
-    # ── Phase 2: No marketplace ───────────────────────────────────────────
+    # ── Phase 2: Bootstrap mechanism (no marketplace) ────────────────────
 
-    def test_phase2_no_marketplace(self, journey):
-        """Phase 2 — OpenCode has no plugin marketplace; phase not applicable."""
-        pytest.skip("OpenCode has no plugin marketplace; phase 2 not applicable")
+    def test_phase2_bootstrap_mechanism(self, journey):
+        """Phase 2 — OpenCode uses file-copy auto-discovery; no manifest required.
+
+        Validates SKILL.md exists at the skill source path and contains the
+        required frontmatter fields (name, description). SKILL.md is the entry
+        point that gets copied into .opencode/skills/ for auto-discovery.
+        """
+        skill_src = (
+            journey["repo_root"]
+            / "pkgs" / "bootstrap" / "coding-aegis" / "skills" / "coding-aegis"
+        )
+        skill_md = skill_src / "SKILL.md"
+        assert skill_md.exists(), f"SKILL.md not found at {skill_md}"
+        content = skill_md.read_text()
+        assert "name: coding-aegis" in content, (
+            f"SKILL.md missing 'name: coding-aegis' frontmatter:\n{content[:500]}"
+        )
+        assert "description:" in content, (
+            f"SKILL.md missing 'description:' frontmatter:\n{content[:500]}"
+        )
 
     # ── Phase 3: Skill discoverability ────────────────────────────────────
 

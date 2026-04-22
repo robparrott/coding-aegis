@@ -191,11 +191,24 @@ class TestGeminiJourney:
             f"Expected AUTH_OK in output, got:\n{result.stdout[:2000]}"
         )
 
-    # ── Phase 2: No marketplace ───────────────────────────────────────────
+    # ── Phase 2: Bootstrap mechanism (no marketplace) ────────────────────
 
-    def test_phase2_no_marketplace(self, journey):
-        """Phase 2 — Gemini CLI has no plugin marketplace; phase not applicable."""
-        pytest.skip("Gemini CLI has no plugin marketplace; phase 2 not applicable")
+    def test_phase2_bootstrap_mechanism(self, journey):
+        """Phase 2 — Gemini uses ``gemini skills link``; no manifest file required.
+
+        Validates SKILL.md exists at the skill source path and contains the
+        required frontmatter fields (name, description). SKILL.md is the entry
+        point that ``gemini skills link`` reads to register the skill.
+        """
+        skill_md = journey["skill_dir"] / "SKILL.md"
+        assert skill_md.exists(), f"SKILL.md not found at {skill_md}"
+        content = skill_md.read_text()
+        assert "name: coding-aegis" in content, (
+            f"SKILL.md missing 'name: coding-aegis' frontmatter:\n{content[:500]}"
+        )
+        assert "description:" in content, (
+            f"SKILL.md missing 'description:' frontmatter:\n{content[:500]}"
+        )
 
     # ── Phase 3: Skill discoverability ────────────────────────────────────
 

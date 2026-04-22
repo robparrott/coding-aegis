@@ -89,7 +89,7 @@ No `.opencode/rules/` path exists. `AGENTS.md` is the only delivery target.
 | Phase | What | Notes |
 |-------|------|-------|
 | 1 | Auth — `opencode run 'Reply with: AUTH_OK'` | Confirms binary present and authenticated |
-| 2 | No marketplace — skip or assert no error | No plugin registry for opencode |
+| 2 | Bootstrap mechanism — assert `SKILL.md` present at skill source path with `name: coding-aegis` and `description:` frontmatter | No marketplace; bootstrap is file-copy auto-discovery into `.opencode/skills/` |
 | 3 | Skill files present in `.opencode/skills/coding-aegis/` | Fixture-created; assert SKILL.md, aegis_lib.py, etc. |
 | 4a | `detect_tool.py` direct — confirm tool=opencode | Depends on confirmed signal (see §4) |
 | 4b | `/coding-aegis detect-tool` via agent | Assert "opencode" in output |

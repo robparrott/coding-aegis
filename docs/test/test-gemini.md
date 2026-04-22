@@ -6,9 +6,21 @@
 
 ## Install Mechanisms
 
-### Phase 2 — Marketplace / Registry Setup
+### Phase 2 — Bootstrap Mechanism
 
-Gemini has no separate marketplace registration step. Skip Phase 2 and proceed directly to Phase 3.
+Gemini has no plugin marketplace. The bootstrap mechanism is `gemini skills link` — the skill is registered directly from a local path. Phase 2 validates that `SKILL.md` exists at the skill source path and contains the required frontmatter (`name`, `description`) that `gemini skills link` reads.
+
+```bash
+python3 -c "
+from pathlib import Path
+skill_md = Path('$SKILL_DIR') / 'SKILL.md'
+assert skill_md.exists()
+content = skill_md.read_text()
+assert 'name: coding-aegis' in content
+assert 'description:' in content
+print('PASS')
+"
+```
 
 ### Phase 3 — Install coding-aegis Skill
 
