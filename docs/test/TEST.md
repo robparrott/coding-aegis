@@ -20,15 +20,15 @@ Run all tools at once:
 pytest tests/integration/ -v
 ```
 
-All tools have exactly 10 tests. Tools without a marketplace have phase 2 as an explicit skip.
+All tools have exactly 10 tests. Tools without a marketplace validate the SKILL.md bootstrap mechanism in phase 2 instead.
 
 | Tool | Test file | Tests | Result | Notes |
 |------|-----------|-------|--------|-------|
 | Claude Code | `test_claude.py` | 10 | **10/10 passing** | — |
 | Codex | `test_codex.py` | 10 | **10/10 passing** | Requires push to GitHub first; phase 6 uses `danger-full-access` sandbox |
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
-| OpenCode | `test_opencode.py` | 10 | **9 pass / 1 skip** | Phase 2 skip (no marketplace) |
-| Gemini | `test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** | Path bugs fixed 2026-04-22. Phases 1, 3, 4a pass. Phases 4b–6 skip on free-tier quota. Revival tracked in `97z.13`. |
+| OpenCode | `test_opencode.py` | 10 | **10/10 passing** | Phase 2 validates SKILL.md bootstrap mechanism |
+| Gemini | `test_gemini.py` | 10 | **10/10 passing (paid tier); quota-skip on free tier** | Phase 2 validates SKILL.md bootstrap. Free-tier quota exhausts phases 4b–6; those steps call `pytest.skip`. |
 | Copilot | `test_copilot.py` | 10 | **10/10 passing** | All phases validated 2026-04-22. No env var signal — path:.github only. Steps take 30–40s (Copilot LLM latency); UX budget warnings are expected. |
 
 ---
@@ -42,8 +42,8 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 | Claude Code | [test-claude.md](test-claude.md) | `tests/integration/test_claude.py` | 10 | **10/10 passing** |
 | Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | 10 | **10/10 passing** — phase 6 uses `danger-full-access` to allow skill dir removal |
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
-| OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **9 pass / 1 skip** (phase 2 not applicable) |
-| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **3 pass / 1 skip / 6 quota-skip** — path bugs fixed 2026-04-22; phases 4b–6 quota-skip on free tier. Revival tracked in `97z.13`. |
+| OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **10/10 passing** |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **10/10 passing (paid tier)** — phases 4b–6 quota-skip on free tier; quota exhaustion calls `pytest.skip`, not `pytest.fail`. |
 | Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **10/10 passing** — all phases validated 2026-04-22. Steps take 30–40s (Copilot LLM latency); UX budget warnings are expected and not a defect. |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.

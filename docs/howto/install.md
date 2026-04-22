@@ -440,13 +440,86 @@ $ gemini skills uninstall coding-aegis --scope workspace
 
 ## GitHub Copilot
 
-*Stub — to be authored when Copilot bootstrap mechanism is designed.*
+### Prerequisites
+
+- `copilot` CLI installed from `github/copilot-cli` (`$ copilot --version`)
+- Authenticated (`COPILOT_GITHUB_TOKEN` or `GH_TOKEN` set, or `gh auth login`)
+- `git init` in your target project directory
+
+### Install
+
+1. **Clone the coding-aegis repo**
+
+   ```
+   $ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+   ```
+
+2. **Copy the skill into your target project**
+
+   ```
+   $ SKILL_SRC=/tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis
+   $ mkdir -p .github/skills
+   $ cp -r "$SKILL_SRC" .github/skills/coding-aegis
+   ```
+
+   Copilot auto-discovers skills from `.github/skills/` — no registration command needed.
+
+3. **Remove the clone**
+
+   The installed skill is self-contained. The clone is only needed during setup.
+
+   ```
+   $ rm -rf /tmp/coding-aegis
+   ```
+
+### Verify
+
+In a Copilot session:
+
+```
+/coding-aegis list
+```
+
+*Expect:* Catalog output listing packages by tier.
+
+### Install a package
+
+```
+/coding-aegis install <package-name>
+```
+
+Copilot installs packages as:
+- **Rules**: written to `.github/rules/aegis--<pkg>--<rule>.instructions.md`
+- **Skills**: copied to `.github/skills/<name>/`
+- **MCP**: written to `.github/mcp/<server>.json`
+
+### Uninstall a package
+
+```
+/coding-aegis uninstall <package-name>
+```
+
+### Updating
+
+Re-clone temporarily, copy the updated skill over the existing one, then remove the clone:
+
+```
+$ git clone https://github.com/robparrott/coding-aegis.git /tmp/coding-aegis
+$ cp -r /tmp/coding-aegis/modules/bootstrap/coding-aegis/skills/coding-aegis .github/skills/coding-aegis
+$ rm -rf /tmp/coding-aegis
+```
+
+### Removing
+
+```
+$ rm -rf .github/skills/coding-aegis
+```
 
 ---
 
 ## Cross-tool notes
 
-- **Skill invocation syntax** differs by tool: Claude Code, Cursor, Gemini, and OpenCode use `/skill-name`; Codex uses `$skill-name`
+- **Skill invocation syntax** differs by tool: Claude Code, Cursor, Gemini, OpenCode, and Copilot use `/skill-name`; Codex uses `$skill-name`
 - **Install paths** are auto-detected — the skill places files where each tool discovers them
 - **Catalog access** — fetched automatically from GitHub on first use via `ensure_catalog()`. No local clone required at runtime; the catalog is cached in `.coding-aegis-catalog/` with a 30-second TTL
 - **Rules** are installed as markdown files with `managed-by: coding-aegis` frontmatter (rule-based tools) or as `<!-- aegis:begin/end -->` sections in `AGENTS.md` (Codex, OpenCode)

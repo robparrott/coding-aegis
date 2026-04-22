@@ -32,7 +32,7 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 | Claude Code | **Fully supported** | Plugin marketplace (`claude plugin marketplace add`) | 10/10 passing |
 | Codex | **Fully supported** | `$skill-installer` from GitHub; `.codex-plugin/plugin.json` manifest | 10/10 passing |
 | Cursor | **Fully supported** | Direct skill copy; `.cursor-plugin/marketplace.json` manifest | 10/10 passing |
-| OpenCode | **Fully supported** | File-copy into `.opencode/skills/`; auto-discovered | 9/10 passing (phase 2 skip) |
+| OpenCode | **Fully supported** | File-copy into `.opencode/skills/`; auto-discovered | 10/10 passing |
 | Gemini | **Supported** | `gemini skills link` from local clone | 10/10 passing on paid tier; quota-skip on free tier |
 | GitHub Copilot | **Fully supported** | File-copy into `.github/skills/`; auto-discovered | 10/10 passing |
 
@@ -43,6 +43,7 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 - **Cursor**: Organization has a Cursor Teams plan (enables Team Marketplace); requires `cursor-cli` installed via Homebrew
 - **Codex**: Requires GitHub Enterprise App for private repo skill install via `$skill-installer`
 - **OpenCode / Gemini**: Supported via local skill copy or CLI skill management; no marketplace required
+- **GitHub Copilot**: Requires `copilot` CLI from `github/copilot-cli`; skill auto-discovered from `.github/skills/`
 - **GitHub Enterprise App**: Required for Cursor private repo access; also required for Codex
 
 ## Backlog

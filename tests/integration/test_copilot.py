@@ -424,10 +424,10 @@ class TestCopilotJourney:
             f"uninstall: unexpected error in output:\n{result.stdout[:2000]}"
         )
 
-        # Verify rule files are removed
-        instructions_dir = journey["test_dir"] / ".github" / "instructions"
-        if instructions_dir.exists():
-            leftover_rules = list(instructions_dir.glob("aegis--helloworld--*"))
+        # Verify rule files are removed (.github/rules/ is the install path)
+        rules_dir = journey["test_dir"] / ".github" / "rules"
+        if rules_dir.exists():
+            leftover_rules = list(rules_dir.glob("aegis--helloworld--*"))
             assert len(leftover_rules) == 0, (
                 f"Rule files still present after uninstall: {leftover_rules}"
             )
