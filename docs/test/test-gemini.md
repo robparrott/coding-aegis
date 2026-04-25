@@ -1,6 +1,6 @@
 # Gemini — Test Detail
 
-> **STATUS (2026-04-22)**: Path bugs fixed. Tests run and produce: 3 pass / 1 skip (no marketplace) / 6 quota-skip. Phases 1, 3, 4a pass on free tier. Agent-mediated phases (4b–6) skip gracefully on quota exhaustion. Full pass requires paid Gemini quota — tracked in `97z.13`.
+> **STATUS (2026-04-22)**: Bootstrap switched to `gemini skills install` from GitHub. **10/10 passing** on free tier when quota is available. Agent-mediated phases (4b–6) produce UX budget warnings (50–100s) under quota pressure but complete. Steps that timeout at 120s indicate quota exhaustion — rerun when quota recovers.
 
 > Tool-specific details for the Gemini skill install test. For the full test plan, phase definitions, and pass criteria see [TEST.md](TEST.md).
 

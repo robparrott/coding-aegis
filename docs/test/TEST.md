@@ -28,7 +28,7 @@ All tools have exactly 10 tests. Tools without a marketplace validate the SKILL.
 | Codex | `test_codex.py` | 10 | **10/10 passing** | Requires push to GitHub first; phase 6 uses `danger-full-access` sandbox |
 | Cursor | `test_cursor.py` | 10 | **10/10 passing** | Requires macOS quarantine fix after `brew install cursor-cli`; see [test-cursor.md §12](test-cursor.md) |
 | OpenCode | `test_opencode.py` | 10 | **10/10 passing** | Phase 2 validates SKILL.md bootstrap mechanism |
-| Gemini | `test_gemini.py` | 10 | **10/10 passing (paid tier); quota-skip on free tier** | Phase 2 validates SKILL.md bootstrap. Free-tier quota exhausts phases 4b–6; those steps call `pytest.skip`. |
+| Gemini | `test_gemini.py` | 10 | **10/10 passing** | Phase 2 validates SKILL.md bootstrap. Requires push to GitHub first (`gemini skills install` fetches from remote). Agent phases produce UX budget warnings under quota pressure; steps timeout at 120s when quota is exhausted — rerun when quota recovers. |
 | Copilot | `test_copilot.py` | 10 | **10/10 passing** | All phases validated 2026-04-22. No env var signal — path:.github only. Steps take 30–40s (Copilot LLM latency); UX budget warnings are expected. |
 
 ---
@@ -43,7 +43,7 @@ Each tool has a detail file covering CLI invocation, install mechanisms, tool de
 | Codex | [test-codex.md](test-codex.md) | `tests/integration/test_codex.py` | 10 | **10/10 passing** — phase 6 uses `danger-full-access` to allow skill dir removal |
 | Cursor | [test-cursor.md](test-cursor.md) | `tests/integration/test_cursor.py` | 10 | **10/10 passing** — `cursor-agent 2026.04.16` working after macOS quarantine fix |
 | OpenCode | [test-opencode.md](test-opencode.md) | `tests/integration/test_opencode.py` | 10 | **10/10 passing** |
-| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **10/10 passing (paid tier)** — phases 4b–6 quota-skip on free tier; quota exhaustion calls `pytest.skip`, not `pytest.fail`. |
+| Gemini | [test-gemini.md](test-gemini.md) | `tests/integration/test_gemini.py` | 10 | **10/10 passing** — requires push to GitHub first (`gemini skills install` fetches from remote). UX budget warnings on agent phases under free-tier quota pressure. |
 | Copilot | [test-copilot.md](test-copilot.md) | `tests/integration/test_copilot.py` | 10 | **10/10 passing** — all phases validated 2026-04-22. Steps take 30–40s (Copilot LLM latency); UX budget warnings are expected and not a defect. |
 
 Each tool must have an equivalent install/uninstall lifecycle. This may vary depending on tool capabilities, but the testing scheme and consistency must be reflected in the test script for each tool.
@@ -189,7 +189,7 @@ pytest tests/unit/ -v
 |------|--------|------|-------|
 | Claude Code | `claude` | `claude /login` | — |
 | Codex | `codex` | `codex auth login` | Changes must be pushed to GitHub first — Codex `$skill-installer` installs from GitHub, not local paths. See [test-codex.md](test-codex.md). |
-| Gemini | `gemini` | Google account | **Deferred** — free-tier quota exhausts frequently, making tests unreliable for day-to-day dev. See [test-gemini.md](test-gemini.md). |
+| Gemini | `gemini` | Google account | Changes must be pushed to GitHub first — `gemini skills install` fetches from the remote repo. Free-tier quota exhausts frequently; agent-mediated phases (4b–6) timeout at 120s. Full pass requires paid tier. See [test-gemini.md](test-gemini.md). |
 | Cursor | `cursor-agent` | Cursor account | After `brew install cursor-cli`, run `xattr -rd com.apple.quarantine $(brew --prefix)/Caskroom/cursor-cli/<version>/` to clear macOS quarantine. See [test-cursor.md §12](test-cursor.md). |
 | OpenCode | `opencode` | Provider API key | `opencode run` requires `git init` in the working directory. |
 | Copilot | `copilot` | `COPILOT_GITHUB_TOKEN` or `GH_TOKEN` | From `github/copilot-cli`. No env var injected into subprocesses — path:.github signal only. Catalog commands use natural language prompts (slash-command syntax with `--catalog` flag causes binary-not-found error). |

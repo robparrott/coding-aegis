@@ -58,7 +58,7 @@ Used as fallback when env vars are absent (e.g. Copilot or degraded environments
 | Codex CLI | `.agents/skills/<name>/` (CWD-relative) | `.agents` | ✅ Confirmed (test output) |
 | OpenCode | `.opencode/skills/<name>/` (project) | `.opencode` | ✅ Confirmed (test output) |
 | Cursor | `~/.cursor/skills/<name>/` (assumed) | `.cursor` | ⚠️ Unverified |
-| Gemini CLI | linked from source path | `.gemini` (if workspace-linked) | ⚠️ Unverified — env var is primary |
+| Gemini CLI | `.gemini/skills/<name>/` (workspace-installed copy) | `.gemini` | ✅ Confirmed — env var is primary, path fallback confirmed |
 | Copilot | `.github/skills/<name>/` (project) | `.github` | ⚠️ Low-confidence — no env var; path signal only. Copilot has no confirmed skill execution. > NEEDS VALIDATION |
 
 ---
@@ -68,8 +68,9 @@ Used as fallback when env vars are absent (e.g. Copilot or degraded environments
 1. **Cursor `__file__` path** — `~/.cursor/skills/` is assumed but not confirmed by running
    the skill inside Cursor. `CURSOR_AGENT=1` is the primary signal; `__file__` is fallback.
 
-2. **Gemini `__file__` path** — Gemini links skills from the source path rather than copying
-   to a tool-specific directory. `GEMINI_CLI=1` env var is the primary signal.
+2. **Gemini `__file__` path** — Confirmed. `gemini skills install` copies the skill to
+   `.gemini/skills/coding-aegis/`, so `__file__` contains `.gemini`. `GEMINI_CLI=1` env var
+   is still the primary signal; path detection is the fallback.
 
 3. **`CURSOR_AGENT=1` reliability across Cursor versions** — It regressed once. The fallback
    to `__file__` is important until this stabilises.
