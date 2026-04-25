@@ -1,6 +1,6 @@
 @AGENTS.md
 
-No, really read AGENTS.md. Don't proceed until you have sone that.
+No, really read AGENTS.md. Don't proceed until you have done that.
 
 Next:
 

@@ -1,18 +1,18 @@
 # coding-aegis
 
-Coding agent governance repository — the central catalog and distribution point for coding agent packages across the engineering organization.
+Coding agent governance repository — a central catalog and distribution point for coding agent modules across an engineering organization.
 
 ## Problem
 
-Engineering organizations adopting AI coding agents (Claude Code, Codex, Cursor, OpenCode, Gemini, GitHub Copilot) need a centralized way to distribute and enforce coding standards, skills, MCP configurations, and governance policies across repositories. Without this, each repo independently configures its tools, leading to inconsistency, duplicated effort, and no mechanism for org-wide governance.
+Engineering organizations adopting AI coding agents (Claude Code, Copliot, etc.) need a centralized way to distribute and enforce coding standards, skills, MCP configurations, and governance policies across repositories and teams using coding agent tools. Without this, each repo independently configures its tools, leading to inconsistency, duplicated effort, and providing little mechanism for org-wide governance.
 
 ## Solution
 
-This repository is the catalog and distribution point for coding agent packages — authored by different teams, curated via PR, organized by governance tier. Packages are authored in Claude Code conventions as the [canonical format](docs/architecture/AD-2-canonical-format.md) and adapted to other tools via renderers. Packages can also reference external GitHub repos via [registry pointers](docs/architecture/AD-12-external-package-references.md), keeping content in the source team's repo while the catalog provides curation and tier gating.
+This repository is a catalog and distribution point for coding agent governance — authored by different teams, curated via PR, organized by governance tier. Packages are authored using Claude Code conventions as the [canonical format](docs/architecture/AD-2-canonical-format.md) and adapted to other tools via renderers. Packages can also reference external GitHub repos via [registry pointers](docs/architecture/AD-12-external-package-references.md), keeping content in the source team's repo while the catalog provides curation and tier gating.
 
 ## Architecture
 
-Packages are the unit of distribution, organized by [tier](docs/architecture/tier-system.md) in the `modules/` directory following a yum/rpm repository model. Tier = directory location; promotion is a directory move via PR.
+Modules are the unit of distribution, organized by [tier](docs/architecture/tier-system.md) in the `modules/` directory following a yum/rpm repository model. Tier = directory location; promotion is a directory move via PR.
 
 | Tier | Enforcement | Behavior |
 |------|-------------|----------|
@@ -20,6 +20,8 @@ Packages are the unit of distribution, organized by [tier](docs/architecture/tie
 | `best-practices` | Recommended | Installed by default, opt-out with justification |
 | `optional` | Opt-in | Listed in catalog, not installed by default |
 | `goodies` | None | Available for browsing |
+
+These tier categories are adaptable to your organization's needs.
 
 The [coding-aegis skill](docs/architecture/coding-aegis.md) is the primary interface — it browses the catalog, installs packages, checks status, and manages governance. It uses a [two-layer architecture](docs/architecture/AD-3-two-layer-skill.md): a minimal bootstrap mechanism per tool, and a rich skill that provides the full experience.
 
@@ -36,15 +38,6 @@ All tools receive equivalent governance via [AGENTS.md as the single source of t
 | Gemini | **Supported** | `gemini skills link` from local clone | 10/10 passing on paid tier; quota-skip on free tier |
 | GitHub Copilot | **Fully supported** | File-copy into `.github/skills/`; auto-discovered | 10/10 passing |
 
-## Assumptions
-
-- **Hosting**: Private GitHub repository accessible to all engineering team members
-- **Claude Code**: Team has access to Claude Code with plugin support
-- **Cursor**: Organization has a Cursor Teams plan (enables Team Marketplace); requires `cursor-cli` installed via Homebrew
-- **Codex**: Requires GitHub Enterprise App for private repo skill install via `$skill-installer`
-- **OpenCode / Gemini**: Supported via local skill copy or CLI skill management; no marketplace required
-- **GitHub Copilot**: Requires `copilot` CLI from `github/copilot-cli`; skill auto-discovered from `.github/skills/`
-- **GitHub Enterprise App**: Required for Cursor private repo access; also required for Codex
 
 ## Backlog
 
